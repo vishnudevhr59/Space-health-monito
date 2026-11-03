@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 SPACE HEALTH MONITO — Python AI/ML Health Intelligence Engine
-Microservice running on port 8000, proxied by the Express backend.
+Microservice running on port 5050, proxied by the Express backend.
 Provides Isolation Forest anomaly detection, rolling statistical time-series
 analysis, multivariate Pearson correlation, 5-point Explainable AI (XAI),
-and NASA OSDR / Twins Study baseline calibration.
+contributing indicator attribution, and NASA OSDR / Twins Study calibration.
 """
 
 import http.server
@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
 PORT = 5050
+MODEL_VERSION = "v4.3.0-isolation-forest"
 
 # ---------------------------------------------------------------------------
 # NASA OSDR & TWINS STUDY CALIBRATION DISTRIBUTIONS
@@ -138,6 +139,7 @@ class IsolationTree:
         euler_mascheroni = 0.5772156649
         return 2.0 * (math.log(n - 1) + euler_mascheroni) - (2.0 * (n - 1) / n)
 
+
 class IsolationForestModel:
     def __init__(self, n_trees=50, max_samples=128):
         self.n_trees = n_trees
@@ -176,22 +178,102 @@ class IsolationForestModel:
         anomaly_score = math.pow(2.0, - (avg_path / c_n))
         return round(anomaly_score, 4)
 
-    def evaluate_sample(self, sample: Dict[str, float]) -> Dict[str, Any]:
-        score = self.score(sample)
-        contributions = {}
-        for feat in self.features:
-            norm = NASA_NORMATIVE_BASELINES.get(feat, {"mean": 60, "std": 10})
-            val = sample.get(feat, norm["mean"])
-            z = abs((val - norm["mean"]) / norm["std"]) if norm["std"] else 0
-            contributions[feat] = round(z, 2)
+    def evaluate_sample(self, raw_sample: Dict[str, Any], personalized_baseline: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Processes a telemetry sample, handles missing features via adaptive baseline imputation,
+        calculates Isolation Forest anomaly score, and returns contributing indicators.
+        """
+        if not raw_sample or not isinstance(raw_sample, dict):
+            return {
+                "status": "INSUFFICIENT_DATA",
+                "error": "Sample is empty or invalid",
+                "anomalyScore": 0.5,
+                "isOutlier": False,
+                "contributingIndicators": [],
+            }
 
-        is_anomaly = score >= 0.62  # Standard Isolation Forest threshold
+        sample = dict(raw_sample)
+        # Normalize key aliases
+        if "restingHeartRate" in sample and "heartRate" not in sample:
+            sample["heartRate"] = sample["restingHeartRate"]
+        if "heartRateVariability" in sample and "hrv" not in sample:
+            sample["hrv"] = sample["heartRateVariability"]
+
+        # Track missing features and imputations
+        imputed_features = []
+        sanitized_point = {}
+        for feat in self.features:
+            norm = (personalized_baseline or {}).get(feat) or NASA_NORMATIVE_BASELINES.get(feat, {"mean": 60.0, "std": 8.0, "unit": ""})
+            if feat in sample and sample[feat] is not None:
+                try:
+                    sanitized_point[feat] = float(sample[feat])
+                except (ValueError, TypeError):
+                    sanitized_point[feat] = norm["mean"]
+                    imputed_features.append(feat)
+            else:
+                sanitized_point[feat] = norm["mean"]
+                imputed_features.append(feat)
+
+        # Compute isolation score s(x, n)
+        score = self.score(sanitized_point)
+
+        # Calculate contributing indicators with Z-score deviations and attribution weight
+        contributing_indicators = []
+        feature_z_scores = {}
+        z_squared_sum = 0.0
+
+        for feat in self.features:
+            norm = (personalized_baseline or {}).get(feat) or NASA_NORMATIVE_BASELINES.get(feat, {"mean": 60.0, "std": 8.0, "unit": ""})
+            val = sanitized_point[feat]
+            std = norm.get("std", 1.0) or 1.0
+            mean = norm.get("mean", val)
+            z = round((val - mean) / std, 2)
+            abs_z = abs(z)
+            feature_z_scores[feat] = abs_z
+            z_squared_sum += abs_z ** 2
+
+        for feat in self.features:
+            norm = (personalized_baseline or {}).get(feat) or NASA_NORMATIVE_BASELINES.get(feat, {"mean": 60.0, "std": 8.0, "unit": ""})
+            val = sanitized_point[feat]
+            mean = norm.get("mean", val)
+            std = norm.get("std", 1.0) or 1.0
+            z = round((val - mean) / std, 2)
+            abs_z = abs(z)
+            unit = norm.get("unit", "")
+            
+            # Weight = (z_i^2 / sum(z_j^2)) * 100
+            weight = round((abs_z ** 2 / z_squared_sum * 100.0) if z_squared_sum > 0 else 25.0, 1)
+
+            contributing_indicators.append({
+                "feature": feat,
+                "observedValue": val,
+                "baselineMean": mean,
+                "zScore": z,
+                "absZScore": abs_z,
+                "contributionWeight": weight,
+                "direction": "ELEVATED" if z > 0 else ("REDUCED" if z < 0 else "NOMINAL"),
+                "unit": unit,
+                "isImputed": feat in imputed_features,
+            })
+
+        # Sort indicators by highest contribution
+        contributing_indicators.sort(key=lambda x: x["contributionWeight"], reverse=True)
+
+        is_anomaly = score >= 0.60  # Standard anomaly threshold in isolation trees
+        epistemic_uncertainty = round(0.05 + (len(imputed_features) * 0.15), 2)
+
         return {
+            "status": "ANALYZED",
             "anomalyScore": score,
             "isOutlier": is_anomaly,
-            "featureZScores": contributions,
-            "modelInfo": "Pure-Python Vectorized Isolation Forest (Trees: 50, Sample: 128)",
-            "limitations": "Model evaluates multivariate statistical isolation; does not formulate autonomous clinical diagnoses.",
+            "featureZScores": feature_z_scores,
+            "contributingIndicators": contributing_indicators,
+            "primaryAnomalyDriver": contributing_indicators[0]["feature"] if contributing_indicators else None,
+            "imputedFeaturesCount": len(imputed_features),
+            "epistemicUncertainty": epistemic_uncertainty,
+            "modelVersion": MODEL_VERSION,
+            "modelInfo": f"Pure-Python Vectorized Isolation Forest ({self.n_trees} Trees, Subsample {self.max_samples})",
+            "limitations": "Model computes multi-variate density isolation and statistical anomaly probability; non-diagnostic decision support only.",
         }
 
 # Global singleton model
@@ -223,7 +305,6 @@ def generate_five_point_xai(metric_name: str, observed: float, baseline_mean: fl
     delta = round(observed - baseline_mean, 2)
     direction = "elevated" if delta > 0 else "reduced"
 
-    # Scientific physiological context grounding
     context_map = {
         "heartRate": {
             "mechanism": "Cephalad fluid redistribution reduces lower-body baroreceptor loading, combined with autonomic sympathetic activation post-countermeasure exercise or communication blackout workloads.",
@@ -269,7 +350,7 @@ def generate_five_point_xai(metric_name: str, observed: float, baseline_mean: fl
         "zScore": z_score,
         "confidence": round(min(98.0, max(75.0, 70.0 + abs_z * 8.5)), 1),
         "whatChanged": f"Observed {metric_name} is {direction} by {abs(delta)} {unit} compared to personalized historical resting baseline.",
-        "historicalComparison": f"{abs_z} standard deviations (|Z|) away from the calibrated 30-sol baseline mean of {baseline_mean} {unit}.",
+        "historicalComparison": f"{abs_z} standard deviations (|Z|) away from the calibrated baseline mean of {baseline_mean} {unit}.",
         "whyFlagged": f"Exceeded configured sensitivity threshold (|Z| >= 2.0σ). Multi-variate Isolation Forest confirms statistically unusual combination.",
         "spaceflightContext": ctx["mechanism"],
         "supportingResearch": ctx["reference"],
@@ -332,10 +413,11 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         res = {
             "status": "ONLINE",
             "service": "SPACE HEALTH MONITO Python ML Intelligence Engine",
-            "version": "v4.2.0-nasa-hrp",
+            "version": MODEL_VERSION,
             "runtime": "Python 3.10 native pure-math environment",
             "modelsLoaded": [
                 "IsolationForestEnsemble (50 Trees, Subsample 128)",
+                "ContributingIndicatorsAttributionEngine",
                 "RollingZScoreEngine (Configurable 1.5σ - 3.0σ)",
                 "MultivariatePearsonMatrix (Cross-indicator bivariate couplings)",
                 "NASA OSDR Calibration KnowledgeBase (Twins Study Distributions)",
@@ -349,15 +431,20 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
     def _handle_full_analyze(self, body: Dict[str, Any]):
         telemetry = body.get("telemetry", [])
         threshold = float(body.get("sensitivityThreshold", 2.0))
-        latest = telemetry[-1] if telemetry else {
-            "heartRate": 64,
-            "spo2": 97.6,
-            "bodyTemperature": 36.9,
-            "hrv": 41,
-        }
+        baseline = body.get("astronautBaseline")
 
-        # Run Isolation Forest
-        if_res = ml_isolation_forest.evaluate_sample(latest)
+        if not telemetry:
+            latest = {
+                "heartRate": 64,
+                "spo2": 97.6,
+                "bodyTemperature": 36.9,
+                "hrv": 41,
+            }
+        else:
+            latest = telemetry[-1]
+
+        # Run Isolation Forest with Contributing Indicators Attribution
+        if_res = ml_isolation_forest.evaluate_sample(latest, personalized_baseline=baseline)
 
         # Run multi-parameter deviations
         flagged_anomalies = []
@@ -369,7 +456,7 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         ]
 
         for m_name, val, unit in metrics_checked:
-            norm = NASA_NORMATIVE_BASELINES.get(m_name, {"mean": val, "std": 1.0})
+            norm = (baseline or {}).get(m_name) or NASA_NORMATIVE_BASELINES.get(m_name, {"mean": val, "std": 1.0})
             z = compute_z_score(val, norm["mean"], norm["std"])
             if abs(z) >= threshold:
                 xai = generate_five_point_xai(m_name, val, norm["mean"], norm["std"], z, unit)
@@ -383,41 +470,71 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
             "overallRiskScore": max(12, risk_index),
             "riskClassification": "NOMINAL" if risk_index < 35 else ("ATTENTION" if risk_index < 65 else "PRIORITY REVIEW"),
             "isolationForest": if_res,
+            "contributingIndicators": if_res.get("contributingIndicators", []),
             "sensitivityThreshold": threshold,
             "totalAnalyzed": len(telemetry) or 72,
             "anomaliesDetected": len(flagged_anomalies),
             "explainableAnomalies": flagged_anomalies,
+            "modelVersion": MODEL_VERSION,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.wfile.write(json.dumps(res).encode())
 
     def _handle_anomaly_detection(self, body: Dict[str, Any]):
-        sample = body.get("sample", {})
-        threshold = float(body.get("threshold", 2.0))
-        if_eval = ml_isolation_forest.evaluate_sample(sample)
+        """
+        Dedicated anomaly detection endpoint consuming health telemetry and returning
+        anomaly scores with contributing indicators.
+        """
+        sample = body.get("sample") or body.get("telemetry")
+        if isinstance(sample, list) and sample:
+            sample = sample[-1]
+        elif not sample:
+            sample = body
 
-        # Compute z-scores for all attributes
-        z_scores = {}
-        anomalous_features = []
-        for feat, norm in NASA_NORMATIVE_BASELINES.items():
-            if feat in sample:
-                z = compute_z_score(sample[feat], norm["mean"], norm["std"])
-                z_scores[feat] = z
-                if abs(z) >= threshold:
-                    anomalous_features.append({
-                        "feature": feat,
-                        "value": sample[feat],
-                        "baseline": norm["mean"],
-                        "zScore": z,
-                    })
+        baseline = body.get("baseline")
+        threshold = float(body.get("threshold", 2.0))
+
+        if not sample or not isinstance(sample, dict) or not any(k in sample for k in ["heartRate", "restingHeartRate", "spo2", "bodyTemperature", "hrv"]):
+            self._set_headers(200)
+            self.wfile.write(json.dumps({
+                "status": "INSUFFICIENT_DATA",
+                "message": "Insufficient or missing health indicators in provided telemetry.",
+                "anomalyScore": 0.0,
+                "isOutlier": False,
+                "contributingIndicators": [],
+                "triageLevel": "NOMINAL",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }).encode())
+            return
+
+        if_eval = ml_isolation_forest.evaluate_sample(sample, personalized_baseline=baseline)
+
+        # Determine triage level based on isolation score and threshold
+        score = if_eval.get("anomalyScore", 0.0)
+        contributions = if_eval.get("contributingIndicators", [])
+        significant_drivers = [c for c in contributions if c.get("absZScore", 0) >= threshold]
+
+        if score >= 0.70 or len(significant_drivers) >= 2:
+            triage = "PRIORITY REVIEW"
+        elif score >= 0.58 or len(significant_drivers) >= 1:
+            triage = "ATTENTION"
+        else:
+            triage = "NOMINAL"
 
         self._set_headers(200)
         res = {
-            "isolationForest": if_eval,
+            "status": "SUCCESS",
+            "modelVersion": MODEL_VERSION,
+            "anomalyScore": score,
+            "isOutlier": if_eval.get("isOutlier", False),
+            "triageLevel": triage,
             "threshold": threshold,
-            "zScores": z_scores,
-            "anomalousFeatures": anomalous_features,
-            "triageLevel": "PRIORITY REVIEW" if len(anomalous_features) >= 2 or if_eval["anomalyScore"] > 0.7 else ("ATTENTION" if anomalous_features else "NOMINAL"),
+            "contributingIndicators": contributions,
+            "primaryAnomalyDriver": if_eval.get("primaryAnomalyDriver"),
+            "featureZScores": if_eval.get("featureZScores", {}),
+            "epistemicUncertainty": if_eval.get("epistemicUncertainty", 0.05),
+            "modelInfo": if_eval.get("modelInfo"),
+            "disclaimer": "Analytical anomaly probability based on spaceflight biometrics. Non-diagnostic decision support.",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.wfile.write(json.dumps(res).encode())
@@ -426,7 +543,6 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         telemetry = body.get("telemetry", [])
         window = body.get("window", "7d")
         
-        # Calculate rolling statistics
         hrs = [p.get("heartRate", 60) for p in telemetry] or [58, 60, 62, 59, 64, 63, 61]
         spo2s = [p.get("spo2", 98.4) for p in telemetry] or [98.5, 98.2, 98.0, 98.4, 97.9, 98.1]
 
@@ -458,7 +574,6 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(res).encode())
 
     def _handle_correlation(self, body: Dict[str, Any]):
-        # Default verified spaceflight correlation pairs
         pairs = [
             {
                 "pair": ["Sleep Duration (< 6.5h)", "Next-Day Resting Heart Rate (+6 BPM)"],
@@ -504,7 +619,6 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(res).encode())
 
     def _handle_baseline_comparison(self, body: Dict[str, Any]):
-        # Compare health indicators across 3 distinct spaceflight phases
         comparison = [
             {
                 "indicator": "Resting Heart Rate",
@@ -562,7 +676,11 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
         res = {
             "astronaut": "CDR Sarah Chen",
             "missionDay": 142,
-            "phases": ["Pre-Flight Baseline (L-90 to L-1)", "In-Flight Telemetry (T+142)", "Post-Flight Target (R+30)"],
+            "phases": [
+                "Pre-Flight Baseline (L-90 to L-1)",
+                "In-Flight Telemetry (T+142)",
+                "Post-Flight Target (R+30)",
+            ],
             "comparisons": comparison,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -570,25 +688,18 @@ class SpaceHealthMLHandler(http.server.BaseHTTPRequestHandler):
 
     def _handle_analysis_history(self):
         self._set_headers(200)
-        res = {
-            "records": [
-                {"timestamp": "2026-11-03T14:00:00Z", "riskScore": 24, "anomalies": 1, "triage": "NOMINAL"},
-                {"timestamp": "2026-11-03T10:00:00Z", "riskScore": 31, "anomalies": 2, "triage": "ATTENTION"},
-                {"timestamp": "2026-11-03T06:00:00Z", "riskScore": 22, "anomalies": 0, "triage": "NOMINAL"},
-                {"timestamp": "2026-11-02T22:00:00Z", "riskScore": 28, "anomalies": 1, "triage": "NOMINAL"},
-            ],
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
-        self.wfile.write(json.dumps(res).encode())
+        self.wfile.write(json.dumps({
+            "history": [],
+            "status": "ONLINE",
+            "totalAnalysesLogged": 142,
+        }).encode())
 
-# ---------------------------------------------------------------------------
-# MAIN EXECUTION
-# ---------------------------------------------------------------------------
-def run():
+def run_server():
+    server_address = ("127.0.0.1", PORT)
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), SpaceHealthMLHandler) as httpd:
-        print(f"[SPACE HEALTH MONITO] Python ML Engine active on port {PORT}")
+    with socketserver.TCPServer(server_address, SpaceHealthMLHandler) as httpd:
+        print(f"[SPACE HEALTH ML] Python ML Intelligence Engine active on port {PORT}")
         httpd.serve_forever()
 
 if __name__ == "__main__":
-    run()
+    run_server()

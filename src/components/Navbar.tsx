@@ -1,13 +1,15 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { User, UserRole } from '../types';
-import { UserCheck, ShieldAlert, Bell, Wifi, Activity } from 'lucide-react';
+import { UserCheck, ShieldAlert, Bell, Wifi, Activity, ShieldCheck } from 'lucide-react';
+import { NetworkStatusIndicator } from './NetworkStatusIndicator';
 
 interface NavbarProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
   currentUser: User;
   onOpenAuthModal: () => void;
+  onOpenProvenanceModal: () => void;
   activeAlertCount: number;
 }
 
@@ -16,6 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectTab,
   currentUser,
   onOpenAuthModal,
+  onOpenProvenanceModal,
   activeAlertCount,
 }) => {
   const primaryNavItems = [
@@ -68,14 +71,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           ))}
         </nav>
 
-        {/* Zone 3: Connection Status + Notification Center + User Profile */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Connection Status + Provenance + Notification Center + User Profile */}
+        <div className="flex items-center gap-2.5 shrink-0">
           
-          {/* Connection Indicator */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B1224] border border-[#00E5FF]/20 text-[10px] font-mono text-slate-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#21D4A5] animate-pulse" />
-            <span className="text-[#00E5FF]">DSN T+142d</span>
-          </div>
+          {/* Real-time Dynamic Network / Offline Sync Status */}
+          <NetworkStatusIndicator />
+
+          {/* NASA Provenance Button */}
+          <button
+            onClick={onOpenProvenanceModal}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B1224] hover:bg-[#101B30] border border-[#00E5FF]/30 text-[10px] font-mono text-[#00E5FF] transition-colors cursor-pointer"
+            title="Inspect Official NASA Research Data Provenance"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-[#21D4A5]" />
+            <span className="font-bold">PROVENANCE</span>
+          </button>
 
           {/* Notification Center Icon */}
           <button

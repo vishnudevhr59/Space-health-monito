@@ -1,34 +1,57 @@
 /**
- * Mongoose Schema Definitions for Space Health Monito
- * MongoDB Collections:
- * 1. Users
- * 2. AstronautProfiles
- * 3. HealthMeasurements
- * 4. SleepRecords
- * 5. ActivityRecords
- * 6. RadiationExposureRecords
- * 7. HealthAlerts
- * 8. AIAnalysisResults
- * 9. WellnessAssessments
- * 10. ResearchReferences
+ * SPACE HEALTH MONITO — Data Models & Schemas
+ * Comprehensive definitions for all 14 mission data domains
+ * NASA Space Apps Challenge 2026
  */
 
+export type UserRole =
+  | 'Astronaut'
+  | 'Flight Medical Officer'
+  | 'Mission Health Specialist'
+  | 'Mission Administrator'
+  | 'Administrator'
+  | 'Researcher';
+
+export type ProvenanceType =
+  | 'REAL_RESEARCH_DATA'
+  | 'SIMULATED_TELEMETRY'
+  | 'ILLUSTRATIVE_REFERENCE'
+  | 'USER_ENTERED'
+  | 'AI_GENERATED';
+
+export type DataQualityStatus =
+  | 'VERIFIED'
+  | 'ESTIMATED'
+  | 'SIMULATED'
+  | 'DEGRADED'
+  | 'SENSOR_UNAVAILABLE'
+  | 'MISSING';
+
+export type TriageSeverity = 'Critical' | 'Warning' | 'Advisory' | 'Nominal';
+export type AlertReviewStatus = 'Active' | 'New' | 'Acknowledged' | 'Under Review' | 'Resolved' | 'Dismissed';
+
+// 1. User Account
 export interface IUser {
   id: string;
   email: string;
   passwordHash: string;
   fullName: string;
-  role: 'Astronaut' | 'Mission Health Specialist' | 'Administrator';
-  assignedCrewId?: string;
+  role: UserRole;
+  assignedCrewId?: string; // If astronaut, links to their profile
   badgeNumber: string;
+  department?: string;
+  isActive: boolean;
   createdAt: string;
+  lastLoginAt?: string;
 }
 
+// 2. Astronaut Profile
 export interface IAstronautProfile {
   id: string;
   userId: string;
   name: string;
   callsign: string;
+  missionId: string;
   mission: string;
   destination: string;
   missionDay: number;
@@ -49,26 +72,280 @@ export interface IAstronautProfile {
   radiationMissionLimitMSv: number;
   boneDensityLossRatePercentPerMonth: number;
   currentStatus: 'Nominal' | 'Under Observation' | 'Intervention Required';
+  activeCountermeasures: string[];
+  updatedAt: string;
 }
 
-export interface IHealthMeasurement {
+// 3. Mission
+export interface IMission {
   id: string;
+  name: string;
+  code: string;
+  orbitTarget: string;
+  launchDate: string;
+  projectedReturnDate: string;
+  currentDay: number;
+  crewIds: string[];
+  primaryFlightSurgeonId: string;
+  environmentalTarget: {
+    cabinTempC: { min: number; max: number };
+    humidityPercent: { min: number; max: number };
+    co2MmHg: { max: number };
+    o2Percent: { min: number; max: number };
+  };
+  status: 'In Flight' | 'Pre-Launch' | 'Completed' | 'Aborted';
+}
+
+// 4. Physiological Telemetry
+export interface IPhysiologicalTelemetry {
+  id: string;
+  idempotencyKey?: string;
   astronautId: string;
+  missionId: string;
   timestamp: string;
+  ingestedAt: string;
+  dataSource: string; // e.g., 'BioHarness-V4', 'Cuff-BP-Module', 'PulseOx-Ear'
+  dataQuality: DataQualityStatus;
+  provenance: ProvenanceType;
+  
+  // Cardiovascular
   heartRate: number; // BPM
-  spo2: number; // %
-  bodyTemperature: number; // Celsius
-  bloodPressure: {
+  heartRateVariability?: number; // ms (RMSSD)
+  hrv?: number; // Alias for RMSSD ms
+  bloodPressure?: {
     systolic: number;
     diastolic: number;
   };
-  hrv: number; // ms (Heart Rate Variability - RMSSD)
-  respiratoryRate: number; // breaths/min
-  perfusionIndex: number;
-  isSimulated: boolean;
-  dataQuality: 'High' | 'Degraded' | 'Partial Missing';
+  perfusionIndex?: number;
+  respiratoryRate?: number; // Breaths/min
+  
+  // Oxygenation
+  spo2: number; // %
+  
+  // Thermoregulation
+  bodyTemperature: number; // Celsius
+  temperatureType?: 'Core' | 'Tympanic' | 'Axillary' | 'Skin';
+  
+  // Unit & sensor metadata
+  units: {
+    heartRate: 'BPM';
+    spo2: '%';
+    bodyTemperature: '°C';
+    hrv: 'ms';
+  };
+  sensorQualityScore?: number; // 0-100
+  isOutlier?: boolean;
 }
 
+// 5. Environmental Telemetry
+export interface IEnvironmentalTelemetry {
+  id: string;
+  missionId: string;
+  habitatSection: 'Crew Quarters' | 'Cupola' | 'Command Module' | 'Exercise Deck' | 'Airlock';
+  timestamp: string;
+  ingestedAt: string;
+  cabinTempC: number;
+  humidityPercent: number;
+  co2MmHg: number;
+  o2Percent: number;
+  cabinPressureKPa: number;
+  traceContaminantIndex: number; // ppm
+  dataQuality: DataQualityStatus;
+  provenance: ProvenanceType;
+}
+
+// 6. Radiation Measurements
+export interface IRadiationMeasurement {
+  id: string;
+  astronautId: string;
+  missionId: string;
+  timestamp: string;
+  ingestedAt: string;
+  sensorLocation: 'Crew Quarters' | 'Cupola' | 'Columbus Lab' | 'Personal Dosimeter';
+  dosimeterSource: 'NASA-CPD-Active' | 'Passive-TLD' | 'Tissue-Equivalent-Proportional-Counter';
+  doseRateMicroSvPerHour: number;
+  accumulatedDailyMSv: number;
+  cumulativeMissionMSv: number;
+  solarActivityIndex: 'Quiet' | 'Minor SPE' | 'Elevated Solar Flux' | 'High GCR';
+  shieldingFactor: number;
+  dataQuality: DataQualityStatus;
+  provenance: ProvenanceType;
+}
+
+// 7. Baseline Profile
+export interface IBaselineProfile {
+  id: string;
+  astronautId: string;
+  phase: 'Pre-Flight Baseline' | 'In-Flight Current' | 'Post-Flight Target';
+  observationPeriod: {
+    startDate: string;
+    endDate: string;
+    solDays: number;
+    sampleCount: number;
+  };
+  metrics: {
+    restingHeartRate: { mean: number; std: number; unit: 'BPM' };
+    spo2: { mean: number; std: number; unit: '%' };
+    bodyTemperature: { mean: number; std: number; unit: '°C' };
+    hrv: { mean: number; std: number; unit: 'ms' };
+    systolicBP: { mean: number; std: number; unit: 'mmHg' };
+    diastolicBP: { mean: number; std: number; unit: 'mmHg' };
+    sleepDurationHours?: { mean: number; std: number; unit: 'Hours' };
+  };
+  calculationMethod: 'Rolling 30-Sol Gaussian Kernel' | 'NASA Normative Calibration' | 'Pre-Launch Clinical Testing';
+  dataSource: string;
+  provenance: ProvenanceType;
+  lastUpdated: string;
+  isLocked: boolean;
+}
+
+// 8. ML Analysis Result
+export interface IMLAnalysisResult {
+  id: string;
+  astronautId: string;
+  timestamp: string;
+  modelVersion: string;
+  sensitivitySettingSigma: number;
+  isolationForestScore: number; // 0.0 - 1.0
+  isIsolatedOutlier: boolean;
+  contributingIndicators: {
+    feature: string;
+    observedValue: number;
+    baselineMean: number;
+    zScore: number;
+    contributionWeight: number; // % contribution to anomaly
+    unit: string;
+  }[];
+  overallRiskScore: number; // 0 - 100
+  triageClassification: 'NOMINAL' | 'ATTENTION' | 'PRIORITY REVIEW';
+  explainableInsights: {
+    id: string;
+    metric: string;
+    triageTier: string;
+    observed: string;
+    baseline: string;
+    delta: string;
+    zScore: number;
+    confidence: number;
+    whatChanged: string;
+    historicalComparison: string;
+    whyFlagged: string;
+    spaceflightContext: string;
+    supportingResearch: string;
+    suggestedNextStep: string;
+  }[];
+  provenance: ProvenanceType;
+  uncertaintyEstimate: number; // 0-1 (model epistemic uncertainty)
+  disclaimer: string;
+}
+
+// 9. Health Alert
+export interface IHealthAlert {
+  id: string;
+  astronautId: string;
+  astronautName: string;
+  missionId?: string;
+  timestamp: string;
+  indicator: string;
+  severity: TriageSeverity;
+  observedValue: string;
+  configuredThreshold: string;
+  title: string;
+  reason: string;
+  suggestedAction: string;
+  status: AlertReviewStatus;
+  dismissalReason?: string;
+  relatedMeasurementId?: string;
+  relatedMLAnalysisId?: string;
+  acknowledgedBy?: string;
+  acknowledgedAt?: string;
+  resolvedAt?: string;
+}
+
+// 10. Notifications
+export interface INotification {
+  id: string;
+  recipientUserId: string;
+  title: string;
+  message: string;
+  severity: 'Info' | 'Warning' | 'Critical';
+  linkTab?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+// 11. Health Report
+export interface IHealthReport {
+  id: string;
+  astronautId: string;
+  generatedByUserId: string;
+  generatedAt: string;
+  title: string;
+  missionDay: number;
+  classification: string;
+  summaryMetrics: {
+    avgHeartRate: number;
+    avgSpO2: number;
+    avgSleepDuration: number;
+    cumulativeRadiationMSv: number;
+    adherenceRatePercent: number;
+  };
+  recommendations: string[];
+  approvedBySurgeon: boolean;
+}
+
+// 12. Research Reference & Provenance
+export interface IResearchReference {
+  id: string;
+  title: string;
+  authors: string;
+  source: string;
+  year: number;
+  url: string;
+  doi?: string;
+  category: 'Cardiovascular' | 'Radiation' | 'Bone & Muscle' | 'Sleep & Circadian' | 'Behavioral';
+  datasetId?: string; // e.g., 'NASA OSDR GL-DS-8841'
+  studyPopulation?: string;
+  sampleSize?: number;
+  variablesUsed: string[];
+  summary: string;
+  keyFindings: string[];
+  provenanceType: ProvenanceType;
+  methodology: string;
+  knownLimitations: string;
+}
+
+// 13. Audit Log
+export interface IAuditLog {
+  id: string;
+  timestamp: string;
+  userId: string;
+  userRole: UserRole;
+  action: string; // e.g., 'INGEST_TELEMETRY', 'ACKNOWLEDGE_ALERT', 'READ_ASTRONAUT_RECORDS'
+  resourceType: string;
+  resourceId?: string;
+  ipAddress?: string;
+  status: 'SUCCESS' | 'DENIED' | 'ERROR';
+  details?: string;
+}
+
+// 14. Device and Sensor Information
+export interface IDeviceSensorInfo {
+  id: string;
+  sensorId: string;
+  name: string;
+  category: 'Cardiovascular' | 'Pulse Oximeter' | 'Dosimeter' | 'Environmental' | 'EEG Sleep Cap';
+  modelNumber: string;
+  firmwareVersion: string;
+  calibrationDate: string;
+  nextCalibrationDue: string;
+  accuracyTolerance: string;
+  batteryPercent: number;
+  status: 'OPERATIONAL' | 'DEGRADED' | 'CALIBRATION_REQUIRED' | 'OFFLINE';
+  assignedAstronautId?: string;
+}
+
+// Sleep and Activity interfaces for backwards compatibility
 export interface ISleepRecord {
   id: string;
   astronautId: string;
@@ -82,6 +359,7 @@ export interface ISleepRecord {
   efficiencyPercent: number;
   qualityRating: 1 | 2 | 3 | 4 | 5;
   subjectiveRestfulness: string;
+  provenance?: ProvenanceType;
 }
 
 export interface IActivityRecord {
@@ -96,63 +374,7 @@ export interface IActivityRecord {
   workloadJoules: number;
   completionRatePercent: number;
   countermeasureAdherence: boolean;
-}
-
-export interface IRadiationExposureRecord {
-  id: string;
-  astronautId: string;
-  timestamp: string;
-  sensorLocation: 'Crew Quarters' | 'Cupola' | 'Columbus Lab' | 'Personal Dosimeter';
-  doseRateMicroSvPerHour: number;
-  accumulatedDailyMSv: number;
-  cumulativeMissionMSv: number;
-  solarActivityIndex: 'Quiet' | 'Minor SPE' | 'Elevated Solar Flux' | 'High GCR';
-  shieldingFactor: number;
-}
-
-export interface IHealthAlert {
-  id: string;
-  astronautId: string;
-  astronautName: string;
-  timestamp: string;
-  indicator: string;
-  severity: 'Critical' | 'Warning' | 'Advisory';
-  observedValue: string;
-  configuredThreshold: string;
-  title: string;
-  reason: string;
-  suggestedAction: string;
-  status: 'Active' | 'Acknowledged' | 'Resolved';
-  acknowledgedBy?: string;
-  acknowledgedAt?: string;
-}
-
-export interface IAIAnalysisResult {
-  id: string;
-  astronautId: string;
-  timestamp: string;
-  overallRiskScore: number; // 0-100
-  riskCategory: 'Low' | 'Moderate' | 'Elevated' | 'Critical';
-  anomaliesDetected: {
-    id: string;
-    metric: string;
-    deviationZScore: number;
-    baselineComparison: string;
-    explanation: string;
-    potentialRisk: string;
-    recommendedCountermeasure: string;
-    evidenceConfidence: number; // 0-1
-  }[];
-  correlations: {
-    factors: [string, string];
-    correlationCoefficient: number;
-    clinicalSignificance: string;
-  }[];
-  trendProjections: {
-    parameter: string;
-    sevenDayProjection: string;
-    trajectory: 'Improving' | 'Stable' | 'Drifting Negative';
-  }[];
+  provenance?: ProvenanceType;
 }
 
 export interface IWellnessAssessment {
@@ -164,18 +386,5 @@ export interface IWellnessAssessment {
   cognitiveFatigue: number; // 1-10
   confinementPerception: number; // 1-10
   socialCohesionScore: number; // 1-10
-  notes?: string;
-}
-
-export interface IResearchReference {
-  id: string;
-  title: string;
-  source: 'NASA Human Research Program' | 'NASA OSDR' | 'NASA GeneLab' | 'NASA Technical Reports (NTRS)' | 'Human Research Roadmap' | 'NASA Space Radiation Research';
-  category: 'Space Radiation' | 'Microgravity & Bone/Muscle' | 'Cardiovascular' | 'Sleep & Behavioral' | 'Immune System';
-  url: string;
-  year: number;
-  authors: string;
-  summary: string;
-  keyFindings: string[];
-  relevanceToAstronautMonitoring: string;
+  notes: string;
 }

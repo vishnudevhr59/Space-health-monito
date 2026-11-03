@@ -1,0 +1,1394 @@
+{
+  "users": [
+    {
+      "id": "usr-1",
+      "email": "sarah.chen@spacehealth.nasa.gov",
+      "passwordHash": "sha256_mock_hash_chen",
+      "fullName": "CDR Sarah Chen, Ph.D.",
+      "role": "Astronaut",
+      "assignedCrewId": "astro-1",
+      "badgeNumber": "EXP-72-CDR",
+      "department": "Flight Operations Directorate",
+      "isActive": true,
+      "createdAt": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "usr-2",
+      "email": "flight.surgeon@spacehealth.nasa.gov",
+      "passwordHash": "sha256_mock_hash_reed",
+      "fullName": "Dr. Evelyn Reed, M.D.",
+      "role": "Flight Medical Officer",
+      "badgeNumber": "JSC-FLTSURG-09",
+      "department": "Space Medicine Operations Division",
+      "isActive": true,
+      "createdAt": "2026-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "usr-3",
+      "email": "flight.director@spacehealth.nasa.gov",
+      "passwordHash": "sha256_mock_hash_vance",
+      "fullName": "Marcus Vance",
+      "role": "Mission Administrator",
+      "badgeNumber": "NASA-ADMIN-01",
+      "department": "Mission Control Center Houston",
+      "isActive": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "usr-4",
+      "email": "researcher.osdr@spacehealth.nasa.gov",
+      "passwordHash": "sha256_mock_hash_osdr",
+      "fullName": "Dr. Kenji Sato",
+      "role": "Researcher",
+      "badgeNumber": "ARC-GENELAB-42",
+      "department": "NASA Ames Space Biosciences",
+      "isActive": true,
+      "createdAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "astronauts": [
+    {
+      "id": "astro-1",
+      "userId": "usr-1",
+      "name": "Sarah Chen",
+      "callsign": "Nova",
+      "missionId": "artemis-gateway-04",
+      "mission": "Artemis Gateway Expedition 04",
+      "destination": "Lunar Orbital Gateway",
+      "missionDay": 142,
+      "totalDaysInSpace": 326,
+      "bloodType": "O-Positive",
+      "age": 38,
+      "heightCm": 172,
+      "weightKg": 64.5,
+      "baselineVitals": {
+        "restingHeartRate": 58,
+        "systolicBP": 114,
+        "diastolicBP": 72,
+        "spo2": 98.4,
+        "bodyTempC": 36.6,
+        "hrvMs": 65
+      },
+      "radiationCumulativeMSv": 78.4,
+      "radiationMissionLimitMSv": 250,
+      "boneDensityLossRatePercentPerMonth": 0.85,
+      "currentStatus": "Nominal",
+      "activeCountermeasures": [
+        "ARED Resistive Loading",
+        "CEVIS Cycle Ergometer",
+        "Dynamic 460nm Lighting"
+      ],
+      "updatedAt": "2026-11-03T17:29:23.033Z"
+    },
+    {
+      "id": "astro-2",
+      "userId": "usr-5",
+      "name": "Liam Davies",
+      "callsign": "Atlas",
+      "missionId": "artemis-gateway-04",
+      "mission": "Artemis Gateway Expedition 04",
+      "destination": "Lunar Orbital Gateway",
+      "missionDay": 142,
+      "totalDaysInSpace": 142,
+      "bloodType": "A-Positive",
+      "age": 42,
+      "heightCm": 184,
+      "weightKg": 81.2,
+      "baselineVitals": {
+        "restingHeartRate": 62,
+        "systolicBP": 118,
+        "diastolicBP": 76,
+        "spo2": 98.1,
+        "bodyTempC": 36.7,
+        "hrvMs": 54
+      },
+      "radiationCumulativeMSv": 82.1,
+      "radiationMissionLimitMSv": 250,
+      "boneDensityLossRatePercentPerMonth": 1.15,
+      "currentStatus": "Under Observation",
+      "activeCountermeasures": [
+        "ARED Resistive Loading",
+        "Bisphosphonate Therapy"
+      ],
+      "updatedAt": "2026-11-03T17:29:23.034Z"
+    },
+    {
+      "id": "astro-3",
+      "userId": "usr-6",
+      "name": "Amina Al-Mansoor",
+      "callsign": "Zenith",
+      "missionId": "artemis-gateway-04",
+      "mission": "Artemis Gateway Expedition 04",
+      "destination": "Lunar Orbital Gateway",
+      "missionDay": 142,
+      "totalDaysInSpace": 215,
+      "bloodType": "B-Positive",
+      "age": 35,
+      "heightCm": 168,
+      "weightKg": 59.8,
+      "baselineVitals": {
+        "restingHeartRate": 55,
+        "systolicBP": 110,
+        "diastolicBP": 70,
+        "spo2": 98.6,
+        "bodyTempC": 36.5,
+        "hrvMs": 72
+      },
+      "radiationCumulativeMSv": 75.3,
+      "radiationMissionLimitMSv": 250,
+      "boneDensityLossRatePercentPerMonth": 0.78,
+      "currentStatus": "Nominal",
+      "activeCountermeasures": [
+        "T2 Treadmill",
+        "ARED Resistive Loading"
+      ],
+      "updatedAt": "2026-11-03T17:29:23.034Z"
+    }
+  ],
+  "missions": [
+    {
+      "id": "artemis-gateway-04",
+      "name": "Artemis Gateway Expedition 04",
+      "code": "GW-EXP-04",
+      "orbitTarget": "Near-Rectilinear Halo Orbit (NRHO)",
+      "launchDate": "2026-06-14T00:00:00.000Z",
+      "projectedReturnDate": "2027-02-14T00:00:00.000Z",
+      "currentDay": 142,
+      "crewIds": [
+        "astro-1",
+        "astro-2",
+        "astro-3"
+      ],
+      "primaryFlightSurgeonId": "usr-2",
+      "environmentalTarget": {
+        "cabinTempC": {
+          "min": 21,
+          "max": 24
+        },
+        "humidityPercent": {
+          "min": 40,
+          "max": 60
+        },
+        "co2MmHg": {
+          "max": 3
+        },
+        "o2Percent": {
+          "min": 20.8,
+          "max": 21.5
+        }
+      },
+      "status": "In Flight"
+    },
+    {
+      "id": "msn-mte-01",
+      "name": "Mars Transit Expedition 01",
+      "code": "MTE-01",
+      "orbitTarget": "Heliocentric Transfer",
+      "launchDate": "2026-11-03T17:37:18.104Z",
+      "projectedReturnDate": "2027-05-02T17:37:18.104Z",
+      "currentDay": 1,
+      "crewIds": [],
+      "primaryFlightSurgeonId": "usr-2",
+      "environmentalTarget": {
+        "cabinTempC": {
+          "min": 21,
+          "max": 24
+        },
+        "humidityPercent": {
+          "min": 40,
+          "max": 60
+        },
+        "co2MmHg": {
+          "max": 3
+        },
+        "o2Percent": {
+          "min": 20.8,
+          "max": 21.5
+        }
+      },
+      "status": "Pre-Launch"
+    },
+    {
+      "id": "msn-mte-01",
+      "name": "Mars Transit Expedition 01",
+      "code": "MTE-01",
+      "orbitTarget": "Heliocentric Transfer",
+      "launchDate": "2026-11-03T17:38:31.849Z",
+      "projectedReturnDate": "2027-05-02T17:38:31.849Z",
+      "currentDay": 1,
+      "crewIds": [],
+      "primaryFlightSurgeonId": "usr-2",
+      "environmentalTarget": {
+        "cabinTempC": {
+          "min": 21,
+          "max": 24
+        },
+        "humidityPercent": {
+          "min": 40,
+          "max": 60
+        },
+        "co2MmHg": {
+          "max": 3
+        },
+        "o2Percent": {
+          "min": 20.8,
+          "max": 21.5
+        }
+      },
+      "status": "Pre-Launch"
+    }
+  ],
+  "telemetry": [
+    {
+      "id": "tel-init-23",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T18:29:23.034Z",
+      "ingestedAt": "2026-11-02T18:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 58,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-22",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T19:29:23.034Z",
+      "ingestedAt": "2026-11-02T19:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 58,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-21",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T20:29:23.034Z",
+      "ingestedAt": "2026-11-02T20:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 55,
+      "spo2": 98.8,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-20",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T21:29:23.034Z",
+      "ingestedAt": "2026-11-02T21:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 52,
+      "spo2": 98.7,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-19",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T22:29:23.034Z",
+      "ingestedAt": "2026-11-02T22:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 52,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-18",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-02T23:29:23.034Z",
+      "ingestedAt": "2026-11-02T23:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 54,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-17",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T00:29:23.034Z",
+      "ingestedAt": "2026-11-03T00:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 53,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-16",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T01:29:23.034Z",
+      "ingestedAt": "2026-11-03T01:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 46,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-15",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T02:29:23.034Z",
+      "ingestedAt": "2026-11-03T02:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 47,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-14",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T03:29:23.034Z",
+      "ingestedAt": "2026-11-03T03:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 51,
+      "spo2": 98.8,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-13",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T04:29:23.034Z",
+      "ingestedAt": "2026-11-03T04:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 52,
+      "spo2": 98.7,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-12",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T05:29:23.034Z",
+      "ingestedAt": "2026-11-03T05:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 50,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 72,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-11",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T06:29:23.034Z",
+      "ingestedAt": "2026-11-03T06:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 52,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-10",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T07:29:23.034Z",
+      "ingestedAt": "2026-11-03T07:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 61,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-9",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T08:29:23.034Z",
+      "ingestedAt": "2026-11-03T08:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 63,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-8",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T09:29:23.034Z",
+      "ingestedAt": "2026-11-03T09:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 61,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-7",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T10:29:23.034Z",
+      "ingestedAt": "2026-11-03T10:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 61,
+      "spo2": 98.8,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-6",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T11:29:23.034Z",
+      "ingestedAt": "2026-11-03T11:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 65,
+      "spo2": 98.7,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-5",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T12:29:23.034Z",
+      "ingestedAt": "2026-11-03T12:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 66,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-4",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T13:29:23.034Z",
+      "ingestedAt": "2026-11-03T13:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 63,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-3",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T14:29:23.034Z",
+      "ingestedAt": "2026-11-03T14:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 61,
+      "spo2": 98,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-2",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T15:29:23.034Z",
+      "ingestedAt": "2026-11-03T15:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 63,
+      "spo2": 98.3,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-1",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T16:29:23.034Z",
+      "ingestedAt": "2026-11-03T16:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 63,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-init-0",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:29:23.034Z",
+      "ingestedAt": "2026-11-03T17:29:23.034Z",
+      "dataSource": "BioHarness-V4-Continuous",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 60,
+      "spo2": 98.8,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 58,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      }
+    },
+    {
+      "id": "tel-1793726995669-183",
+      "idempotencyKey": "a252757b5fe6bfc2baf99f2e72c7385fb5fac010cce4e5d3d7005bd3f461167a",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:29:55.669Z",
+      "ingestedAt": "2026-11-03T17:29:55.669Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 66,
+      "spo2": 98.2,
+      "bodyTemperature": 36.7,
+      "heartRateVariability": 62,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1793727437948-855",
+      "idempotencyKey": "6ddfbdfe2a33d5d285d7668a7305e47a6e948d111d80c4c77751b4ab22aab7d8",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:37:17.948Z",
+      "ingestedAt": "2026-11-03T17:37:17.948Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 64,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 65,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1793727438002-188",
+      "idempotencyKey": "test_idempotency_key_1793727437997",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:37:18.002Z",
+      "ingestedAt": "2026-11-03T17:37:18.002Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 60,
+      "spo2": 98.5,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1793727511742-368",
+      "idempotencyKey": "0bd19e3dfccd5cf225967f74921443bb216dd47adf1f1a158029ae9617d18ce1",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:38:31.742Z",
+      "ingestedAt": "2026-11-03T17:38:31.742Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 64,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 65,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1793727511767-994",
+      "idempotencyKey": "test_idempotency_key_1793727511764",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T17:38:31.767Z",
+      "ingestedAt": "2026-11-03T17:38:31.767Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 60,
+      "spo2": 98.5,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    }
+  ],
+  "environmental": [
+    {
+      "id": "env-01",
+      "missionId": "artemis-gateway-04",
+      "habitatSection": "Crew Quarters",
+      "timestamp": "2026-11-03T17:29:23.034Z",
+      "ingestedAt": "2026-11-03T17:29:23.034Z",
+      "cabinTempC": 22.4,
+      "humidityPercent": 46.2,
+      "co2MmHg": 2.4,
+      "o2Percent": 21,
+      "cabinPressureKPa": 101.3,
+      "traceContaminantIndex": 0.04,
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY"
+    }
+  ],
+  "radiation": [],
+  "baselines": [
+    {
+      "id": "base-chen-preflight",
+      "astronautId": "astro-1",
+      "phase": "Pre-Flight Baseline",
+      "observationPeriod": {
+        "startDate": "2026-03-15T00:00:00.000Z",
+        "endDate": "2026-06-13T00:00:00.000Z",
+        "solDays": 90,
+        "sampleCount": 12960
+      },
+      "metrics": {
+        "restingHeartRate": {
+          "mean": 56,
+          "std": 5.2,
+          "unit": "BPM"
+        },
+        "spo2": {
+          "mean": 98.8,
+          "std": 0.6,
+          "unit": "%"
+        },
+        "bodyTemperature": {
+          "mean": 36.5,
+          "std": 0.22,
+          "unit": "°C"
+        },
+        "hrv": {
+          "mean": 68,
+          "std": 7.5,
+          "unit": "ms"
+        },
+        "systolicBP": {
+          "mean": 112,
+          "std": 6,
+          "unit": "mmHg"
+        },
+        "diastolicBP": {
+          "mean": 70,
+          "std": 5,
+          "unit": "mmHg"
+        },
+        "sleepDurationHours": {
+          "mean": 7.8,
+          "std": 0.6,
+          "unit": "Hours"
+        }
+      },
+      "calculationMethod": "Pre-Launch Clinical Testing",
+      "dataSource": "NASA Johnson Space Center Flight Medicine Baseline Testing",
+      "provenance": "REAL_RESEARCH_DATA",
+      "lastUpdated": "2026-06-13T00:00:00.000Z",
+      "isLocked": true
+    },
+    {
+      "id": "base-chen-inflight",
+      "astronautId": "astro-1",
+      "phase": "In-Flight Current",
+      "observationPeriod": {
+        "startDate": "2026-09-24T00:00:00.000Z",
+        "endDate": "2026-10-24T00:00:00.000Z",
+        "solDays": 30,
+        "sampleCount": 4320
+      },
+      "metrics": {
+        "restingHeartRate": {
+          "mean": 62.4,
+          "std": 6.1,
+          "unit": "BPM"
+        },
+        "spo2": {
+          "mean": 97.8,
+          "std": 0.8,
+          "unit": "%"
+        },
+        "bodyTemperature": {
+          "mean": 36.72,
+          "std": 0.28,
+          "unit": "°C"
+        },
+        "hrv": {
+          "mean": 51.2,
+          "std": 8.2,
+          "unit": "ms"
+        },
+        "systolicBP": {
+          "mean": 116,
+          "std": 7,
+          "unit": "mmHg"
+        },
+        "diastolicBP": {
+          "mean": 74,
+          "std": 5.5,
+          "unit": "mmHg"
+        },
+        "sleepDurationHours": {
+          "mean": 6.8,
+          "std": 0.9,
+          "unit": "Hours"
+        }
+      },
+      "calculationMethod": "Rolling 30-Sol Gaussian Kernel",
+      "dataSource": "Deep Space Network Live Ingestion Stream",
+      "provenance": "SIMULATED_TELEMETRY",
+      "lastUpdated": "2026-10-24T00:00:00.000Z",
+      "isLocked": false
+    },
+    {
+      "id": "base-chen-postflight",
+      "astronautId": "astro-1",
+      "phase": "Post-Flight Target",
+      "observationPeriod": {
+        "startDate": "2027-02-15T00:00:00.000Z",
+        "endDate": "2027-03-17T00:00:00.000Z",
+        "solDays": 30,
+        "sampleCount": 4320
+      },
+      "metrics": {
+        "restingHeartRate": {
+          "mean": 58,
+          "std": 5.5,
+          "unit": "BPM"
+        },
+        "spo2": {
+          "mean": 98.5,
+          "std": 0.7,
+          "unit": "%"
+        },
+        "bodyTemperature": {
+          "mean": 36.6,
+          "std": 0.25,
+          "unit": "°C"
+        },
+        "hrv": {
+          "mean": 65,
+          "std": 7.8,
+          "unit": "ms"
+        },
+        "systolicBP": {
+          "mean": 114,
+          "std": 6.5,
+          "unit": "mmHg"
+        },
+        "diastolicBP": {
+          "mean": 72,
+          "std": 5,
+          "unit": "mmHg"
+        },
+        "sleepDurationHours": {
+          "mean": 7.5,
+          "std": 0.7,
+          "unit": "Hours"
+        }
+      },
+      "calculationMethod": "NASA Normative Calibration",
+      "dataSource": "NASA Human Research Program Standard Rehabilitation Targets",
+      "provenance": "ILLUSTRATIVE_REFERENCE",
+      "lastUpdated": "2026-06-13T00:00:00.000Z",
+      "isLocked": true
+    }
+  ],
+  "mlAnalyses": [],
+  "alerts": [
+    {
+      "id": "alt-01",
+      "astronautId": "astro-1",
+      "astronautName": "CDR Sarah Chen",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-03T16:29:23.034Z",
+      "indicator": "Heart Rate Variability (RMSSD)",
+      "severity": "Warning",
+      "observedValue": "41 ms",
+      "configuredThreshold": "Threshold: 50 ms",
+      "title": "Parasympathetic Autonomic Attenuation",
+      "reason": "Post-EVA recovery latency and sleep deficit below 6.5 hours triggered autonomic fatigue flag.",
+      "suggestedAction": "Prescribe 10-minute guided resonant breathing (0.1 Hz); adjust scheduled EVA timeline.",
+      "status": "Active"
+    }
+  ],
+  "notifications": [],
+  "reports": [],
+  "researchReferences": [
+    {
+      "id": "ref-01",
+      "title": "The NASA Twins Study: A multidimensional analysis of a year-long human spaceflight",
+      "authors": "Garrett-Bakelman, F. E., Darshi, M., Green, S. J., et al.",
+      "source": "Science",
+      "year": 2019,
+      "url": "https://www.science.org/doi/10.1126/science.aau8650",
+      "doi": "10.1126/science.aau8650",
+      "category": "Cardiovascular",
+      "datasetId": "NASA OSDR GL-DS-8841",
+      "studyPopulation": "1 astronaut (340 days on ISS) paired with identical twin control on Earth",
+      "sampleSize": 2,
+      "variablesUsed": [
+        "Resting Heart Rate",
+        "Carotid Artery Wall Thickness",
+        "Cytokines",
+        "Telomere Dynamics"
+      ],
+      "summary": "Identified transient telomere elongation, vascular wall remodeling, and sustained immune pathway activation during long-duration flight.",
+      "keyFindings": [
+        "Post-flight cardiovascular deceleration rate exhibits transient attenuation.",
+        "91.3% of expression changes returned to pre-flight baselines within six months of recovery."
+      ],
+      "provenanceType": "REAL_RESEARCH_DATA",
+      "methodology": "Longitudinal genomics, physiological telemetry, multi-omics profiling",
+      "knownLimitations": "Single identical twin pair study limits broad statistical generalizability."
+    },
+    {
+      "id": "ref-02",
+      "title": "Risk of Bone Fracture due to Spaceflight-induced changes in bone mineral density",
+      "authors": "Sibonga, J. D., Evans, H. J., Sung, H. G., et al.",
+      "source": "NASA Human Research Program Human Research Roadmap",
+      "year": 2021,
+      "url": "https://humanresearchroadmap.nasa.gov/risks/risk.aspx?i=103",
+      "category": "Bone & Muscle",
+      "datasetId": "NASA HRP-BONE-2021",
+      "studyPopulation": "ISS crew members participating in ARED and CEVIS countermeasure protocols",
+      "sampleSize": 84,
+      "variablesUsed": [
+        "Dual-energy X-ray Absorptiometry (DXA)",
+        "Serum Osteocalcin",
+        "Urinary NTx"
+      ],
+      "summary": "Axial mechanical loading via Advanced Resistive Exercise Device (ARED) successfully limits bone mineral density loss to under 1.0% per month.",
+      "keyFindings": [
+        "Unmitigated microgravity produces 1.0% to 1.5% monthly trabecular bone loss.",
+        "ARED countermeasure combined with Vitamin D3 preserves proximal femur geometry."
+      ],
+      "provenanceType": "REAL_RESEARCH_DATA",
+      "methodology": "Longitudinal pre- and post-flight DXA imaging and in-flight biochemical markers",
+      "knownLimitations": "Micro-CT resolution unavailable in-flight; relies on post-landing scans."
+    },
+    {
+      "id": "ref-03",
+      "title": "Increased core body temperature in astronauts during long-duration spaceflight",
+      "authors": "Stahn, A. C., Werner, A., Opatz, O., et al.",
+      "source": "Scientific Reports",
+      "year": 2017,
+      "url": "https://www.nature.com/articles/s41598-017-15560-0",
+      "doi": "10.1038/s41598-017-15560-0",
+      "category": "Cardiovascular",
+      "datasetId": "ThermoLab-ISS-09",
+      "studyPopulation": "11 astronauts performing cycle ergometry aboard the ISS",
+      "sampleSize": 11,
+      "variablesUsed": [
+        "Core Body Temperature",
+        "Skin Temperature",
+        "Heat Flux"
+      ],
+      "summary": "Demonstrated chronic elevation of astronaut core body temperature by ~1.0°C during rest and exercise due to impaired evaporative convection.",
+      "keyFindings": [
+        "Core body temperature shifts upward by ~1.0°C under weightlessness.",
+        "Elevated IL-6 levels suggest a sustained low-grade systemic inflammatory response."
+      ],
+      "provenanceType": "REAL_RESEARCH_DATA",
+      "methodology": "Non-invasive double-sensor forehead heat flux thermometry",
+      "knownLimitations": "Conducted under microgravity forced-air ventilation constraints."
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "aud-1793727511845-103",
+      "timestamp": "2026-11-03T17:38:31.845Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ACCESS_DENIED",
+      "resourceType": "/api/missions",
+      "status": "DENIED",
+      "details": "Role Astronaut lacks permission for POST /api/missions"
+    },
+    {
+      "id": "aud-1793727511768-202",
+      "timestamp": "2026-11-03T17:38:31.768Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1793727511767-994",
+      "status": "SUCCESS",
+      "details": "HR: 60 BPM, SpO2: 98.5% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1793727511743-120",
+      "timestamp": "2026-11-03T17:38:31.743Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1793727511742-368",
+      "status": "SUCCESS",
+      "details": "HR: 64 BPM, SpO2: 98.6% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1793727438099-695",
+      "timestamp": "2026-11-03T17:37:18.099Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ACCESS_DENIED",
+      "resourceType": "/api/missions",
+      "status": "DENIED",
+      "details": "Role Astronaut lacks permission for POST /api/missions"
+    },
+    {
+      "id": "aud-1793727438004-710",
+      "timestamp": "2026-11-03T17:37:18.004Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1793727438002-188",
+      "status": "SUCCESS",
+      "details": "HR: 60 BPM, SpO2: 98.5% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1793727437953-104",
+      "timestamp": "2026-11-03T17:37:17.953Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1793727437948-855",
+      "status": "SUCCESS",
+      "details": "HR: 64 BPM, SpO2: 98.6% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1793726995670-159",
+      "timestamp": "2026-11-03T17:29:55.670Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1793726995669-183",
+      "status": "SUCCESS",
+      "details": "HR: 66 BPM, SpO2: 98.2% for astronaut astro-1"
+    }
+  ],
+  "devices": [
+    {
+      "id": "dev-01",
+      "sensorId": "BIOHARNESS-CDR-01",
+      "name": "Zephyr BioHarness 4 Telemetry Strap",
+      "category": "Cardiovascular",
+      "modelNumber": "BH-400-AEROSPACE",
+      "firmwareVersion": "v2.8.4-flight",
+      "calibrationDate": "2026-05-10T00:00:00.000Z",
+      "nextCalibrationDue": "2026-11-10T00:00:00.000Z",
+      "accuracyTolerance": "±1.0 BPM / ±0.5 ms RMSSD",
+      "batteryPercent": 88,
+      "status": "OPERATIONAL",
+      "assignedAstronautId": "astro-1"
+    },
+    {
+      "id": "dev-02",
+      "sensorId": "PULSE-OX-EAR-04",
+      "name": "Aerospace Reflectance Pulse Oximeter",
+      "category": "Pulse Oximeter",
+      "modelNumber": "OX-55-AERO",
+      "firmwareVersion": "v1.4.1",
+      "calibrationDate": "2026-06-01T00:00:00.000Z",
+      "nextCalibrationDue": "2026-12-01T00:00:00.000Z",
+      "accuracyTolerance": "±0.8% SpO2",
+      "batteryPercent": 94,
+      "status": "OPERATIONAL",
+      "assignedAstronautId": "astro-1"
+    }
+  ],
+  "sleepRecords": [],
+  "activityRecords": [],
+  "wellnessAssessments": []
+}
