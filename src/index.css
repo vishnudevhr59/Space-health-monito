@@ -1,0 +1,108 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-space-primary: #050816;
+  --color-space-secondary: #0B1224;
+  --color-space-card: #101B30;
+  --color-cyan-accent: #00E5FF;
+  --color-electric-blue: #438BFF;
+  --color-space-purple: #8B5CF6;
+  --color-space-success: #21D4A5;
+  --color-space-warning: #FFB547;
+  --color-space-critical: #FF5368;
+}
+
+@layer base {
+  body {
+    background-color: #050816;
+    color: #F1F5F9;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+  code, kbd, samp, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Aerospace Glassmorphism & Atmospheric Lighting */
+.glass-panel {
+  background: rgba(16, 27, 48, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+}
+
+.glass-panel-glow {
+  background: rgba(16, 27, 48, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  box-shadow: 0 0 25px -5px rgba(0, 229, 255, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 30px -5px rgba(0, 229, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Subtle Space Grid and Star Texture Background */
+.space-stars-bg {
+  background-color: #050816;
+  background-image: 
+    radial-gradient(1.5px 1.5px at 20px 30px, #ffffff33, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #00E5FF44, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 90px 40px, #438BFF33, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 160px 120px, #ffffff44, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 230px 190px, #8B5CF633, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 290px 80px, #ffffff22, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 350px 350px;
+}
+
+/* Custom aerospace telemetry scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #050816;
+}
+::-webkit-scrollbar-thumb {
+  background: #101B30;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00E5FF;
+}
+
+@keyframes pulse-cyan {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(0, 229, 255, 0);
+  }
+}
+
+.radar-sweep {
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 229, 255, 0.15) 60deg, transparent 90deg);
+}
+
+/* Clean print styles for health report PDF generation */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

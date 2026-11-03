@@ -1,0 +1,8 @@
+{
+  "name": "SPACE HEALTH MONITO",
+  "description": "AI-Powered Astronaut Health Monitoring & Decision Support System for NASA Space Apps Challenge 2026. Monitoring Human Health Beyond Earth.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
