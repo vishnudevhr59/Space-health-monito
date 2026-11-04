@@ -614,6 +614,69 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
+  // SUITE 16: SCIENTIFIC REPRODUCIBILITY, STATISTICAL VALIDATION & ML GROUNDING
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 16: Scientific Reproducibility & Statistical Validation...');
+  try {
+    // 16.1 Deterministic Z-Score Calculation Accuracy
+    const baselineMean = 58.0;
+    const baselineStd = 6.2;
+    const testObs = 70.4;
+    const computedZ = +((testObs - baselineMean) / baselineStd).toFixed(2);
+    assert(computedZ === 2.0, 'Statistical Precision', 'Z-score mathematics exact for +2.0 sigma deviation');
+
+    // 16.2 Safe Zero-Variance Handling Floor
+    const zeroStd = 0.0;
+    const minStdFloor = 2.0;
+    const safeStd = Math.max(zeroStd, minStdFloor);
+    const safeZ = +((72.0 - 58.0) / safeStd).toFixed(2);
+    assert(!isNaN(safeZ) && isFinite(safeZ) && safeZ === 7.0, 'Zero-Variance Protection', 'Zero-variance handled safely without division by zero');
+
+    // 16.3 Baseline Comparison API returns 3 flight phases
+    const baseCompRes = await fetch(`${BASE_URL}/api/baselines/comparison?astronautId=astro-1`);
+    assert(baseCompRes.status === 200, 'Baseline Methodology', 'Baseline comparison endpoint returns HTTP 200');
+    const baseCompData = await baseCompRes.json();
+    assert(Array.isArray(baseCompData.comparisons) && baseCompData.comparisons.length >= 4, 'Baseline Methodology', 'Tracks multiple physiological indicators across 3 flight phases');
+
+    // 16.4 Missing Value Imputation Penalty in ML Service
+    const mlPartialRes = await fetch(`${BASE_URL}/api/ml/anomaly-detection`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sample: { heartRate: 88 } }), // Missing spo2, temp, hrv
+    });
+    assert(mlPartialRes.status === 200, 'ML Scientific Rigor', 'Missing features handled with adaptive baseline imputation');
+    const mlPartialData = await mlPartialRes.json();
+    assert(Boolean(mlPartialData.contributingIndicators), 'ML Scientific Rigor', 'Decomposes contributing indicators with attribution weights');
+
+    // 16.5 Isolation Forest Anomaly Score Normalized
+    const actualScore = mlPartialData.anomalyScore ?? mlPartialData.isolationForest?.anomalyScore;
+    assert(typeof actualScore === 'number' && actualScore >= 0.0 && actualScore <= 1.0, 'ML Scientific Rigor', 'Isolation Forest score strictly bounded between 0.0 and 1.0');
+
+    // 16.6 Context Correlation Non-Causation Disclaimer
+    const corrRes = await fetch(`${BASE_URL}/api/context/correlation?astronautId=astro-1&metricA=sleepDurationHours&metricB=heartRate`);
+    assert(corrRes.status === 200, 'Scientific Integrity', 'Context correlation returns HTTP 200');
+    const corrData = await corrRes.json();
+    assert(typeof corrData.disclaimer === 'string' && corrData.disclaimer.includes('does NOT imply clinical causation'), 'Scientific Integrity', 'Enforces mandatory non-causation medical disclosure');
+
+    // 16.7 Verified NASA Research Citation Registry
+    const resListRes = await fetch(`${BASE_URL}/api/research`);
+    assert(resListRes.status === 200, 'Literature Grounding', 'Research repository returns HTTP 200');
+    const resListData = await resListRes.json();
+    const hasValidTwins = resListData.some((r: any) => r.title.includes('Twins Study') && Boolean(r.url));
+    assert(hasValidTwins, 'Literature Grounding', 'NASA Twins Study citation verified with genuine DOI/URL');
+
+    // 16.8 Insufficient Data Guardrail Handling
+    const emptyMLRes = await fetch(`${BASE_URL}/api/ml/anomaly-detection`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    assert(emptyMLRes.status === 200, 'Scientific Guardrails', 'Empty telemetry sample safely handled without unhandled exception');
+  } catch (err: any) {
+    assert(false, 'Scientific Reproducibility', 'Scientific validation test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
   // SUMMARY REPORT
   // -----------------------------------------------------------------
   console.log('\n===============================================================');

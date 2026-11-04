@@ -164,4 +164,12 @@ export interface ResearchReference {
   summary: string;
   keyFindings: string[];
   relevanceToAstronautMonitoring: string;
+  doi?: string;
+  datasetId?: string;
+  studyPopulation?: string;
+  sampleSize?: number | string;
+  variablesUsed?: string[];
+  provenanceType?: string;
+  methodology?: string;
+  knownLimitations?: string;
 }

@@ -32,11 +32,17 @@ import { ResearchPage } from './pages/ResearchPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SystemHealthPage } from './pages/SystemHealthPage';
 import { MissionSimulationBar } from './components/MissionSimulationBar';
+import { LogVitalsModal } from './components/LogVitalsModal';
+import { EmergencyBeaconModal } from './components/EmergencyBeaconModal';
+import { SplashScreen } from './components/SplashScreen';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const [currentTab, setCurrentTab] = useState<string>('landing');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProvenanceModalOpen, setIsProvenanceModalOpen] = useState(false);
+  const [isLogVitalsModalOpen, setIsLogVitalsModalOpen] = useState(false);
+  const [isEmergencyBeaconOpen, setIsEmergencyBeaconOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Active User session (Default: CDR Sarah Chen)
@@ -264,40 +270,33 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050816] text-slate-100 flex flex-col font-sans selection:bg-[#00E5FF]/20 selection:text-[#00E5FF]">
       
-      {/* PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
-      <MissionSimulationBar />
+      {/* CINEMATIC STARTUP SPLASH SCREEN WITH SMOOTH TRANSITION TO LANDING PAGE */}
+      {showSplash && (
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      )}
 
-      {/* NAVIGATION BAR */}
+      {/* ROW 1 & ROW 2: BRAND HEADER & SECONDARY NAVIGATION STRIP */}
       <Navbar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
         currentUser={currentUser}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenProvenanceModal={() => setIsProvenanceModalOpen(true)}
+        onOpenLogVitals={() => setIsLogVitalsModalOpen(true)}
+        onOpenEmergencyBeacon={() => setIsEmergencyBeaconOpen(true)}
+        onSyncOffline={() => {
+          offlineSyncService.startBackgroundSync();
+          loadInitialData();
+        }}
         activeAlertCount={activeAlertCount}
       />
 
-      {/* BODY WITH OPTIONAL SIDEBAR FOR CONSOLE VIEWS */}
-      <div className="flex-1 flex relative">
-        
-        {/* SIDEBAR FOR MISSION CONTROL VIEWS */}
-        {isConsoleView && (
-          <Sidebar
-            currentTab={currentTab}
-            onSelectTab={setCurrentTab}
-            activeAlertCount={activeAlertCount}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            currentUser={currentUser}
-          />
-        )}
+      {/* ROW 3: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
+      <MissionSimulationBar />
 
-        {/* MAIN VIEWPORT STAGE */}
-        <main
-          className={`flex-1 transition-all duration-300 ${
-            isConsoleView ? (isSidebarCollapsed ? 'ml-16' : 'ml-16 md:ml-64') : ''
-          }`}
-        >
+      {/* ROW 4: MAIN VIEWPORT STAGE */}
+      <div className="flex-1 flex relative w-full overflow-x-hidden">
+        <main className="w-full flex-1 min-w-0 transition-all duration-300">
           {/* PAGE 1: LANDING PAGE */}
           {currentTab === 'landing' && (
             <LandingPage
@@ -435,6 +434,22 @@ export default function App() {
       <DataProvenanceModal
         isOpen={isProvenanceModalOpen}
         onClose={() => setIsProvenanceModalOpen(false)}
+      />
+
+      {/* QUICK ACTION: DIRECT LOG VITALS MODAL */}
+      <LogVitalsModal
+        isOpen={isLogVitalsModalOpen}
+        onClose={() => setIsLogVitalsModalOpen(false)}
+        onLogMeasurement={handleLogMeasurement}
+        astronautId={astronaut.id}
+      />
+
+      {/* QUICK ACTION: EMERGENCY MEDICAL BEACON MODAL */}
+      <EmergencyBeaconModal
+        isOpen={isEmergencyBeaconOpen}
+        onClose={() => setIsEmergencyBeaconOpen(false)}
+        astronautName={astronaut.name}
+        astronautId={astronaut.id}
       />
 
     </div>
