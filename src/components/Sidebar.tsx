@@ -10,6 +10,7 @@ import {
   FileText,
   Sliders,
   ShieldAlert,
+  ShieldCheck,
   BookOpen,
   ChevronLeft,
   ChevronRight,
@@ -123,6 +124,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <BookOpen className="w-4 h-4 text-[#00E5FF] shrink-0" />
             {!isCollapsed && <span>NASA Research</span>}
+          </button>
+
+          <button
+            onClick={() => onSelectTab('system-health')}
+            title={isCollapsed ? 'System Health & Tests' : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              currentTab === 'system-health'
+                ? 'bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/40 font-bold shadow-[0_0_15px_rgba(0,229,255,0.15)]'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            {!isCollapsed && <span>System Health & Tests</span>}
           </button>
         </div>
       </div>

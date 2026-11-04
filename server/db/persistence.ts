@@ -25,6 +25,8 @@ import {
   ISleepRecord,
   IActivityRecord,
   IWellnessAssessment,
+  IRawObservation,
+  TelemetryClassificationType,
 } from './models.js';
 
 interface DatabaseCollections {
@@ -45,10 +47,12 @@ interface DatabaseCollections {
   sleepRecords: ISleepRecord[];
   activityRecords: IActivityRecord[];
   wellnessAssessments: IWellnessAssessment[];
+  rawObservations: IRawObservation[];
 }
 
 export class PersistentDatabase {
   private dbPath: string;
+  private backupPath: string;
   private isSaving: boolean = false;
   private pendingSave: boolean = false;
   private idempotencyKeys: Set<string> = new Set();
@@ -71,6 +75,7 @@ export class PersistentDatabase {
     sleepRecords: [],
     activityRecords: [],
     wellnessAssessments: [],
+    rawObservations: [],
   };
 
   constructor(storageDir?: string) {
@@ -79,36 +84,121 @@ export class PersistentDatabase {
       fs.mkdirSync(dir, { recursive: true });
     }
     this.dbPath = path.join(dir, 'space_health_db.json');
+    this.backupPath = path.join(dir, 'space_health_db.backup.json');
     this.loadDatabase();
   }
 
   /**
-   * Load database from disk or seed initial verified datasets
+   * Load database from disk or self-heal from backup if file is corrupted
    */
-  private loadDatabase() {
+  public loadDatabase(): boolean {
     try {
       if (fs.existsSync(this.dbPath)) {
         const raw = fs.readFileSync(this.dbPath, 'utf-8');
-        const parsed = JSON.parse(raw);
-        this.data = { ...this.data, ...parsed };
-        
-        // Rebuild idempotency index
-        this.data.telemetry.forEach((t) => {
-          if (t.idempotencyKey) {
-            this.idempotencyKeys.add(t.idempotencyKey);
+        try {
+          const parsed = JSON.parse(raw);
+          this.data = { ...this.data, ...parsed };
+          if (!this.data.rawObservations) this.data.rawObservations = [];
+          
+          // Rebuild idempotency index
+          this.data.telemetry.forEach((t) => {
+            if (t.idempotencyKey) {
+              this.idempotencyKeys.add(t.idempotencyKey);
+            }
+          });
+          console.log(`[SPACE HEALTH DB] Persistent storage loaded successfully from ${this.dbPath} (${this.data.telemetry.length} telemetry records).`);
+          return true;
+        } catch (jsonErr: any) {
+          console.warn(`[SPACE HEALTH DB] Database corrupted (${jsonErr.message}). Attempting recovery from backup...`);
+          if (this.restoreFromBackup()) {
+            return true;
           }
-        });
-        console.log(`[SPACE HEALTH DB] Persistent storage loaded successfully from ${this.dbPath} (${this.data.telemetry.length} telemetry records).`);
+          throw jsonErr;
+        }
       } else {
         console.log(`[SPACE HEALTH DB] Initializing fresh persistent storage with NASA calibration datasets...`);
         this.seedInitialDatabase();
         this.saveSync();
+        this.createBackup();
+        return true;
       }
     } catch (err: any) {
-      console.error(`[SPACE HEALTH DB] Load error: ${err.message}. Initializing defaults.`);
+      console.error(`[SPACE HEALTH DB] Fatal load error: ${err.message}. Initializing defaults.`);
       this.seedInitialDatabase();
       this.saveSync();
+      this.createBackup();
+      return false;
     }
+  }
+
+  /**
+   * Create an explicit backup snapshot of the database
+   */
+  public createBackup(): string {
+    try {
+      const serialized = JSON.stringify(this.data, null, 2);
+      fs.writeFileSync(this.backupPath, serialized, 'utf-8');
+      console.log(`[SPACE HEALTH DB] Backup snapshot created at ${this.backupPath}`);
+      return this.backupPath;
+    } catch (err: any) {
+      console.error(`[SPACE HEALTH DB] Backup creation failed:`, err.message);
+      return '';
+    }
+  }
+
+  /**
+   * Restore database from backup snapshot
+   */
+  public restoreFromBackup(): boolean {
+    try {
+      if (fs.existsSync(this.backupPath)) {
+        const rawBackup = fs.readFileSync(this.backupPath, 'utf-8');
+        const parsed = JSON.parse(rawBackup);
+        this.data = { ...this.data, ...parsed };
+        if (!this.data.rawObservations) this.data.rawObservations = [];
+        this.saveSync();
+        console.log(`[SPACE HEALTH DB] Self-healing successful! Restored from ${this.backupPath}`);
+        return true;
+      }
+    } catch (err: any) {
+      console.error(`[SPACE HEALTH DB] Failed to restore from backup:`, err.message);
+    }
+    return false;
+  }
+
+  /**
+   * Record raw observation preserving provenance and classification without discarding
+   */
+  public recordRawObservation(obs: {
+    astronautId: string;
+    rawPayload: any;
+    classification: TelemetryClassificationType;
+    rejectionReason?: string;
+    warnings?: string[];
+    ingestedRecordId?: string;
+    dataSource?: string;
+  }): IRawObservation {
+    const newObs: IRawObservation = {
+      id: `raw-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      astronautId: obs.astronautId || 'unknown',
+      receivedAt: new Date().toISOString(),
+      rawPayload: obs.rawPayload,
+      classification: obs.classification,
+      rejectionReason: obs.rejectionReason,
+      warnings: obs.warnings,
+      ingestedRecordId: obs.ingestedRecordId,
+      dataSource: obs.dataSource || 'TelemetryStream',
+    };
+    if (!this.data.rawObservations) {
+      this.data.rawObservations = [];
+    }
+    this.data.rawObservations.push(newObs);
+    // Retain up to 2000 raw observations for inspection
+    if (this.data.rawObservations.length > 2000) {
+      this.data.rawObservations = this.data.rawObservations.slice(-2000);
+    }
+    this.save();
+    return newObs;
   }
 
   /**
@@ -121,13 +211,16 @@ export class PersistentDatabase {
     }
     this.isSaving = true;
 
+    const tempPath = `${this.dbPath}.tmp-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     try {
-      const tempPath = `${this.dbPath}.tmp-${Date.now()}`;
       const serialized = JSON.stringify(this.data, null, 2);
       await fs.promises.writeFile(tempPath, serialized, 'utf-8');
       await fs.promises.rename(tempPath, this.dbPath);
     } catch (err: any) {
       console.error(`[SPACE HEALTH DB] Atomic save error:`, err.message);
+      if (fs.existsSync(tempPath)) {
+        try { await fs.promises.unlink(tempPath); } catch {}
+      }
     } finally {
       this.isSaving = false;
       if (this.pendingSave) {
@@ -141,13 +234,16 @@ export class PersistentDatabase {
    * Synchronous save for initialization or shutdown
    */
   public saveSync(): void {
+    const tempPath = `${this.dbPath}.tmp-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     try {
-      const tempPath = `${this.dbPath}.tmp-${Date.now()}`;
       const serialized = JSON.stringify(this.data, null, 2);
       fs.writeFileSync(tempPath, serialized, 'utf-8');
       fs.renameSync(tempPath, this.dbPath);
     } catch (err: any) {
       console.error(`[SPACE HEALTH DB] Sync save error:`, err.message);
+      if (fs.existsSync(tempPath)) {
+        try { fs.unlinkSync(tempPath); } catch {}
+      }
     }
   }
 

@@ -1,75 +1,59 @@
-# SPACE HEALTH MONITO — Advanced AI/ML Health Intelligence Engine
+# SPACE HEALTH MONITO — End-to-End Reliability, Security, Mission Simulation & Responsive Engineering
 
-An intelligent, explainable biotelemetry analytics engine for astronaut health monitoring during long-duration space exploration (Artemis Gateway Expedition 04), featuring Python-powered statistical and machine learning algorithms, Isolation Forest anomaly scoring, multi-variate correlation analysis, spaceflight physiological context interpretation, and evidence-grounded decision support.
+## Title & Summary
+SPACE HEALTH MONITO is an AI-powered astronaut health monitoring and decision-support prototype built for the NASA Space Apps Challenge 2026 under the theme "Monitoring Human Health Beyond Earth". This phase strengthens mission resilience, delivers an interactive 4-scenario end-to-end mission simulation controller with Scenario B default, hardens physiological data classification against arbitrary truncation, fortifies security/RBAC, extends automated tests, and ensures mobile-first responsive layout stability across 9 standardized viewports.
 
 ---
 
 ## User Review & Critical Decisions
 
 > [!IMPORTANT]
-> The following architectural and model decisions were confirmed during the Phase 1 clarification interview:
-
-- **Confirmed Decision 1 (ML Service Orchestration)**: A dedicated Python REST ML service running on port `8000`, cleanly proxied by the Express backend at `/api/ml/*`, preserving Express as the primary application gateway.
-- **Confirmed Decision 2 (Dataset Calibration)**: Anomaly detection models and Isolation Forest tree thresholds calibrated against published **NASA OSDR** (Open Science Data Repository) and **NASA Twins Study** normative distributions.
-- **Confirmed Decision 3 (Anomaly Classification & Sensitivity)**: Dynamic sensitivity control ($1.5\sigma$ to $3.0\sigma$, default $2.0\sigma$) powering three non-diagnostic tiers: `NOMINAL`, `ATTENTION`, and `PRIORITY REVIEW`.
+> The following decisions were confirmed by the user for Prompt 7:
+> - **Active Default Mission Simulation Scenario**: Scenario B (Gradual Health Measurement Deviation) is active by default to showcase personalized baseline comparison, Isolation Forest statistical detection, and context correlation.
+> - **Mission Simulator UI Presentation**: Persistent Mission Control Bar anchored above the main workspace with scenario selector, Play, Pause, Step, and Reset controls.
+> - **Automated Test Reporting Depth**: Comprehensive test runner with terminal execution, detailed markdown audit reports (`docs/testing/END_TO_END_AUDIT.md`, `SECURITY_AUDIT.md`, `RESPONSIVE_TEST_REPORT.md`), and an interactive System Health & Test Suite Status UI view.
 
 ---
 
 ## 1. Overview & Core Concept
 
-During deep-space transit and orbital gateway stays, communication latency (up to 24 minutes one-way on Mars trajectories) prevents real-time ground control intervention. The **SPACE HEALTH MONITO AI/ML Health Intelligence Engine** equips astronauts and flight surgeons with autonomous biotelemetry interpretation.
-
-### Core Questions Answered by the Engine:
-1. **What has changed?** Quantifies shifts in heart rate, HRV (RMSSD), SpO2, core body temperature, sleep architecture, and countermeasure power output.
-2. **How does it compare to individual baselines?** Evaluates Z-scores, percentage deviations, and moving-window variance against the astronaut's pre-flight normative measurements.
-3. **Are indicators changing together?** Computes bivariate Pearson correlation and cross-channel coupling (e.g., sleep loss predicting subsequent cardiac sympathetic acceleration).
-4. **Is the observation anomalous?** Runs multi-dimensional Isolation Forest tree depth evaluations to isolate high-dimensional physiological outliers.
-5. **What spaceflight factors are relevant?** Connects findings to microgravity cephalad fluid shifts, cosmic radiation ionizing flux, circadian phase delays, and mechanotransduction loss.
-6. **What operational step is needed?** Recommends evidence-grounded non-diagnostic countermeasure adjustments (ARED load, electrolyte rehydration, blue-depleted lighting) and alerts flight surgeons when criteria are met.
+- **What It Does**: Provides long-duration space mission crews and flight surgeons with continuous physiological telemetry monitoring, multidimensional baseline drift detection (Isolation Forest + adaptive Z-scores), multi-factor spaceflight context correlation (ECLSS, radiation, sleep, ARED workload), daily crew health briefings with evidence tracing, and an earth-independent offline synchronization pipeline.
+- **Target Audience & Persona**:
+  - *Astronaut / Crew Medical Officer (CMO)*: Needs immediate, low-cognitive-load summaries, offline accessibility, contextual correlations, and actionable checklists.
+  - *Flight Surgeon / Mission Support (Ground)*: Inspects historical telemetry, audit logs, model versions, statistical provenance, and data quality flags.
+- **Scientific & Operational Boundary**: Explicitly labeled as a research and decision-support prototype. Includes strict disclaimers that statistical anomalies and temporal associations do not constitute clinical diagnoses or proof of causation.
 
 ---
 
 ## 2. User Experience & Visual Design
 
-The UI integrates seamlessly into the existing mission-control design system (`#050816` midnight navy, `#0B1224` console background, `#101B30` glassmorphic cards, `#00E5FF` cyan accent, `#438BFF` electric blue, `#8B5CF6` purple, `#21D4A5` nominal green, `#FFB547` warning amber, and `#FF5368` critical rose).
-
-### Upgrades to Existing Views:
-
-#### A. DashboardPage — Live Physiological Trends Prominence
-- Prominently positions the `LivePhysiologicalTrends` component at the apex of the dashboard telemetry stage.
-- Plots 24 hours of dual-channel continuous telemetry (Heart Rate and SpO2) using Recharts.
-- Shows dashed reference lines representing the astronaut's resting baseline (`58 BPM` and `98.4%`), hypoxia warning boundary (`95.0%`), and a shaded nominal tolerance corridor.
-- Displays interactive hover tooltips highlighting exact deviations ($\Delta \text{BPM}$ and $\Delta \text{SpO2}$) and outlier markers for transient excursions.
-
-#### B. AiAnalysisPage — Comprehensive AI Health Intelligence Center
-- **Health Intelligence Summary Ribbon**: Displays total measurements analyzed, active anomalies flagged, model sensitivity status, data completeness (e.g., 99.4%), and last inference timestamp.
-- **Interactive Z-Score Sensitivity Slider**: Real-time slider from $1.5\sigma$ to $3.0\sigma$ that immediately updates chart outlier flags and triage cards.
-- **Multivariate Correlation Matrix**: Heatmap grid showing Pearson $r$ values between Sleep Duration, Resting Heart Rate, Core Temperature, HRV RMSSD, and Daily Exercise Load.
-- **Personalized 3-Phase Baseline Visualizer**: Interactive chart comparing health indicators across **Pre-Flight Baseline**, **During Spaceflight (T+142)**, and **Post-Flight Target Range**.
-- **Five-Point Explainable AI (XAI) Cards**:
-  1. *What Changed?* (biomarker delta and rate of shift)
-  2. *Historical Comparison* (z-score against 30-sol baseline)
-  3. *Why Was It Flagged?* (statistical algorithm and threshold triggered)
-  4. *Spaceflight Context* (biological mechanism and NASA research reference)
-  5. *Next Action* (countermeasure recommendation or clinical triage)
-
-#### C. MonitoAiPage — Data-Aware Research Assistant
-- Connects MONITO AI directly to the live Python ML inference outputs and the NASA Research Knowledge Base.
-- Allows natural-language queries such as:
-  - *"Compare my current heart rate with my pre-flight baseline."*
-  - *"What anomalies were flagged in the last 24 hours and why?"*
-  - *"Explain how microgravity fluid shifts correlate with my recent HRV measurements."*
+- **Visual Identity & Theme**:
+  - *Aesthetic Direction*: Aerospace mission-control console following the Science, Space & Biotech design reference. Clinical deep obsidian background (`#0B0E17` / `#07090E`), precision slate structural panels (`#111827`), hairline borders (`#1E293B`), and calibrated telemetry accents (laser cyan `#06B6D4`, telemetry amber `#F59E0B`, emerald `#10B981`, and crimson `#F43F5E`).
+  - *Typography*: Clean neo-grotesque sans-serif for UI labels paired with tabular monospace numerals (`font-mono tabular-nums`) for telemetry values, timestamps, and coordinates to prevent layout shift.
+  - *Zero-Pill Discipline*: Unboxed metadata tags separated by subtle typographic dividers (`·` or `/`). Interactive filters and scenario selectors are functional segmented button controls.
+- **Persistent Mission Control Bar**:
+  - Mounted persistently above the main view.
+  - Controls: Scenario Selector (`Scenario A: Normal`, `Scenario B: Gradual Deviation`, `Scenario C: Sensor Failure`, `Scenario D: Comm Loss`), Play/Pause, Step Advance, Reset, and Simulation Speed multiplier.
+  - Real-time simulated status banner indicating scenario objectives, active telemetry streams, and synthetic data watermarks.
+- **Responsive Layout Architecture (9 Viewports)**:
+  - Mobile (`320x568`, `360x800`, `390x844`, `430x932`): Single-column stacked cards, collapsible drawer navigation, touch targets $\ge 44\text{px}$, responsive charts with adjusted tick counts.
+  - Tablet (`768x1024`, `1024x768`): Adaptive 2-column grid, compact sidebar, dual-axis correlation charts.
+  - Laptop & Desktop (`1366x768`, `1440x900`, `1920x1080`): Multi-column mission control dashboard, full telemetry ribbons, and side-by-side diagnostic decomposition.
 
 ---
 
 ## 3. Key Product Decisions & Trade-Offs
 
-| Decision | Chosen Approach | Rationale | Alternatives Considered |
-| :--- | :--- | :--- | :--- |
-| **Python Service Architecture** | Native Python HTTP microservice on port 8000 using standard library math/statistics/json/socketserver, proxied via Express | Operates with 100% reliability in restricted sandboxes without requiring external pip dependencies; delivers true Python execution | Python script spawn per request (high overhead) or external cloud microservice (network egress / sandbox constraints) |
-| **Isolation Forest Engine** | Pure-Python vectorized Isolation Forest tree ensemble ($t=100$ trees, sub-sample size $\psi=256$) | Provides deterministic, zero-dependency anomaly score calculation $s(x,n) = 2^{-\frac{E(h(x))}{c(n)}}$ without heavy C-extension compilation | Scikit-learn binary dependency (not preinstalled in environment) |
-| **Scientific Safety Boundary** | Strict non-diagnostic advisory labels; all anomaly tiers categorized as `NOMINAL`, `ATTENTION`, or `PRIORITY REVIEW` | Complies with medical safety standards and NASA Space Apps Challenge research guidelines | Diagnostic claims or simulated treatment prescriptions |
-| **Correlation vs Causation** | Prominent visual badge and tooltips labeling all bivariate correlations as *statistical associations* | Prevents cognitive bias and false causal assumptions during mission operations | Unannotated correlation coefficients |
+- **Decision 1: Physiological Data Classification vs. Arbitrary Discarding**
+  - *Chosen Approach*: Replace hard rejection filters with a 7-tier classification engine: `Structurally Invalid`, `Impossible / Malformed`, `Unusual Observation`, `Potential Sensor Artifact`, `Missing Measurement`, `Stale Measurement`, and `Requires Human Review`. Original raw observations are preserved with complete provenance.
+  - *Why*: In spaceflight physiology, extreme or drifting values (e.g., severe bradycardia during sleep or tachycardia during EVA exertion) must never be silently discarded.
+  - *Alternatives Considered*: Rigid upper/lower cutoffs (rejected because real medical events could be scrubbed).
+- **Decision 2: Integrated Mission Simulation Engine**
+  - *Chosen Approach*: Deterministic in-memory scenario generator that feeds synthetic telemetry into the existing store and API endpoints with an explicit `isSimulated: true` watermark.
+  - *Why*: Enables reproducible demonstration during competition judging without corrupting real or baseline datasets.
+- **Decision 3: Persistent File Storage Concurrency & Recovery**
+  - *Chosen Approach*: Atomic file replacement pattern via `.tmp` write and POSIX `rename` with an in-memory queue mutex and automated corrupt database recovery/backup routines.
+  - *Why*: Eliminates file corruption risks on sudden node shutdowns while avoiding external database daemon dependencies for offline edge spacecraft nodes.
 
 ---
 
@@ -79,78 +63,76 @@ The UI integrates seamlessly into the existing mission-control design system (`#
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           BROWSER FRONTEND (React)                          │
-│                                                                             │
-│  ┌───────────────────────┐ ┌───────────────────────┐ ┌───────────────────┐  │
-│  │ LivePhysiological     │ │ AiAnalysisPage        │ │ MonitoAiPage      │  │
-│  │ Trends (Recharts)     │ │ (XAI & Baseline HUD)  │ │ (Grounded Chat)   │  │
-│  └───────────┬───────────┘ └───────────┬───────────┘ └─────────┬─────────┘  │
-└──────────────┼─────────────────────────┼───────────────────────┼────────────┘
-               │                         │                       │
-               ▼                         ▼                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        NODE.JS / EXPRESS BACKEND (Port 3000)                │
+│                       SPACE HEALTH MONITO FRONTEND (React 19)               │
 │                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ REST Gateway Routes:                                                  │  │
-│  │   /api/telemetry/*  ·  /api/astronauts/*  ·  /api/ai/chat             │  │
-│  │   /api/ml/*  --->  Reverse Proxy to Python ML Service                 │  │
-│  └──────────────────────────────────┬────────────────────────────────────┘  │
-│                                     │                                       │
-│  ┌───────────────────────────────┐  │  ┌─────────────────────────────────┐  │
-│  │ In-Memory & MongoDB Store     │  │  │ Background Python Process Mgr   │  │
-│  │ (10 collections / 200+ docs)  │  │  │ (Spawns and monitors Port 8000) │  │
-│  └───────────────────────────────┘  │  └────────────────┬────────────────┘  │
-└─────────────────────────────────────┼───────────────────┼───────────────────┘
-                                      │ HTTP Request      │
-                                      ▼                   ▼
+│  │           Persistent Mission Control Simulation Bar (Scenarios A-D)   │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│  ┌────────────────────┬──────────────────────────────────────────────────┐  │
+│  │  Top Telemetry Bar │ Link Status (LIVE / CACHED / PENDING / OFFLINE)  │  │
+│  ├────────────────────┴──────────────────────────────────────────────────┤  │
+│  │  Navigation Tabs:                                                     │  │
+│  │  [Dashboard] [AI Analysis] [Context Explorer] [Briefing] [Timeline]   │  │
+│  │  [Alerts (5-State)] [System Health & Tests] [Research Explorer]       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ HTTP / REST / SSE
+                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       PYTHON ML SERVICE (Port 8000)                         │
+│                    NODE.JS / EXPRESS PRIMARY BACKEND (:3000)                │
 │                                                                             │
-│  ┌─────────────────────────────┐     ┌───────────────────────────────────┐  │
-│  │ HTTP Request Dispatcher     │     │ Anomaly Detection Engine          │  │
-│  │ - POST /api/ml/analyze      │────>│ - Isolation Forest Scoring        │  │
-│  │ - POST /api/ml/anomaly      │     │ - Dynamic Z-Score / MAD Filtering │  │
-│  │ - POST /api/ml/trends       │     │ - Three-Tier Triage Classification│  │
-│  │ - POST /api/ml/correlation  │     └─────────────────┬─────────────────┘  │
-│  │ - POST /api/ml/baseline     │                       │                    │
-│  │ - GET  /api/ml/model-status │                       ▼                    │
-│  └─────────────────────────────┘     ┌───────────────────────────────────┐  │
-│                                      │ Spaceflight Context Engine        │  │
-│                                      │ - Microgravity / Cephalad Shifts  │  │
-│                                      │ - GCR / SPE Dosimetry Exposure    │  │
-│                                      │ - Circadian Rhythm Delay          │  │
-│                                      │ - Explainable AI (XAI) Synthesis  │  │
-│                                      └───────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────┘
+│  ┌───────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐  │
+│  │ Telemetry Classifier  │  │ RBAC & Auth Guard   │  │ Mission Simulator │  │
+│  │ (7-Tier Quality)      │  │ (Astro Isolation)   │  │ (Scenarios A-D)   │  │
+│  └───────────┬───────────┘  └──────────┬──────────┘  └─────────┬─────────┘  │
+│              │                         │                       │            │
+│              ▼                         ▼                       ▼            │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ Database Store & Atomic File Persistence (`space_health_db.json`)     │  │
+│  │ - Write Mutex Queue  - POSIX Temp File Swap  - Corrupt Auto-Recovery │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────┬───────────────────────────────┬──────────────────┘
+                           │                               │
+        Proxy `/api/ml/*`  │                               │ Gemini SDK Proxy
+                           ▼                               ▼
+┌──────────────────────────────────────┐     ┌────────────────────────────────┐
+│   PYTHON ML MICROSERVICE (:5050)     │     │      MONITO AI ENGINE          │
+│   - Isolation Forest Vectorized      │     │  - Official NASA GeneLab/OSDR  │
+│   - Adaptive Z-Score Engine          │     │  - Strict Citation Grounding   │
+│   - Feature Contribution (XAI)       │     │  - Offline Fallback RAG        │
+└──────────────────────────────────────┘     └────────────────────────────────┘
 ```
 
-### API Endpoints Specification
-
-1. `POST /api/ml/analyze`: Full suite analysis executing baseline deviation, Isolation Forest, trend detection, and correlation.
-2. `POST /api/ml/anomaly-detection`: Statistical outlier detection with configurable sensitivity slider threshold ($1.5\sigma$ to $3.0\sigma$).
-3. `POST /api/ml/trend-analysis`: Windowed time-series analysis across $24\text{h}$, $7\text{d}$, $14\text{d}$, and $30\text{d}$ with moving averages and slope direction.
-4. `POST /api/ml/correlation`: Bivariate Pearson coefficients across physiological and environmental metrics.
-5. `POST /api/ml/baseline-comparison`: Tri-phase comparison across Pre-Flight, In-Flight, and Post-Flight ranges.
-6. `GET /api/ml/model-status`: Health and calibration status of the Python Isolation Forest and NASA OSDR reference baseline.
+### Component & API Implementation Mapping
+1. **Mission Simulation Controller (`src/components/MissionSimulationBar.tsx`)**:
+   - Manages playback of Scenarios A, B, C, and D.
+   - Dispatches simulated telemetry events to `/api/simulation/telemetry` with `isSimulated: true`.
+2. **7-Tier Telemetry Classifier (`server/validators/telemetryValidator.ts`)**:
+   - Classifies measurements without silent drops; preserves raw payloads in `database.rawObservations`.
+3. **System Health & Test Suite Console (`src/pages/SystemHealthPage.tsx`)**:
+   - Displays real-time operational status for Database, Express, Python ML (:5050), and Gemini.
+   - Shows active automated test matrix with live pass/fail counts and log inspector.
+4. **Security & Data Isolation (`server/middleware/auth.ts` & `server/routes/telemetry.ts`)**:
+   - Validates JWT tokens, prevents ID tampering across astronauts, strips sensitive credentials from logs.
+5. **Audit Documentation Generation (`docs/testing/`)**:
+   - `docs/testing/END_TO_END_AUDIT.md`: Feature-by-feature implementation status matrix.
+   - `docs/testing/SECURITY_AUDIT.md`: Threat model, RBAC isolation, storage security analysis.
+   - `docs/testing/RESPONSIVE_TEST_REPORT.md`: Matrix across all 9 target viewports.
+6. **Automated Test Suite Expansion (`scripts/run_automated_tests.ts`)**:
+   - Extends test coverage from 81 tests to 100+ comprehensive tests covering simulation scenarios, 7-tier classification, atomic write failure recovery, and cross-astronaut access prevention.
 
 ---
 
-## 5. Implementation Roadmap
+## 5. Phased Execution Roadmap
 
-1. **Python ML Engine (`server_ml.py`)**:
-   - Create self-contained Python HTTP server on port 8000.
-   - Implement pure-Python Isolation Forest ensemble and rolling statistical analytics.
-   - Implement NASA OSDR and Twins Study calibration distributions.
-   - Implement the Spaceflight Physiological Context generator and 5-point XAI constructor.
-2. **Express Backend Proxy & Process Management (`server.ts`)**:
-   - Ensure `server.ts` auto-spawns and monitors `python3 server_ml.py`.
-   - Mount `/api/ml/*` reverse proxy endpoints with robust fallback handling.
-3. **Frontend Integration & Component Enhancements**:
-   - Ensure `LivePhysiologicalTrends` in `src/pages/DashboardPage.tsx` actively displays 24h continuous data with dashed baseline reference lines.
-   - Wire `src/pages/AiAnalysisPage.tsx` to the live `/api/ml/*` endpoints with the interactive sensitivity slider and 3-phase baseline visualizer.
-   - Connect `src/pages/MonitoAiPage.tsx` with ML inference context for grounded assistant dialogues.
-4. **Verification**:
-   - Test all Python endpoints via curl.
-   - Run `lint_applet` (`tsc --noEmit`).
-   - Run `compile_applet` (`npm run build`).
+- **Phase 1: System Audit & Documentation**: Comprehensive code inspection, generating `docs/testing/END_TO_END_AUDIT.md`.
+- **Phase 2: Health Data Correctness & 7-Tier Classification**: Upgrade validator to categorize data without discarding valid physiological extremes.
+- **Phase 3: Mission Simulation Engine**: Build backend simulator routes and the persistent frontend Mission Control bar with Scenario B active default.
+- **Phase 4: Security & Cross-Astronaut Isolation**: Audit JWT verification, enforce astronaut scoping on all record endpoints, redact log outputs.
+- **Phase 5: Storage Reliability & Self-Healing**: Implement backup snapshotting, file integrity checks, and auto-recovery on corrupted JSON files.
+- **Phase 6: ML Microservice Resilience**: Add request timeout budgets, health probe retries, and fallback statistical analytics if Python service fails.
+- **Phase 7: MONITO AI Grounding & Illustrative Checklists**: Re-verify all NASA citations and update emergency review workflows with clear prototype disclosures.
+- **Phase 8: System Health Console & Observability**: Add System Health page in the UI showing service readiness and test execution logs.
+- **Phase 9: Mobile-First Responsive Engineering**: Refine CSS media queries, layouts, and touch targets across 9 viewports (`320px` to `1920px`).
+- **Phase 10: Five-Member Code Organization**: Verify and maintain clear module READMEs and contribution guidelines.
+- **Phase 11: Expanded Test Suite & Verification**: Run extended automated tests, compile applet (`npm run build`), and verify zero lint errors (`npm run lint`).

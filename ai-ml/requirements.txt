@@ -1,0 +1,4 @@
+# SPACE HEALTH MONITO — Python Analytics Dependencies
+# The microservice is implemented with pure-Python vectorized algorithms
+# to ensure zero external binary compilation dependencies in space flight and air-gapped environments.
+# Python 3.8+ compatible.

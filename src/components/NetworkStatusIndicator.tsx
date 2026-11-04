@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { offlineSyncService, SyncStatus } from '../services/offlineSyncService';
-import { Wifi, WifiOff, RefreshCw, Database, CloudUpload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { offlineSyncService } from '../services/offlineSyncService';
+import { Wifi, WifiOff, RefreshCw, Database, CloudUpload, AlertCircle, RotateCcw } from 'lucide-react';
 
 export const NetworkStatusIndicator: React.FC = () => {
   const [syncState, setSyncState] = useState(offlineSyncService.getState());
@@ -15,8 +15,12 @@ export const NetworkStatusIndicator: React.FC = () => {
 
   const handleManualSync = async () => {
     setIsSyncing(true);
-    await offlineSyncService.syncQueuedMeasurements();
+    await offlineSyncService.startBackgroundSync();
     setIsSyncing(false);
+  };
+
+  const handleRetryFailed = () => {
+    offlineSyncService.retryAllFailed();
   };
 
   const getBadgeConfig = () => {
@@ -57,9 +61,19 @@ export const NetworkStatusIndicator: React.FC = () => {
         return {
           icon: <AlertCircle className="w-3.5 h-3.5 text-[#FF5368]" />,
           dotColor: 'bg-[#FF5368]',
-          label: 'SYNC INTERRUPTED',
+          label: syncState.nextRetryDelayMs
+            ? `RETRY IN ${Math.ceil(syncState.nextRetryDelayMs / 1000)}s (#${syncState.consecutiveFailures})`
+            : 'SYNC INTERRUPTED',
           colorClass: 'text-[#FF5368] bg-[#FF5368]/10 border-[#FF5368]/30',
-          description: 'Telemetry upload failed. Retrying automatically.',
+          description: 'Telemetry upload encountered an interruption. Exponential backoff active.',
+        };
+      case 'STALE':
+        return {
+          icon: <Database className="w-3.5 h-3.5 text-amber-400" />,
+          dotColor: 'bg-amber-400',
+          label: 'DATA STALE (>24H)',
+          colorClass: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+          description: 'Telemetry stream is over 24 hours old. Refresh needed.',
         };
       default:
         return {
@@ -93,6 +107,17 @@ export const NetworkStatusIndicator: React.FC = () => {
           title="Force Sync Offline Queue"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[#00E5FF]' : ''}`} />
+        </button>
+      )}
+
+      {syncState.failedCount > 0 && (
+        <button
+          onClick={handleRetryFailed}
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-300 hover:text-white transition-colors cursor-pointer text-[10px]"
+          title="Reset backoff and retry all failed items"
+        >
+          <RotateCcw className="w-3 h-3 text-red-400" />
+          <span>{syncState.failedCount} Failed</span>
         </button>
       )}
 

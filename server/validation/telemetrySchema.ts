@@ -4,10 +4,11 @@
  * and data quality tagging.
  */
 
-import { IPhysiologicalTelemetry, DataQualityStatus, ProvenanceType } from '../db/models.js';
+import { IPhysiologicalTelemetry, DataQualityStatus, ProvenanceType, TelemetryClassificationType } from '../db/models.js';
 
 export interface ValidationResult {
   isValid: boolean;
+  classification: TelemetryClassificationType;
   errors: string[];
   warnings: string[];
   sanitized?: Partial<IPhysiologicalTelemetry>;
@@ -75,6 +76,7 @@ export function validatePhysiologicalTelemetry(raw: any): ValidationResult {
   if (!raw || typeof raw !== 'object') {
     return {
       isValid: false,
+      classification: 'STRUCTURALLY_INVALID',
       errors: ['Telemetry payload must be a non-null JSON object'],
       warnings: [],
       dataQuality: 'MISSING',
@@ -171,6 +173,24 @@ export function validatePhysiologicalTelemetry(raw: any): ValidationResult {
     }
   }
 
+  // Determine 7-tier classification according to NASA flight medicine data taxonomy
+  let classification: TelemetryClassificationType = 'NOMINAL';
+  if (!raw.astronautId || typeof raw.astronautId !== 'string' || !raw.astronautId.trim()) {
+    classification = 'STRUCTURALLY_INVALID';
+  } else if (raw.heartRate === undefined && raw.spo2 === undefined) {
+    classification = 'MISSING_MEASUREMENT';
+  } else if (errors.some(e => e.includes('impossible') || e.includes('Sensor artifact') || e.includes('physical envelope'))) {
+    classification = 'POTENTIAL_SENSOR_ARTIFACT';
+  } else if (errors.some(e => e.includes('future') || e.includes('clock drift') || e.includes('invalid') || e.includes('Invalid timestamp'))) {
+    classification = 'IMPOSSIBLE_OR_MALFORMED';
+  } else if (warnings.some(w => w.includes('older than 365 days'))) {
+    classification = 'STALE_MEASUREMENT';
+  } else if (warnings.some(w => w.includes('hypoxic') || w.includes('exceeds normal clinical resting envelope'))) {
+    classification = 'UNUSUAL_OBSERVATION';
+  } else if (warnings.length > 1) {
+    classification = 'REQUIRES_HUMAN_REVIEW';
+  }
+
   // Determine Data Quality Status
   let dataQuality: DataQualityStatus = 'VERIFIED';
   if (errors.length > 0) {
@@ -208,6 +228,7 @@ export function validatePhysiologicalTelemetry(raw: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
+    classification,
     errors,
     warnings,
     sanitized,

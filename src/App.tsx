@@ -30,6 +30,8 @@ import { AlertsPage } from './pages/AlertsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ResearchPage } from './pages/ResearchPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SystemHealthPage } from './pages/SystemHealthPage';
+import { MissionSimulationBar } from './components/MissionSimulationBar';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('landing');
@@ -224,7 +226,8 @@ export default function App() {
   // Alert acknowledgment
   const handleAcknowledgeAlert = async (
     alertId: string,
-    action: 'acknowledge' | 'resolve'
+    action: 'acknowledge' | 'resolve' | 'review' | 'dismiss',
+    dismissalReason?: string
   ) => {
     try {
       const res = await fetch(`/api/alerts/${alertId}/acknowledge`, {
@@ -233,6 +236,7 @@ export default function App() {
         body: JSON.stringify({
           acknowledgedBy: currentUser.fullName,
           action,
+          dismissalReason,
         }),
       });
       if (res.ok) {
@@ -242,7 +246,7 @@ export default function App() {
         );
       }
     } catch (err) {
-      console.error('Failed to acknowledge alert:', err);
+      console.error('Failed to update alert status:', err);
     }
   };
 
@@ -260,6 +264,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050816] text-slate-100 flex flex-col font-sans selection:bg-[#00E5FF]/20 selection:text-[#00E5FF]">
       
+      {/* PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
+      <MissionSimulationBar />
+
       {/* NAVIGATION BAR */}
       <Navbar
         currentTab={currentTab}
@@ -404,6 +411,11 @@ export default function App() {
           {/* NASA RESEARCH REPOSITORY */}
           {currentTab === 'research' && (
             <ResearchPage researchList={researchList} />
+          )}
+
+          {/* SUBSYSTEM OBSERVABILITY & SYSTEM HEALTH CONSOLE */}
+          {currentTab === 'system-health' && (
+            <SystemHealthPage />
           )}
         </main>
       </div>

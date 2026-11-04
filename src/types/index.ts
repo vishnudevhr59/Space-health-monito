@@ -107,7 +107,8 @@ export interface HealthAlert {
   title: string;
   reason: string;
   suggestedAction: string;
-  status: 'Active' | 'Acknowledged' | 'Resolved';
+  status: 'Active' | 'New' | 'Acknowledged' | 'Under Review' | 'Resolved' | 'Dismissed';
+  dismissalReason?: string;
   acknowledgedBy?: string;
   acknowledgedAt?: string;
 }

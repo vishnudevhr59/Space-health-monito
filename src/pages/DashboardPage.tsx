@@ -9,6 +9,9 @@ import {
 } from '../types';
 import { MetricCard } from '../components/MetricCard';
 import { LivePhysiologicalTrends } from '../components/LivePhysiologicalTrends';
+import { DailyBriefing } from '../components/DailyBriefing';
+import { ContextExplorer } from '../components/ContextExplorer';
+import { MissionTimeline } from '../components/MissionTimeline';
 import {
   Activity,
   Heart,
@@ -72,6 +75,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onNavigate,
 }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'24h' | '7d'>('7d');
+  const [activeModuleTab, setActiveModuleTab] = useState<'briefing' | 'trends' | 'context' | 'timeline'>('briefing');
   const [showLogModal, setShowLogModal] = useState(false);
   const [newHr, setNewHr] = useState(72);
   const [newSpo2, setNewSpo2] = useState(98.5);
@@ -387,12 +391,82 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
-      {/* LIVE PHYSIOLOGICAL TRENDS SUMMARY COMPONENT (WITH DASHED BASELINES) */}
-      <LivePhysiologicalTrends
-        telemetry={telemetry}
-        baselineHeartRate={astronaut.baselineVitals?.restingHeartRate || 58}
-        baselineSpo2={astronaut.baselineVitals?.spo2 || 98.4}
-      />
+      {/* MISSION CONTROL WORKFLOW MODULE TABS */}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-[#0B1224] border border-slate-800 font-mono text-xs">
+          <button
+            onClick={() => setActiveModuleTab('briefing')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
+              activeModuleTab === 'briefing'
+                ? 'bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/40 font-bold shadow-lg shadow-[#00E5FF]/10'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#00E5FF]" />
+            <span>1. Daily Clinical Briefing</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModuleTab('trends')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
+              activeModuleTab === 'trends'
+                ? 'bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/40 font-bold shadow-lg shadow-[#00E5FF]/10'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            <span>2. Live Physiological Trends</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModuleTab('context')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
+              activeModuleTab === 'context'
+                ? 'bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/40 font-bold shadow-lg shadow-[#00E5FF]/10'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>3. Context Explorer</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModuleTab('timeline')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
+              activeModuleTab === 'timeline'
+                ? 'bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/40 font-bold shadow-lg shadow-[#00E5FF]/10'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>4. Mission Timeline</span>
+          </button>
+        </div>
+
+        {/* Tab 1: Daily Clinical Briefing */}
+        {activeModuleTab === 'briefing' && (
+          <DailyBriefing astronaut={astronaut} onNavigate={onNavigate} />
+        )}
+
+        {/* Tab 2: Live Physiological Trends */}
+        {activeModuleTab === 'trends' && (
+          <LivePhysiologicalTrends
+            telemetry={telemetry}
+            baselineHeartRate={astronaut.baselineVitals?.restingHeartRate || 58}
+            baselineSpo2={astronaut.baselineVitals?.spo2 || 98.4}
+          />
+        )}
+
+        {/* Tab 3: Context Explorer */}
+        {activeModuleTab === 'context' && (
+          <ContextExplorer astronaut={astronaut} />
+        )}
+
+        {/* Tab 4: Mission Timeline */}
+        {activeModuleTab === 'timeline' && (
+          <MissionTimeline astronaut={astronaut} />
+        )}
+      </div>
 
       {/* HEALTH CORRELATION ANALYSIS (ADVANCED MULTI-VARIATE ASSOCIATIONS) */}
       <div className="rounded-3xl bg-[#101B30]/80 border border-[#00E5FF]/20 p-6 shadow-xl space-y-4">

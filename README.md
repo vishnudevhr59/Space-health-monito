@@ -132,11 +132,35 @@ npm run dev
 ### Running Automated Test Suite
 ```bash
 npm run test
-# Executes 50 automated tests verifying Database, Telemetry Validation, ML Isolation Forest, RBAC, and Provenance.
+# Executes 103 comprehensive automated tests across 15 suites verifying:
+# - Subsystem Health Probes & Readiness
+# - Telemetry Validation & Failure Cases (Clock Drift, Sensor Artifacts, Extreme Limits)
+# - Database Querying, Filtering & Pagination
+# - Pure-Python Isolation Forest & Epistemic Attribution (Port 5050)
+# - Personalized Baseline Management (3-Phase Comparison)
+# - Daily Astronaut Health Briefings (Sections A-H)
+# - Multi-System Context Correlation Engine (Pearson r + Medical Non-Causation Guardrails)
+# - Unified Mission Timeline Engine (Filterable Event Streams)
+# - Prioritized 5-State Alert Lifecycle (New, Acknowledged, Under Review, Resolved, Dismissed)
+# - Scientific Data Provenance & NASA Datasets (OSDR, Twins Study, ThermoLab)
+# - Security Role-Based Access Control (RBAC) & Token Lifecycle
+# - 7-Tier Telemetry Classification & Observation Preservation
+# - Mission Simulation Engine (Scenarios A, B, C, D)
+# - Cross-Astronaut Security & Data Isolation
+# - Storage Reliability & Self-Healing Disaster Recovery
 ```
 
-### Running Production Build
+### Running Production Build & Lint Checks
 ```bash
-npm run build
-npm run lint
+npm run build   # Production Vite bundle
+npm run lint    # TypeScript typecheck (tsc --noEmit)
 ```
+
+---
+
+## 8. Integrated Mission Simulation Environment
+Accessible via the persistent top Mission Control bar across all views:
+- **Scenario A:** Normal Mission Operations (nominal circadian rhythm, 100% verified data quality, zero unsupported alerts).
+- **Scenario B (Active Default):** Gradual Health Deviation (subtle autonomic drift -> statistical anomaly score 0.72 -> context correlation with sleep loss and high ARED workload -> alert triage review).
+- **Scenario C:** Sensor Failure & Poor Data Quality (optical coupling degradation -> stale packets -> out-of-bounds artifact classified as `POTENTIAL_SENSOR_ARTIFACT` and preserved in raw observations -> sensor offline flag).
+- **Scenario D:** Deep-Space Comm Interruption (DSN link cut -> transition to local cached baselines -> offline queueing -> link restoration -> exponential backoff sync with zero duplicates).

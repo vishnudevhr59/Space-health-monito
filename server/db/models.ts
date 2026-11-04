@@ -30,6 +30,28 @@ export type DataQualityStatus =
 export type TriageSeverity = 'Critical' | 'Warning' | 'Advisory' | 'Nominal';
 export type AlertReviewStatus = 'Active' | 'New' | 'Acknowledged' | 'Under Review' | 'Resolved' | 'Dismissed';
 
+export type TelemetryClassificationType =
+  | 'NOMINAL'
+  | 'STRUCTURALLY_INVALID'
+  | 'IMPOSSIBLE_OR_MALFORMED'
+  | 'UNUSUAL_OBSERVATION'
+  | 'POTENTIAL_SENSOR_ARTIFACT'
+  | 'MISSING_MEASUREMENT'
+  | 'STALE_MEASUREMENT'
+  | 'REQUIRES_HUMAN_REVIEW';
+
+export interface IRawObservation {
+  id: string;
+  astronautId: string;
+  receivedAt: string;
+  rawPayload: any;
+  classification: TelemetryClassificationType;
+  rejectionReason?: string;
+  warnings?: string[];
+  ingestedRecordId?: string;
+  dataSource: string;
+}
+
 // 1. User Account
 export interface IUser {
   id: string;

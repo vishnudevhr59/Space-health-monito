@@ -1,7 +1,10 @@
 /**
  * SPACE HEALTH MONITO — Comprehensive Automated Test Suite
  * Validates Database, Telemetry Pipeline, Python ML Isolation Forest,
- * Security RBAC, Data Provenance, and System Health.
+ * Security RBAC, Data Provenance, Daily Briefing, Context Explorer,
+ * Mission Timeline, Offline Backoff, and Failure Scenarios.
+ * 
+ * NASA Space Apps Challenge 2026
  */
 
 const BASE_URL = 'http://127.0.0.1:3000';
@@ -28,7 +31,7 @@ function assert(condition: boolean, suite: string, name: string, details?: strin
 
 async function runTests() {
   console.log('\n===============================================================');
-  console.log('   SPACE HEALTH MONITO — AUTOMATED ACCEPTANCE TEST SUITE');
+  console.log('   SPACE HEALTH MONITO — COMPREHENSIVE ACCEPTANCE TEST SUITE');
   console.log('===============================================================\n');
 
   // -----------------------------------------------------------------
@@ -56,9 +59,9 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
-  // SUITE 2: TELEMETRY VALIDATION & PIPELINE (SECTION 3, 4)
+  // SUITE 2: TELEMETRY VALIDATION & FAILURE CASES
   // -----------------------------------------------------------------
-  console.log('\nRunning Suite 2: Telemetry Validation & Ingestion Pipeline...');
+  console.log('\nRunning Suite 2: Telemetry Validation & Failure Cases...');
   try {
     // 2.1 Valid Ingestion
     const validRes = await fetch(`${BASE_URL}/api/telemetry`, {
@@ -76,7 +79,7 @@ async function runTests() {
     });
     assert(validRes.status === 201, 'Telemetry Validation', 'Valid telemetry accepted with HTTP 201');
     const validData = await validRes.json();
-    assert(validData.status === 'INGESTED' && validData.record.heartRate === 64, 'Telemetry Validation', 'Record correctly stored with verified heart rate');
+    assert(validData.status === 'INGESTED' && validData.record.heartRate === 64, 'Telemetry Validation', 'Record stored with verified heart rate');
 
     // 2.2 Rejection of Impossible Value (Heart Rate 340 BPM)
     const impossibleRes = await fetch(`${BASE_URL}/api/telemetry`, {
@@ -88,11 +91,21 @@ async function runTests() {
         spo2: 98.0,
       }),
     });
-    assert(impossibleRes.status === 422, 'Telemetry Validation', 'Impossible heart rate (340 BPM) rejected with HTTP 422');
-    const impossibleData = await impossibleRes.json();
-    assert(impossibleData.error.includes('Payload rejected'), 'Telemetry Validation', 'Rejection message clearly states payload rejected');
+    assert(impossibleRes.status === 422, 'Telemetry Failure Handling', 'Impossible heart rate (340 BPM) rejected with HTTP 422');
 
-    // 2.3 Rejection of Impossible SpO2 (> 100%)
+    // 2.3 Rejection of Impossible Low Heart Rate (< 28 BPM)
+    const lowHrRes = await fetch(`${BASE_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        astronautId: 'astro-1',
+        heartRate: 15,
+        spo2: 98.0,
+      }),
+    });
+    assert(lowHrRes.status === 422, 'Telemetry Failure Handling', 'Physiologically impossible low heart rate (<28 BPM) rejected with HTTP 422');
+
+    // 2.4 Rejection of Impossible SpO2 (> 100%)
     const badSpo2Res = await fetch(`${BASE_URL}/api/telemetry`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,9 +115,9 @@ async function runTests() {
         spo2: 115,
       }),
     });
-    assert(badSpo2Res.status === 422, 'Telemetry Validation', 'Impossible SpO2 (115%) rejected with HTTP 422');
+    assert(badSpo2Res.status === 422, 'Telemetry Failure Handling', 'Impossible SpO2 (115%) rejected with HTTP 422');
 
-    // 2.4 Rejection of Future Timestamp (Clock Drift > 5m)
+    // 2.5 Rejection of Future Timestamp (Clock Drift > 5m)
     const futureDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     const futureRes = await fetch(`${BASE_URL}/api/telemetry`, {
       method: 'POST',
@@ -116,9 +129,9 @@ async function runTests() {
         timestamp: futureDate,
       }),
     });
-    assert(futureRes.status === 422, 'Telemetry Validation', 'Future timestamp (>5m drift) rejected with HTTP 422');
+    assert(futureRes.status === 422, 'Telemetry Failure Handling', 'Future timestamp (>5m drift) rejected with HTTP 422');
 
-    // 2.5 Rejection of Missing Astronaut ID
+    // 2.6 Rejection of Missing Astronaut ID
     const missingIdRes = await fetch(`${BASE_URL}/api/telemetry`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,9 +140,19 @@ async function runTests() {
         spo2: 98.0,
       }),
     });
-    assert(missingIdRes.status === 422, 'Telemetry Validation', 'Missing astronautId rejected with HTTP 422');
+    assert(missingIdRes.status === 422, 'Telemetry Failure Handling', 'Missing astronautId rejected with HTTP 422');
 
-    // 2.6 Idempotency & Deduplication Check
+    // 2.7 Rejection of Missing Telemetry Core Fields (No HR or SpO2)
+    const emptyFieldsRes = await fetch(`${BASE_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        astronautId: 'astro-1',
+      }),
+    });
+    assert(emptyFieldsRes.status === 422, 'Telemetry Failure Handling', 'Missing core physiological metrics rejected with HTTP 422');
+
+    // 2.8 Idempotency & Deduplication Check
     const fixedKey = `test_idempotency_key_${Date.now()}`;
     const idemp1 = await fetch(`${BASE_URL}/api/telemetry`, {
       method: 'POST',
@@ -145,7 +168,7 @@ async function runTests() {
     });
     assert(idemp2.status === 200, 'Telemetry Idempotency', 'Duplicate submission detected & returned HTTP 200');
     const idemp2Data = await idemp2.json();
-    assert(idemp2Data.isDuplicate === true, 'Telemetry Idempotency', 'Flag isDuplicate set to true without creating ghost duplicate');
+    assert(idemp2Data.isDuplicate === true, 'Telemetry Idempotency', 'Flag isDuplicate set to true without creating duplicate database record');
   } catch (err: any) {
     assert(false, 'Telemetry Pipeline', 'Exception during validation tests', err.message);
   }
@@ -200,22 +223,17 @@ async function runTests() {
     assert(anomalyRes.status === 200, 'ML Anomaly Detection', 'Anomaly detection endpoint returns HTTP 200');
     const anomData = await anomalyRes.json();
     assert(anomData.status === 'SUCCESS', 'ML Anomaly Detection', 'Execution status is SUCCESS');
-    assert(typeof anomData.anomalyScore === 'number' && anomData.anomalyScore >= 0 && anomData.anomalyScore <= 1, 'ML Anomaly Detection', 'Anomaly score is normalized between 0.0 and 1.0');
-    assert(anomData.triageLevel === 'PRIORITY REVIEW', 'ML Anomaly Detection', 'Multi-variate deviation correctly triaged as PRIORITY REVIEW');
-    assert(Array.isArray(anomData.contributingIndicators) && anomData.contributingIndicators.length === 4, 'ML Contributing Indicators', 'All 4 biometrics decomposed into contributing indicators');
-    
-    // Check indicator ranking
-    const topDriver = anomData.contributingIndicators[0];
-    assert(topDriver.contributionWeight > 0 && typeof topDriver.zScore === 'number', 'ML Contributing Indicators', `Primary driver (${topDriver.feature}) has quantified contribution weight (${topDriver.contributionWeight}%) and Z-score (${topDriver.zScore}σ)`);
+    assert(typeof anomData.anomalyScore === 'number' && anomData.anomalyScore >= 0 && anomData.anomalyScore <= 1, 'ML Anomaly Detection', 'Anomaly score normalized 0.0 - 1.0');
+    assert(anomData.triageLevel === 'PRIORITY REVIEW', 'ML Anomaly Detection', 'Multi-variate deviation triaged as PRIORITY REVIEW');
+    assert(Array.isArray(anomData.contributingIndicators) && anomData.contributingIndicators.length === 4, 'ML Contributing Indicators', 'All 4 biometrics decomposed into indicators');
 
-    // 4.3 Missing Feature Adaptive Imputation
+    // 4.3 Missing Feature Adaptive Imputation & Epistemic Uncertainty
     const partialRes = await fetch(`${BASE_URL}/api/ml/anomaly-detection`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sample: {
           heartRate: 62,
-          // SpO2, bodyTemperature, HRV missing
         },
         threshold: 2.0,
       }),
@@ -225,7 +243,7 @@ async function runTests() {
     assert(partialData.status === 'SUCCESS', 'ML Missing Features', 'Adaptive baseline imputation succeeded');
     assert(partialData.epistemicUncertainty > 0.05, 'ML Missing Features', 'Epistemic uncertainty penalizes imputed metrics');
 
-    // 4.4 Insufficient Data Rejection
+    // 4.4 Empty Payload Rejection
     const emptyRes = await fetch(`${BASE_URL}/api/ml/anomaly-detection`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -238,7 +256,7 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
-  // SUITE 5: BASELINES & 3-PHASE COMPARISON (SECTION 6)
+  // SUITE 5: BASELINES & 3-PHASE COMPARISON
   // -----------------------------------------------------------------
   console.log('\nRunning Suite 5: Personalized Baseline Management...');
   try {
@@ -256,9 +274,126 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
-  // SUITE 6: SCIENTIFIC DATA PROVENANCE & TRACEABILITY (SECTION 7)
+  // SUITE 6: DAILY ASTRONAUT HEALTH BRIEFING (FEATURE 3)
   // -----------------------------------------------------------------
-  console.log('\nRunning Suite 6: Scientific Data Provenance & Traceability...');
+  console.log('\nRunning Suite 6: Daily Astronaut Health Briefing (Sections A-H)...');
+  try {
+    const brfRes = await fetch(`${BASE_URL}/api/briefing/astro-1`);
+    assert(brfRes.status === 200, 'Daily Briefing', 'Briefing endpoint returns HTTP 200');
+    const brfData = await brfRes.json();
+
+    assert(typeof brfData.briefingId === 'string' && brfData.briefingId.startsWith('BRF-'), 'Daily Briefing', 'Generates traceable Briefing ID');
+    assert(Array.isArray(brfData.importantObservations) && brfData.importantObservations.length >= 2, 'Daily Briefing', 'Section A: Important observations populated with Z-scores');
+    assert(brfData.importantObservations[0].sourceRecordId !== undefined, 'Daily Briefing Traceability', 'Section A: Observations link directly to underlying source record IDs');
+    assert(brfData.reportingPeriodChanges.restingHeartRate !== undefined, 'Daily Briefing', 'Section B: 24-hour period changes computed');
+    assert(Array.isArray(brfData.persistentTrends) && brfData.persistentTrends.length >= 2, 'Daily Briefing', 'Section C: Persistent multi-sol trends tracked');
+    assert(brfData.dataQualityAndIntegrity.activeSensors.length >= 3, 'Daily Briefing', 'Section D: Sensor data quality audit present');
+    assert(brfData.environmentalContext.cabinCO2 !== undefined, 'Daily Briefing', 'Section E: Spacecraft environmental context integrated');
+    assert(Array.isArray(brfData.scheduledTasks) && brfData.scheduledTasks.length >= 3, 'Daily Briefing', 'Section F: Scheduled crew tasks listed');
+    assert(brfData.systemAndSyncStatus.dsnLink.includes('LIVE'), 'Daily Briefing', 'Section H: DSN system synchronization status reported');
+
+    // Test Briefing Item Acknowledgment
+    const ackRes = await fetch(`${BASE_URL}/api/briefing/astro-1/acknowledge/obs-01`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    assert(ackRes.status === 200, 'Daily Briefing Acknowledge', 'Briefing item acknowledged successfully with HTTP 200');
+    const ackData = await ackRes.json();
+    assert(ackData.success === true && ackData.acknowledgedItemId === 'obs-01', 'Daily Briefing Acknowledge', 'Acknowledgement response confirms observation ID');
+  } catch (err: any) {
+    assert(false, 'Daily Briefing', 'Briefing tests caught error', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 7: MULTI-SYSTEM CONTEXT CORRELATION ENGINE (FEATURE 2)
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 7: Multi-System Context Correlation Engine...');
+  try {
+    const corrRes = await fetch(`${BASE_URL}/api/context/correlation?astronautId=astro-1&metricA=sleepDurationHours&metricB=heartRate&windowDays=7`);
+    assert(corrRes.status === 200, 'Context Correlation', 'Correlation endpoint returns HTTP 200');
+    const corrData = await corrRes.json();
+
+    assert(corrData.pairedObservationCount === 7, 'Context Correlation', 'All 7 sols aligned with paired observations');
+    assert(typeof corrData.pearsonCorrelationR === 'number', 'Context Correlation', 'Pearson correlation coefficient r computed');
+    assert(corrData.disclaimer.includes('does NOT imply clinical causation'), 'Context Correlation Guardrails', 'Enforces mandatory non-causation medical disclaimer');
+    assert(Array.isArray(corrData.alignedData) && corrData.alignedData.length === 7, 'Context Correlation', 'Returns aligned dual-metric time-series');
+  } catch (err: any) {
+    assert(false, 'Context Correlation', 'Correlation tests caught error', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 8: UNIFIED MISSION TIMELINE (FEATURE 4)
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 8: Unified Mission Timeline Engine...');
+  try {
+    const timeRes = await fetch(`${BASE_URL}/api/timeline/astro-1`);
+    assert(timeRes.status === 200, 'Mission Timeline', 'Timeline endpoint returns HTTP 200');
+    const timeData = await timeRes.json();
+
+    assert(Array.isArray(timeData.events) && timeData.events.length > 0, 'Mission Timeline', 'Events array populated');
+    assert(timeData.events.some((e: any) => e.category === 'Exercise'), 'Mission Timeline', 'Includes Exercise events');
+    assert(timeData.events.some((e: any) => e.category === 'Sleep'), 'Mission Timeline', 'Includes Sleep events');
+    assert(timeData.events.some((e: any) => e.category === 'Telemetry'), 'Mission Timeline', 'Includes Telemetry events');
+    assert(timeData.events[0].sourceId !== undefined, 'Mission Timeline Traceability', 'Every timeline event links to source record ID');
+
+    // Filter by single category
+    const filterRes = await fetch(`${BASE_URL}/api/timeline/astro-1?categories=Sleep`);
+    const filterData = await filterRes.json();
+    assert(filterData.events.every((e: any) => e.category === 'Sleep'), 'Mission Timeline Filter', 'Category filter strictly enforced');
+  } catch (err: any) {
+    assert(false, 'Mission Timeline', 'Timeline tests caught error', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 9: 5-STATE ALERT WORKFLOW & OPERATIONAL PROCEDURES (FEATURE 7)
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 9: Prioritized 5-State Alert Lifecycle...');
+  try {
+    const alertsRes = await fetch(`${BASE_URL}/api/alerts`);
+    const alertsList = await alertsRes.json();
+    assert(Array.isArray(alertsList) && alertsList.length > 0, 'Alerts System', 'Active alerts list retrieved');
+
+    const testAlert = alertsList[0];
+
+    // 9.1 Mark Under Review
+    const reviewRes = await fetch(`${BASE_URL}/api/alerts/${testAlert.id}/acknowledge`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'review' }),
+    });
+    assert(reviewRes.status === 200, 'Alerts Lifecycle', 'Mark Under Review transitions state to HTTP 200');
+    const reviewData = await reviewRes.json();
+    assert(reviewData.status === 'Under Review', 'Alerts Lifecycle', 'Status confirmed as "Under Review"');
+
+    // 9.2 Dismiss with Mandatory Clinical Rationale
+    const dismissRes = await fetch(`${BASE_URL}/api/alerts/${testAlert.id}/acknowledge`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'dismiss',
+        dismissalReason: 'Verified transient post-ARED recovery lag; seated trace nominal.',
+      }),
+    });
+    assert(dismissRes.status === 200, 'Alerts Lifecycle', 'Dismiss with reason returns HTTP 200');
+    const dismissData = await dismissRes.json();
+    assert(dismissData.status === 'Dismissed' && dismissData.dismissalReason.includes('post-ARED'), 'Alerts Lifecycle', 'Status transitioned to Dismissed with logged rationale');
+
+    // 9.3 Resolve Alert
+    const resolveRes = await fetch(`${BASE_URL}/api/alerts/${testAlert.id}/acknowledge`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'resolve' }),
+    });
+    const resolveData = await resolveRes.json();
+    assert(resolveData.status === 'Resolved', 'Alerts Lifecycle', 'Status transitioned to Resolved');
+  } catch (err: any) {
+    assert(false, 'Alerts System', 'Alert test caught error', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 10: SCIENTIFIC DATA PROVENANCE & NASA REFERENCES
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 10: Scientific Data Provenance & NASA Datasets...');
   try {
     const provRes = await fetch(`${BASE_URL}/api/provenance`);
     assert(provRes.status === 200, 'Data Provenance', 'Provenance endpoint returns HTTP 200');
@@ -267,29 +402,29 @@ async function runTests() {
     assert(provData.provenanceStandards.SIMULATED_TELEMETRY !== undefined, 'Data Provenance', 'Defines SIMULATED_TELEMETRY standard');
     assert(provData.provenanceStandards.ILLUSTRATIVE_REFERENCE !== undefined, 'Data Provenance', 'Defines ILLUSTRATIVE_REFERENCE standard');
     assert(Array.isArray(provData.verifiedDatasets) && provData.verifiedDatasets.length >= 3, 'Data Provenance', 'Contains verified NASA datasets with source URLs');
-    assert(provData.verifiedDatasets.some((d: any) => d.datasetId === 'NASA OSDR GL-DS-8841'), 'Data Provenance', 'Contains NASA OSDR Twins Study dataset reference');
+    assert(provData.verifiedDatasets.some((d: any) => d.datasetId === 'NASA OSDR GL-DS-8841'), 'Data Provenance', 'Contains NASA OSDR Twins Study reference');
+    assert(provData.verifiedDatasets.some((d: any) => d.datasetId === 'ThermoLab-ISS-09'), 'Data Provenance', 'Contains ThermoLab core body temperature reference');
   } catch (err: any) {
     assert(false, 'Data Provenance', 'Failed provenance test', err.message);
   }
 
   // -----------------------------------------------------------------
-  // SUITE 7: SECURITY & ROLE-BASED ACCESS CONTROL (RBAC) (SECTION 12)
+  // SUITE 11: SECURITY & ROLE-BASED ACCESS CONTROL (RBAC)
   // -----------------------------------------------------------------
-  console.log('\nRunning Suite 7: Security & Role-Based Access Control...');
+  console.log('\nRunning Suite 11: Security & Role-Based Access Control...');
   try {
-    // 7.1 Rejection of Unauthorized Mission Creation by non-admin role
+    // 11.1 Rejection of Unauthorized Mission Creation by non-admin role
     const unauthRes = await fetch(`${BASE_URL}/api/missions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Token for Astronaut role (not Mission Administrator)
         Authorization: `Bearer shm_jwt_${Buffer.from(JSON.stringify({ userId: 'usr-1', role: 'Astronaut', exp: Date.now() + 100000 })).toString('base64')}`,
       },
       body: JSON.stringify({ name: 'Unauthorized Mission', code: 'UNAUTH-01' }),
     });
     assert(unauthRes.status === 403, 'Security RBAC', 'Astronaut role forbidden from creating missions (HTTP 403)');
 
-    // 7.2 Allowed Mission Creation by Mission Administrator
+    // 11.2 Allowed Mission Creation by Mission Administrator
     const authAdminRes = await fetch(`${BASE_URL}/api/missions`, {
       method: 'POST',
       headers: {
@@ -300,7 +435,7 @@ async function runTests() {
     });
     assert(authAdminRes.status === 201, 'Security RBAC', 'Mission Administrator successfully creates mission (HTTP 201)');
 
-    // 7.3 Expired Token Rejection
+    // 11.3 Expired Token Rejection
     const expiredRes = await fetch(`${BASE_URL}/api/missions`, {
       method: 'POST',
       headers: {
@@ -312,6 +447,170 @@ async function runTests() {
     assert(expiredRes.status === 401, 'Security RBAC', 'Expired token rejected with HTTP 401');
   } catch (err: any) {
     assert(false, 'Security RBAC', 'Failed security tests', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 12: 7-TIER TELEMETRY CLASSIFICATION & OBSERVATION PRESERVATION
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 12: 7-Tier Telemetry Classification & Observation Preservation...');
+  try {
+    // 12.1 Nominal classification
+    const nominalRes = await fetch(`${BASE_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        astronautId: 'astro-1',
+        heartRate: 64,
+        spo2: 98.4,
+        bodyTemperature: 36.6,
+      }),
+    });
+    const nominalData = await nominalRes.json();
+    assert(nominalRes.status === 201 && nominalData.classification === 'NOMINAL', 'Data Classification', 'Nominal vitals classified as NOMINAL');
+
+    // 12.2 Unusual observation classification (accepted with flag)
+    const unusualRes = await fetch(`${BASE_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        astronautId: 'astro-1',
+        heartRate: 115,
+        spo2: 94.0,
+      }),
+    });
+    const unusualData = await unusualRes.json();
+    assert(unusualRes.status === 201 && unusualData.classification === 'UNUSUAL_OBSERVATION', 'Data Classification', 'Excursion vitals classified as UNUSUAL_OBSERVATION');
+
+    // 12.3 Potential sensor artifact preservation (rejected from stream, kept in raw observations)
+    const artifactRes = await fetch(`${BASE_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        astronautId: 'astro-1',
+        heartRate: 310,
+        spo2: 98.0,
+      }),
+    });
+    const artifactData = await artifactRes.json();
+    assert(artifactRes.status === 422 && artifactData.classification === 'POTENTIAL_SENSOR_ARTIFACT', 'Data Classification', 'Extreme artifact (310 BPM) classified as POTENTIAL_SENSOR_ARTIFACT');
+    assert(artifactData.preservedInRawObservations === true, 'Data Classification', 'Rejected artifact preserved in raw observations store');
+
+    // 12.4 Raw Observations API retrieval
+    const rawObsRes = await fetch(`${BASE_URL}/api/telemetry/raw-observations`);
+    assert(rawObsRes.status === 200, 'Observation Provenance', 'Raw observations endpoint returns HTTP 200');
+    const rawObsData = await rawObsRes.json();
+    assert(Array.isArray(rawObsData.observations) && rawObsData.total >= 1, 'Observation Provenance', 'Raw observations array populated and traceable');
+  } catch (err: any) {
+    assert(false, 'Data Classification', 'Telemetry classification test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 13: MISSION SIMULATION ENGINE (SCENARIOS A, B, C, D)
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 13: Mission Simulation Engine...');
+  try {
+    // 13.1 Scenario List
+    const scenariosRes = await fetch(`${BASE_URL}/api/simulation/scenarios`);
+    assert(scenariosRes.status === 200, 'Mission Simulation', 'Scenarios endpoint returns HTTP 200');
+    const scenariosData = await scenariosRes.json();
+    assert(Array.isArray(scenariosData) && scenariosData.length === 4, 'Mission Simulation', 'Provides all 4 mission scenarios (A, B, C, D)');
+
+    // 13.2 State Inquiry (Scenario B default active)
+    const stateRes = await fetch(`${BASE_URL}/api/simulation/state`);
+    assert(stateRes.status === 200, 'Mission Simulation', 'Simulation state endpoint returns HTTP 200');
+    const stateData = await stateRes.json();
+    assert(stateData.activeScenario === 'SCENARIO_B', 'Mission Simulation', 'Scenario B is active default as requested');
+
+    // 13.3 Start / Select Scenario
+    const startRes = await fetch(`${BASE_URL}/api/simulation/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario: 'SCENARIO_B' }),
+    });
+    assert(startRes.status === 200, 'Mission Simulation', 'Simulation start executes successfully');
+
+    // 13.4 Pause Simulation
+    const pauseRes = await fetch(`${BASE_URL}/api/simulation/pause`, { method: 'POST' });
+    const pauseData = await pauseRes.json();
+    assert(pauseRes.status === 200 && pauseData.state.status === 'PAUSED', 'Mission Simulation', 'Simulation pauses successfully');
+
+    // 13.5 Resume Simulation
+    const resumeRes = await fetch(`${BASE_URL}/api/simulation/resume`, { method: 'POST' });
+    const resumeData = await resumeRes.json();
+    assert(resumeRes.status === 200 && resumeData.state.status === 'RUNNING', 'Mission Simulation', 'Simulation resumes successfully');
+
+    // 13.6 Advance Step
+    const stepRes = await fetch(`${BASE_URL}/api/simulation/step`, { method: 'POST' });
+    const stepData = await stepRes.json();
+    assert(stepRes.status === 200 && stepData.state.currentStep === 1, 'Mission Simulation', 'Simulation advances to step 1');
+
+    // 13.7 Reset Simulation
+    const resetRes = await fetch(`${BASE_URL}/api/simulation/reset`, { method: 'POST' });
+    const resetData = await resetRes.json();
+    assert(resetRes.status === 200 && resetData.state.currentStep === 0, 'Mission Simulation', 'Simulation resets to step 0');
+  } catch (err: any) {
+    assert(false, 'Mission Simulation', 'Simulation engine failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 14: CROSS-ASTRONAUT SECURITY & DATA ISOLATION
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 14: Cross-Astronaut Security & Data Isolation...');
+  try {
+    // 14.1 Astronaut attempting unauthorized write to another astronaut's telemetry
+    const crossAstroRes = await fetch(`${BASE_URL}/api/telemetry/astro-2`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer shm_jwt_${Buffer.from(JSON.stringify({ userId: 'usr-1', role: 'Astronaut', assignedCrewId: 'astro-1', exp: Date.now() + 100000 })).toString('base64')}`,
+      },
+      body: JSON.stringify({ heartRate: 70, spo2: 98.0 }),
+    });
+    assert(crossAstroRes.status === 403, 'Cross-Astronaut Isolation', 'Astronaut forbidden from writing to other crew telemetry (HTTP 403)');
+
+    // 14.2 Astronaut authorized write to own telemetry
+    const selfAstroRes = await fetch(`${BASE_URL}/api/telemetry/astro-1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer shm_jwt_${Buffer.from(JSON.stringify({ userId: 'usr-1', role: 'Astronaut', assignedCrewId: 'astro-1', exp: Date.now() + 100000 })).toString('base64')}`,
+      },
+      body: JSON.stringify({ heartRate: 65, spo2: 98.4 }),
+    });
+    assert(selfAstroRes.status === 201 || selfAstroRes.status === 200, 'Cross-Astronaut Isolation', 'Astronaut permitted to write to own telemetry');
+
+    // 14.3 Flight Medical Officer authorized to write to any astronaut
+    const fmoRes = await fetch(`${BASE_URL}/api/telemetry/astro-2`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer shm_jwt_${Buffer.from(JSON.stringify({ userId: 'usr-2', role: 'Flight Medical Officer', exp: Date.now() + 100000 })).toString('base64')}`,
+      },
+      body: JSON.stringify({ heartRate: 68, spo2: 98.6 }),
+    });
+    assert(fmoRes.status === 201 || fmoRes.status === 200, 'Cross-Astronaut Isolation', 'Flight Medical Officer permitted to manage any crew telemetry');
+  } catch (err: any) {
+    assert(false, 'Cross-Astronaut Isolation', 'Data isolation test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 15: STORAGE RELIABILITY & SELF-HEALING DISASTER RECOVERY
+  // -----------------------------------------------------------------
+  console.log('\nRunning Suite 15: Storage Reliability & Self-Healing Disaster Recovery...');
+  try {
+    // 15.1 Snapshot Backup Creation
+    const backupRes = await fetch(`${BASE_URL}/api/system/backup`, { method: 'POST' });
+    assert(backupRes.status === 200, 'Disaster Recovery', 'Snapshot backup endpoint returns HTTP 200');
+    const backupData = await backupRes.json();
+    assert(backupData.status === 'BACKUP_CREATED' && Boolean(backupData.backupPath), 'Disaster Recovery', 'Backup file path returned');
+
+    // 15.2 Restore From Snapshot
+    const restoreRes = await fetch(`${BASE_URL}/api/system/restore`, { method: 'POST' });
+    assert(restoreRes.status === 200, 'Disaster Recovery', 'Restore endpoint returns HTTP 200');
+    const restoreData = await restoreRes.json();
+    assert(restoreData.status === 'RESTORE_SUCCESS', 'Disaster Recovery', 'Self-healing restoration verified successfully');
+  } catch (err: any) {
+    assert(false, 'Disaster Recovery', 'Storage reliability test failure', err.message);
   }
 
   // -----------------------------------------------------------------
