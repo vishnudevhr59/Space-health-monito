@@ -34,7 +34,14 @@ import { SystemHealthPage } from './pages/SystemHealthPage';
 import { MissionSimulationBar } from './components/MissionSimulationBar';
 import { LogVitalsModal } from './components/LogVitalsModal';
 import { EmergencyBeaconModal } from './components/EmergencyBeaconModal';
+import { ShiftHandoverModal } from './components/ShiftHandoverModal';
 import { SplashScreen } from './components/SplashScreen';
+import { MissionControlTicker } from './components/MissionControlTicker';
+import {
+  AnomalyInjectionState,
+  NOMINAL_HEALTH_STATE,
+} from './components/SimulationAnomalyPanel';
+import { MissionAuditLogModal } from './components/MissionAuditLogModal';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState<boolean>(true);
@@ -43,7 +50,10 @@ export default function App() {
   const [isProvenanceModalOpen, setIsProvenanceModalOpen] = useState(false);
   const [isLogVitalsModalOpen, setIsLogVitalsModalOpen] = useState(false);
   const [isEmergencyBeaconOpen, setIsEmergencyBeaconOpen] = useState(false);
+  const [isShiftHandoverOpen, setIsShiftHandoverOpen] = useState(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [anomalyState, setAnomalyState] = useState<AnomalyInjectionState>(NOMINAL_HEALTH_STATE);
 
   // Active User session (Default: CDR Sarah Chen)
   const [currentUser, setCurrentUser] = useState<User>({
@@ -284,6 +294,8 @@ export default function App() {
         onOpenProvenanceModal={() => setIsProvenanceModalOpen(true)}
         onOpenLogVitals={() => setIsLogVitalsModalOpen(true)}
         onOpenEmergencyBeacon={() => setIsEmergencyBeaconOpen(true)}
+        onOpenShiftHandover={() => setIsShiftHandoverOpen(true)}
+        onOpenAuditModal={() => setIsAuditModalOpen(true)}
         onSyncOffline={() => {
           offlineSyncService.startBackgroundSync();
           loadInitialData();
@@ -291,10 +303,27 @@ export default function App() {
         activeAlertCount={activeAlertCount}
       />
 
-      {/* ROW 3: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
-      <MissionSimulationBar />
+      {/* ROW 3: MISSION CONTROL LIVE TICKER (MET, Ka-BAND LATENCY, ISTRAC/HOUSTON GROUND LOCK, ECLSS, STATUS TOGGLE) */}
+      <MissionControlTicker
+        missionDay={astronaut.missionDay}
+        habitatPressurePsi={anomalyState.cabinPressurePsi}
+        cabinCo2MmHg={anomalyState.cabinCo2MmHg}
+        emergencyStatus={anomalyState.severity}
+        onStatusChange={(newStatus) =>
+          setAnomalyState((prev) => ({
+            ...prev,
+            severity: newStatus,
+            isAnomalyActive: newStatus !== 'NOMINAL',
+            anomalyName: newStatus === 'NOMINAL' ? 'Nominal Operations' : `Manual Emergency State: ${newStatus}`,
+          }))
+        }
+        onOpenAuditModal={() => setIsAuditModalOpen(true)}
+      />
 
-      {/* ROW 4: MAIN VIEWPORT STAGE */}
+      {/* ROW 4: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
+      <MissionSimulationBar onNavigateTab={(tab) => setCurrentTab(tab)} />
+
+      {/* ROW 5: MAIN VIEWPORT STAGE */}
       <div className="flex-1 flex relative w-full overflow-x-hidden">
         <main className="w-full flex-1 min-w-0 transition-all duration-300">
           {/* PAGE 1: LANDING PAGE */}
@@ -326,6 +355,9 @@ export default function App() {
               onRefreshTelemetry={loadInitialData}
               onLogMeasurement={handleLogMeasurement}
               onNavigate={setCurrentTab}
+              anomalyState={anomalyState}
+              onInjectAnomaly={setAnomalyState}
+              onResetNominal={() => setAnomalyState(NOMINAL_HEALTH_STATE)}
             />
           )}
 
@@ -450,6 +482,21 @@ export default function App() {
         onClose={() => setIsEmergencyBeaconOpen(false)}
         astronautName={astronaut.name}
         astronautId={astronaut.id}
+      />
+
+      {/* QUICK ACTION / FLIGHT SURGEON: SHIFT HANDOVER BRIEFING MODAL */}
+      <ShiftHandoverModal
+        isOpen={isShiftHandoverOpen}
+        onClose={() => setIsShiftHandoverOpen(false)}
+        astronaut={astronaut}
+        alerts={alerts}
+        currentUserFullName={currentUser.fullName}
+      />
+
+      {/* MISSION AUDIT TRAIL LEDGER & DATA EXPORT MODAL */}
+      <MissionAuditLogModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
       />
 
     </div>

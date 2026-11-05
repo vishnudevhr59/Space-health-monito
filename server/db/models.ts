@@ -410,3 +410,51 @@ export interface IWellnessAssessment {
   socialCohesionScore: number; // 1-10
   notes: string;
 }
+
+export interface IShiftHandoverRecord {
+  id: string;
+  shiftDate: string;
+  shiftPeriod: string;
+  outgoingSurgeon: string;
+  incomingSurgeon: string;
+  astronautId: string;
+  astronautName: string;
+  vitalsSummary24h: {
+    meanHeartRate: number;
+    heartRateRange: [number, number];
+    meanSpo2: number;
+    meanHrv: number;
+    meanCoreTemp: number;
+    sleepDurationHours: number;
+  };
+  openAlertsCount: number;
+  unresolvedIssues: string[];
+  clinicalDirectives: string[];
+  countermeasuresScheduled: string[];
+  outgoingSignature: string;
+  incomingSignature: string;
+  status: 'SUBMITTED' | 'SIGNED' | 'ARCHIVED';
+  timestamp: string;
+}
+
+export interface ISimulatedEmergencyBeaconPacket {
+  packetId: string;
+  utcTimestamp: string;
+  missionId: string;
+  habitatModule: string;
+  astronautId: string;
+  astronautName: string;
+  emergencyCode: string;
+  biometrics: {
+    heartRateBpm: number;
+    spo2Percent: number;
+    coreTempC: number;
+    bloodPressure: string;
+    hrvMs: number;
+  };
+  telemetrySource: string;
+  isSimulatedDemo: true;
+  dsnChannel: string;
+  packetChecksumSha256: string;
+  disclosure: string;
+}

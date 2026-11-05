@@ -212,7 +212,7 @@ export const AiAnalysisPage: React.FC<AiAnalysisPageProps> = ({
   const triageClassification = liveAnalysis?.riskClassification ?? 'NOMINAL';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6 overflow-x-hidden">
       
       {/* HEADER WITH SCIENTIFIC DISCLAIMER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">

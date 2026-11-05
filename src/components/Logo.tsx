@@ -92,12 +92,16 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
       </div>
 
       {showText && (
-        <div className="flex flex-col select-none">
-          <div className="flex items-center gap-1.5 leading-none">
-            <span className="font-extrabold tracking-wider text-white text-base md:text-lg">SPACE HEALTH</span>
-            <span className="font-bold tracking-wider text-cyan-400 text-base md:text-lg">MONITO</span>
+        <div className="flex flex-col select-none min-w-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 leading-none">
+            <span className="font-extrabold tracking-wider text-white text-xs sm:text-base md:text-lg whitespace-nowrap">
+              SPACE HEALTH
+            </span>
+            <span className="font-bold tracking-wider text-cyan-400 text-xs sm:text-base md:text-lg">
+              MONITO
+            </span>
           </div>
-          <span className="text-[10px] tracking-widest uppercase text-slate-400 font-mono mt-0.5">
+          <span className="text-[8px] sm:text-[10px] tracking-widest uppercase text-slate-400 font-mono mt-0.5 hidden sm:block whitespace-nowrap">
             Mission Decision Support · 2026
           </span>
         </div>

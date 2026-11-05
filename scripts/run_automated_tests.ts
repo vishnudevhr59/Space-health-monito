@@ -677,6 +677,129 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
+  // SUITE 17: GUIDED MISSION DEMONSTRATION & CAPABILITY INTEGRITY
+  // -----------------------------------------------------------------
+  console.log('Running Suite 17: Guided Demonstration & Capability Integrity...');
+  try {
+    // 17.1 Simulated Emergency Beacon Packet Generator
+    const beaconPayload = {
+      astronautId: 'astro-1',
+      astronautName: 'CDR Sarah Chen',
+      emergencyCode: 'MAYDAY-MED-01-DEMO',
+      biometrics: {
+        heartRateBpm: 142,
+        spo2Percent: 91.2,
+        coreTempC: 38.5,
+        bloodPressure: '158/96 mmHg',
+        hrvMs: 24,
+      },
+    };
+
+    const beaconRes = await fetch(`${BASE_URL}/api/simulation/beacon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(beaconPayload),
+    });
+    assert(beaconRes.status === 201, 'Capability Integrity', 'Simulated emergency beacon endpoint accepts packet and returns HTTP 201');
+    const beaconData = await beaconRes.json();
+    assert(beaconData.packet && beaconData.packet.isSimulatedDemo === true, 'Capability Integrity', 'Emergency beacon packet strictly enforces isSimulatedDemo: true flag');
+    assert(typeof beaconData.packet.packetChecksumSha256 === 'string', 'Capability Integrity', 'Emergency beacon packet includes SHA-256 checksum integrity header');
+    assert(beaconData.packet.disclosure.includes('LOCAL SOFTWARE SIMULATION DEMO'), 'Capability Integrity', 'Emergency beacon packet carries mandatory local simulation disclosure');
+
+    // 17.2 Flight Surgeon Shift Handover Execution
+    const handoverPayload = {
+      shiftDate: new Date().toISOString().split('T')[0],
+      shiftPeriod: 'Bravo (08:00-16:00 UTC)',
+      outgoingSurgeon: 'Dr. Marcus Vance (Flight Surgeon, MCC-Houston)',
+      incomingSurgeon: 'Dr. Elena Rostova, M.D. (Gateway Flight Med)',
+      astronautId: 'astro-1',
+      astronautName: 'CDR Sarah Chen',
+      vitalsSummary24h: {
+        meanHeartRate: 64,
+        heartRateRange: [56, 88],
+        meanSpo2: 98.2,
+        meanHrv: 58,
+        meanCoreTemp: 36.8,
+        sleepDurationHours: 6.8,
+      },
+      openAlertsCount: 1,
+      unresolvedIssues: ['Autonomic Fatigue under surveillance'],
+      clinicalDirectives: ['Hydration +750mL oral rehydration salts'],
+      countermeasuresScheduled: ['ARED Heavy Resistive Squat Protocol (14:00 UTC)'],
+      outgoingSignature: 'M. Vance, MD / MCC-SURGEON-04',
+      incomingSignature: 'E. Rostova, MD / GATEWAY-MED-02',
+    };
+
+    const handoverRes = await fetch(`${BASE_URL}/api/shift-handover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(handoverPayload),
+    });
+    assert(handoverRes.status === 201, 'Shift Handover Operations', 'Shift handover briefing endpoint saves record with dual signatures (HTTP 201)');
+    const handoverData = await handoverRes.json();
+    assert(handoverData.record && handoverData.record.status === 'SIGNED', 'Shift Handover Operations', 'Shift handover record confirmed as SIGNED status');
+
+    // 17.3 Shift Handover Retrieval
+    const latestHandoverRes = await fetch(`${BASE_URL}/api/shift-handover/latest`);
+    assert(latestHandoverRes.status === 200, 'Shift Handover Operations', 'Shift handover latest endpoint retrieves verified shift report');
+    const latestHandoverData = await latestHandoverRes.json();
+    assert(Boolean(latestHandoverData.latest?.outgoingSignature), 'Shift Handover Operations', 'Handover record retains outgoing and incoming digital signatures');
+
+    // 17.4 Simulation Reset Integrity
+    const simResetRes = await fetch(`${BASE_URL}/api/simulation/reset`, { method: 'POST' });
+    assert(simResetRes.status === 200, 'Simulation Controller', 'Simulation reset completes with HTTP 200');
+    const simResetData = await simResetRes.json();
+    assert(simResetData.state.currentStep === 0, 'Simulation Controller', 'Simulation state strictly reset to step 0');
+  } catch (err: any) {
+    assert(false, 'Capability Integrity', 'Demonstration & capability integrity test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 18: AI FLIGHT SURGEON DIAGNOSTICS & OFFLINE RESILIENCE
+  // -----------------------------------------------------------------
+  console.log('Running Suite 18: AI Flight Surgeon Diagnostics & Offline Resilience...');
+  try {
+    // 18.1 Valid Flight Surgeon Diagnostic Request
+    const testAnomaly = {
+      isAnomalyActive: true,
+      anomalyName: 'Acute Resting Tachycardia & Sympathovagal Exhaustion',
+      heartRate: 142,
+      spo2: 96.5,
+      bodyTemperature: 37.1,
+      bloodPressure: { systolic: 154, diastolic: 96 },
+      hrv: 18,
+      respiratoryRate: 24,
+      cabinPressurePsi: 14.7,
+      cabinCo2MmHg: 2.2,
+      vestibularConflictScore: 2.5,
+      severity: 'CRITICAL',
+      etiology: 'Sympathovagal deconditioning and cephalad fluid loss with cardiac hyper-irritability.',
+      countermeasures: ['Oral saline rehydration salt bolus 750 mL', '15° head-up sleep rack deployment'],
+    };
+
+    const diagRes = await fetch(`${BASE_URL}/api/ai/flight-surgeon-diagnostic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ anomalyState: testAnomaly }),
+    });
+    assert(diagRes.status === 200, 'Flight Surgeon Engine', 'Diagnostic endpoint returns HTTP 200');
+    const diagData = await diagRes.json();
+    assert(Boolean(diagData.anomalyName), 'Flight Surgeon Engine', 'Returns valid anomalyName');
+    assert(Array.isArray(diagData.countermeasures) && diagData.countermeasures.length >= 2, 'Flight Surgeon Engine', 'Returns structured countermeasure protocols');
+    assert(Boolean(diagData.clinicalDisclaimer), 'Flight Surgeon Engine', 'Carries aerospace medical disclaimer');
+
+    // 18.2 Validation on missing payload
+    const invalidRes = await fetch(`${BASE_URL}/api/ai/flight-surgeon-diagnostic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    assert(invalidRes.status === 400, 'Flight Surgeon Engine', 'Rejects missing anomalyState with HTTP 400');
+  } catch (err: any) {
+    assert(false, 'Flight Surgeon Engine', 'Flight Surgeon diagnostics test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
   // SUMMARY REPORT
   // -----------------------------------------------------------------
   console.log('\n===============================================================');

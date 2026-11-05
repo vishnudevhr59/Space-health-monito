@@ -82,23 +82,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
         <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-[#438BFF]/12 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-[#8B5CF6]/10 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left Column (7 cols): Hero Title, Description, CTAs */}
             <div className="lg:col-span-7 text-left space-y-6">
               
               {/* Mission Status Badge */}
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#101B30]/90 border border-[#00E5FF]/40 text-[#00E5FF] text-xs font-mono shadow-[0_0_15px_-3px_rgba(0,229,255,0.3)]">
-                <span className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse" />
+              <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-full bg-[#101B30]/90 border border-[#00E5FF]/40 text-[#00E5FF] text-[10px] sm:text-xs font-mono shadow-[0_0_15px_-3px_rgba(0,229,255,0.3)] max-w-full">
+                <span className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse shrink-0" />
                 <span className="tracking-wider uppercase font-semibold">MISSION STATUS: ORBITAL LINK SYNCHRONIZED</span>
-                <span className="text-slate-500">|</span>
-                <span className="text-slate-300">NASA Space Apps 2026</span>
+                <span className="text-slate-500 hidden xs:inline">|</span>
+                <span className="text-slate-300 hidden xs:inline">NASA Space Apps 2026</span>
               </div>
 
               {/* Exact Requested Hero Heading */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] break-words">
                 THE FUTURE OF <br />
                 <span className="bg-gradient-to-r from-[#00E5FF] via-[#438BFF] to-[#8B5CF6] bg-clip-text text-transparent">
                   HUMAN HEALTH
@@ -107,7 +107,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
               </h1>
 
               {/* Exact Requested Supporting Text */}
-              <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed max-w-xl">
+              <p className="text-sm sm:text-base lg:text-lg text-slate-300 font-normal leading-relaxed max-w-xl">
                 Intelligent health monitoring, scientific insights, and AI-powered decision support for the next generation of human space exploration.
               </p>
 
@@ -256,7 +256,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
       </section>
 
       {/* SPACE HEALTH CHALLENGES SECTION */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 w-full max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="text-xs uppercase font-mono tracking-widest text-[#00E5FF] mb-2 font-semibold">
             Operational Aerospace Physiology
@@ -306,7 +306,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
 
       {/* NASA OPEN SCIENCE DATA & RESEARCH INTEGRATION */}
       <section className="py-20 border-t border-slate-800/80 bg-[#070B16]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-[#101B30]/80 border border-[#00E5FF]/25 p-8 sm:p-12 shadow-2xl relative overflow-hidden">
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

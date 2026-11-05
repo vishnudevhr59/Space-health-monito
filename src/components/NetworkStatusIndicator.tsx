@@ -89,14 +89,15 @@ export const NetworkStatusIndicator: React.FC = () => {
   const badge = getBadgeConfig();
 
   return (
-    <div className="flex items-center gap-2 font-mono text-xs">
+    <div className="flex items-center gap-1 sm:gap-2 font-mono text-xs shrink-0">
       <div
-        className={`flex items-center gap-2 px-2.5 py-1 rounded-full border ${badge.colorClass} shadow-sm transition-all`}
+        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full border ${badge.colorClass} shadow-sm transition-all`}
         title={badge.description}
       >
-        <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor}`} />
+        <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor} shrink-0`} />
         {badge.icon}
-        <span className="font-bold text-[10px] tracking-wider uppercase">{badge.label}</span>
+        <span className="font-bold text-[9px] sm:text-[10px] tracking-wider uppercase hidden md:inline whitespace-nowrap">{badge.label}</span>
+        <span className="font-bold text-[8px] tracking-wider uppercase md:hidden whitespace-nowrap">{badge.label.replace('DSN LINK: ', '').replace(' (OFFLINE)', '')}</span>
       </div>
 
       {syncState.pendingCount > 0 && (

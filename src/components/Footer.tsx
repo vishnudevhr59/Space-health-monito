@@ -5,7 +5,7 @@ import { ExternalLink, ShieldCheck } from 'lucide-react';
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#05070f] border-t border-slate-800/80 mt-16 text-slate-400 text-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           
           <div className="md:col-span-2">

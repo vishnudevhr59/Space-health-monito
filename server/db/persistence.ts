@@ -27,6 +27,8 @@ import {
   IWellnessAssessment,
   IRawObservation,
   TelemetryClassificationType,
+  IShiftHandoverRecord,
+  ISimulatedEmergencyBeaconPacket,
 } from './models.js';
 
 interface DatabaseCollections {
@@ -48,6 +50,8 @@ interface DatabaseCollections {
   activityRecords: IActivityRecord[];
   wellnessAssessments: IWellnessAssessment[];
   rawObservations: IRawObservation[];
+  shiftHandovers: IShiftHandoverRecord[];
+  simulatedBeacons: ISimulatedEmergencyBeaconPacket[];
 }
 
 export class PersistentDatabase {
@@ -76,6 +80,8 @@ export class PersistentDatabase {
     activityRecords: [],
     wellnessAssessments: [],
     rawObservations: [],
+    shiftHandovers: [],
+    simulatedBeacons: [],
   };
 
   constructor(storageDir?: string) {
@@ -99,6 +105,8 @@ export class PersistentDatabase {
           const parsed = JSON.parse(raw);
           this.data = { ...this.data, ...parsed };
           if (!this.data.rawObservations) this.data.rawObservations = [];
+          if (!this.data.shiftHandovers) this.data.shiftHandovers = [];
+          if (!this.data.simulatedBeacons) this.data.simulatedBeacons = [];
           
           // Rebuild idempotency index
           this.data.telemetry.forEach((t) => {

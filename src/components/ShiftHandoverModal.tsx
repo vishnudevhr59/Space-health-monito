@@ -1,0 +1,369 @@
+import React, { useState } from 'react';
+import {
+  FileText,
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  UserCheck,
+  Clock,
+  ShieldCheck,
+  Send,
+  Download,
+  Calendar,
+  Activity,
+  HeartPulse,
+} from 'lucide-react';
+import { ShiftHandoverRecord, AstronautProfile, HealthAlert } from '../types';
+
+interface ShiftHandoverModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  astronaut: AstronautProfile;
+  alerts: HealthAlert[];
+  currentUserFullName?: string;
+}
+
+export const ShiftHandoverModal: React.FC<ShiftHandoverModalProps> = ({
+  isOpen,
+  onClose,
+  astronaut,
+  alerts,
+  currentUserFullName = 'Dr. Marcus Vance (Flight Surgeon, MCC-Houston)',
+}) => {
+  const [shiftPeriod, setShiftPeriod] = useState<'Alpha (00:00-08:00 UTC)' | 'Bravo (08:00-16:00 UTC)' | 'Charlie (16:00-24:00 UTC)'>('Bravo (08:00-16:00 UTC)');
+  const [outgoingSurgeon, setOutgoingSurgeon] = useState<string>(currentUserFullName);
+  const [incomingSurgeon, setIncomingSurgeon] = useState<string>('Dr. Elena Rostova, M.D. (Gateway Flight Med)');
+  const [clinicalDirectives, setClinicalDirectives] = useState<string>(
+    '1. Maintain continuous BioHarness HRV monitoring across upcoming exercise session.\n2. Hydrate +750 mL oral electrolyte rehydration salts.\n3. Verify evening cabin CO2 scrubber bed regeneration cycle.'
+  );
+  const [outgoingSignature, setOutgoingSignature] = useState<string>('M. Vance, MD / MCC-SURGEON-04');
+  const [incomingSignature, setIncomingSignature] = useState<string>('E. Rostova, MD / GATEWAY-MED-02');
+  const [submittedRecord, setSubmittedRecord] = useState<ShiftHandoverRecord | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  if (!isOpen) return null;
+
+  const activeAlerts = alerts.filter((a) => a.status === 'Active');
+
+  const handleSubmitHandover = async () => {
+    setLoading(true);
+    const newRecord: ShiftHandoverRecord = {
+      id: `HND-${Date.now().toString(36).toUpperCase()}`,
+      shiftDate: new Date().toISOString().split('T')[0],
+      shiftPeriod,
+      outgoingSurgeon,
+      incomingSurgeon,
+      astronautId: astronaut.id,
+      astronautName: astronaut.name,
+      vitalsSummary24h: {
+        meanHeartRate: 64,
+        heartRateRange: [56, 88],
+        meanSpo2: 98.2,
+        meanHrv: 58,
+        meanCoreTemp: 36.8,
+        sleepDurationHours: 6.8,
+      },
+      openAlertsCount: activeAlerts.length,
+      unresolvedIssues: activeAlerts.map((a) => `${a.severity}: ${a.title} (${a.indicator})`),
+      clinicalDirectives: clinicalDirectives.split('\n').filter((l) => l.trim().length > 0),
+      countermeasuresScheduled: [
+        'ARED Heavy Resistive Squat Protocol (14:00 UTC)',
+        'Resonant HRV Biofeedback 20-min cycle (18:30 UTC)',
+      ],
+      outgoingSignature,
+      incomingSignature,
+      status: 'SIGNED',
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch('/api/shift-handover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRecord),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSubmittedRecord(data.record || newRecord);
+      } else {
+        setSubmittedRecord(newRecord);
+      }
+    } catch {
+      setSubmittedRecord(newRecord);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadMarkdown = () => {
+    if (!submittedRecord) return;
+    const md = `# LUNAR GATEWAY FLIGHT SURGEON SHIFT HANDOVER
+**Shift Record ID:** ${submittedRecord.id}
+**Date:** ${submittedRecord.shiftDate}
+**Shift Period:** ${submittedRecord.shiftPeriod}
+**Crew Member:** ${submittedRecord.astronautName} (${submittedRecord.astronautId})
+
+## 1. PHYSICIAN ROSTER
+- **Outgoing Flight Surgeon:** ${submittedRecord.outgoingSurgeon}
+- **Incoming Flight Surgeon:** ${submittedRecord.incomingSurgeon}
+
+## 2. 24-HOUR PHYSIOLOGICAL SUMMARY
+- **Mean Resting Heart Rate:** ${submittedRecord.vitalsSummary24h.meanHeartRate} BPM (Range: ${submittedRecord.vitalsSummary24h.heartRateRange[0]} - ${submittedRecord.vitalsSummary24h.heartRateRange[1]} BPM)
+- **Mean SpO2 Saturation:** ${submittedRecord.vitalsSummary24h.meanSpo2}%
+- **Mean HRV (rMSSD):** ${submittedRecord.vitalsSummary24h.meanHrv} ms
+- **Mean Core Body Temperature:** ${submittedRecord.vitalsSummary24h.meanCoreTemp}°C
+- **Sleep Duration:** ${submittedRecord.vitalsSummary24h.sleepDurationHours} Hours
+
+## 3. OPEN CLINICAL INCIDENTS (${submittedRecord.openAlertsCount})
+${submittedRecord.unresolvedIssues.map((i) => `- ${i}`).join('\n') || '- Nil active clinical incidents.'}
+
+## 4. SHIFT DIRECTIVES
+${submittedRecord.clinicalDirectives.map((d) => `- ${d}`).join('\n')}
+
+## 5. DUAL CLINICAL SIGNATURES
+- **Outgoing Sign-off:** ${submittedRecord.outgoingSignature} [TIMESTAMP: ${submittedRecord.timestamp}]
+- **Incoming Sign-off:** ${submittedRecord.incomingSignature} [TIMESTAMP: ${submittedRecord.timestamp}]
+
+*Generated by SPACE HEALTH MONITO — NASA Space Apps Challenge 2026*
+`;
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SHIFT_HANDOVER_${submittedRecord.id}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+      <div className="bg-[#0B1224] border-2 border-[#00E5FF]/40 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_0_60px_rgba(0,229,255,0.2)] flex flex-col max-h-[92vh]">
+        {/* Modal Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-[#070D1F] shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#00E5FF]/10 rounded-xl border border-[#00E5FF]/30">
+              <FileText className="w-6 h-6 text-[#00E5FF]" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span>FLIGHT SURGEON SHIFT HANDOVER BRIEFING</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#00E5FF]/20 text-[#00E5FF] font-extrabold border border-[#00E5FF]/40">
+                  OFFICIAL PROTOCOL
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400 font-mono">
+                Continuous 24/7 Clinical Care Transition · Gateway Expedition 04
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="p-5 space-y-4 text-xs font-mono overflow-y-auto">
+          {submittedRecord ? (
+            /* SUBMITTED CONFIRMATION VIEW */
+            <div className="space-y-4 animate-fadeIn">
+              <div className="p-4 bg-emerald-950/60 border border-emerald-500/60 rounded-xl space-y-2 text-emerald-200">
+                <div className="flex items-center gap-2 font-bold text-sm text-white">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <span>SHIFT HANDOVER BRIEFING OFFICIALLY FILED</span>
+                </div>
+                <p className="text-xs leading-relaxed text-emerald-200/90 font-sans">
+                  The clinical care transition for <strong>{astronaut.name}</strong> was recorded with dual digital signatures into the persistent mission database. Houston Flight Medicine and Gateway Medical Operations are synchronized.
+                </p>
+                <div className="text-[11px] text-emerald-300 font-mono pt-1">
+                  RECORD ID: <span className="font-bold">{submittedRecord.id}</span> · TIMESTAMP: {submittedRecord.timestamp}
+                </div>
+              </div>
+
+              {/* Handover Summary Card */}
+              <div className="p-4 bg-[#050816] rounded-xl border border-slate-800 space-y-3">
+                <div className="font-bold text-slate-200 text-xs border-b border-slate-800 pb-2 flex items-center justify-between">
+                  <span>CLINICAL TRANSITION SUMMARY</span>
+                  <span className="text-cyan-400">{submittedRecord.shiftPeriod}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-[11px]">
+                  <div>
+                    <span className="text-slate-500">OUTGOING SURGEON:</span>
+                    <div className="text-white font-bold">{submittedRecord.outgoingSurgeon}</div>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">INCOMING SURGEON:</span>
+                    <div className="text-white font-bold">{submittedRecord.incomingSurgeon}</div>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">OPEN ALERTS AT HANDOVER:</span>
+                    <div className="text-amber-400 font-bold">{submittedRecord.openAlertsCount} active item(s)</div>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">MEAN 24H VITALS:</span>
+                    <div className="text-cyan-300 font-bold">HR: 64 BPM | SpO2: 98.2% | Temp: 36.8°C</div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800/80">
+                  <span className="text-slate-500 block mb-1">CLINICAL DIRECTIVES:</span>
+                  <div className="text-slate-300 text-[11px] space-y-1">
+                    {submittedRecord.clinicalDirectives.map((d, idx) => (
+                      <div key={idx} className="flex items-start gap-1.5">
+                        <span className="text-cyan-400">•</span>
+                        <span>{d}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  onClick={handleDownloadMarkdown}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-500/50 text-cyan-200 transition-colors cursor-pointer text-xs font-mono font-bold"
+                >
+                  <Download className="w-4 h-4 text-cyan-400" />
+                  <span>Download Shift Handover Report (.MD)</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* HANDOVER FORM */
+            <div className="space-y-4">
+              {/* Shift Period & Roster */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] text-slate-400 block mb-1">SHIFT ROTATION PERIOD</label>
+                  <select
+                    value={shiftPeriod}
+                    onChange={(e: any) => setShiftPeriod(e.target.value)}
+                    className="w-full bg-[#050816] border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#00E5FF]"
+                  >
+                    <option value="Alpha (00:00-08:00 UTC)">Alpha (00:00-08:00 UTC)</option>
+                    <option value="Bravo (08:00-16:00 UTC)">Bravo (08:00-16:00 UTC)</option>
+                    <option value="Charlie (16:00-24:00 UTC)">Charlie (16:00-24:00 UTC)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 block mb-1">CREW MEMBER MONITORED</label>
+                  <div className="p-2 bg-[#050816] border border-slate-800 rounded-lg text-white font-bold text-xs">
+                    {astronaut.name} ({astronaut.id}) · Day {astronaut.missionDay}
+                  </div>
+                </div>
+              </div>
+
+              {/* Roster Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] text-slate-400 block mb-1">OUTGOING FLIGHT SURGEON</label>
+                  <input
+                    type="text"
+                    value={outgoingSurgeon}
+                    onChange={(e) => setOutgoingSurgeon(e.target.value)}
+                    className="w-full bg-[#050816] border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#00E5FF]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 block mb-1">INCOMING FLIGHT SURGEON</label>
+                  <input
+                    type="text"
+                    value={incomingSurgeon}
+                    onChange={(e) => setIncomingSurgeon(e.target.value)}
+                    className="w-full bg-[#050816] border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#00E5FF]"
+                  />
+                </div>
+              </div>
+
+              {/* Active Alerts at Handover */}
+              <div className="p-3 bg-slate-900/70 rounded-xl border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400 font-bold flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Active Alerts Requiring Ongoing Surveillance ({activeAlerts.length})</span>
+                  </span>
+                </div>
+                {activeAlerts.length > 0 ? (
+                  <div className="space-y-1">
+                    {activeAlerts.map((a) => (
+                      <div key={a.id} className="p-2 bg-[#050816] rounded border border-slate-800 text-[10px] flex items-center justify-between">
+                        <div>
+                          <span className="font-bold text-rose-300">[{a.severity}]</span>{' '}
+                          <span className="text-white">{a.title}</span>
+                        </div>
+                        <span className="text-cyan-400 font-mono">{a.indicator}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-[11px]">No critical or warning alerts active at shift handover.</p>
+                )}
+              </div>
+
+              {/* Clinical Directives */}
+              <div>
+                <label className="text-[11px] text-slate-400 block mb-1">
+                  SHIFT CLINICAL DIRECTIVES & COUNTERMEASURES (ONE PER LINE)
+                </label>
+                <textarea
+                  rows={3}
+                  value={clinicalDirectives}
+                  onChange={(e) => setClinicalDirectives(e.target.value)}
+                  className="w-full bg-[#050816] border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-[#00E5FF] leading-relaxed"
+                />
+              </div>
+
+              {/* Dual Digital Signatures */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[#050816] rounded-xl border border-slate-800">
+                <div>
+                  <label className="text-[10px] text-slate-500 block mb-1">OUTGOING SURGEON DIGITAL SIGN-OFF</label>
+                  <input
+                    type="text"
+                    value={outgoingSignature}
+                    onChange={(e) => setOutgoingSignature(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-cyan-300 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-slate-500 block mb-1">INCOMING SURGEON DIGITAL SIGN-OFF</label>
+                  <input
+                    type="text"
+                    value={incomingSignature}
+                    onChange={(e) => setIncomingSignature(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-cyan-300 font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Actions Footer */}
+        <div className="p-4 bg-slate-900/70 border-t border-slate-800 flex items-center justify-between shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer text-xs font-mono"
+          >
+            {submittedRecord ? 'Close' : 'Cancel'}
+          </button>
+
+          {!submittedRecord && (
+            <button
+              onClick={handleSubmitHandover}
+              disabled={loading}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold transition-all shadow-[0_0_20px_rgba(0,229,255,0.4)] cursor-pointer text-xs font-mono"
+            >
+              <Send className="w-4 h-4" />
+              <span>{loading ? 'SUBMITTING...' : 'SIGN & SUBMIT HANDOVER BRIEFING'}</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

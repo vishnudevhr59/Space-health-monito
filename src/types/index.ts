@@ -173,3 +173,51 @@ export interface ResearchReference {
   methodology?: string;
   knownLimitations?: string;
 }
+
+export interface ShiftHandoverRecord {
+  id: string;
+  shiftDate: string;
+  shiftPeriod: 'Alpha (00:00-08:00 UTC)' | 'Bravo (08:00-16:00 UTC)' | 'Charlie (16:00-24:00 UTC)';
+  outgoingSurgeon: string;
+  incomingSurgeon: string;
+  astronautId: string;
+  astronautName: string;
+  vitalsSummary24h: {
+    meanHeartRate: number;
+    heartRateRange: [number, number];
+    meanSpo2: number;
+    meanHrv: number;
+    meanCoreTemp: number;
+    sleepDurationHours: number;
+  };
+  openAlertsCount: number;
+  unresolvedIssues: string[];
+  clinicalDirectives: string[];
+  countermeasuresScheduled: string[];
+  outgoingSignature: string;
+  incomingSignature: string;
+  status: 'SUBMITTED' | 'SIGNED' | 'ARCHIVED';
+  timestamp: string;
+}
+
+export interface SimulatedEmergencyBeaconPacket {
+  packetId: string;
+  utcTimestamp: string;
+  missionId: string;
+  habitatModule: string;
+  astronautId: string;
+  astronautName: string;
+  emergencyCode: string;
+  biometrics: {
+    heartRateBpm: number;
+    spo2Percent: number;
+    coreTempC: number;
+    bloodPressure: string;
+    hrvMs: number;
+  };
+  telemetrySource: string;
+  isSimulatedDemo: true;
+  dsnChannel: string;
+  packetChecksumSha256: string;
+  disclosure: string;
+}

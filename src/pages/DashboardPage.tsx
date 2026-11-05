@@ -35,6 +35,7 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
+  FileText,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -50,6 +51,14 @@ import {
   Bar,
   Legend,
 } from 'recharts';
+import { GlassCockpitHUD } from '../components/GlassCockpitHUD';
+import { AiDiagnosticEngineBanner } from '../components/AiDiagnosticEngineBanner';
+import {
+  SimulationAnomalyPanel,
+  AnomalyInjectionState,
+  NOMINAL_HEALTH_STATE,
+} from '../components/SimulationAnomalyPanel';
+import { MissionAuditLogModal } from '../components/MissionAuditLogModal';
 
 interface DashboardPageProps {
   astronaut: AstronautProfile;
@@ -61,6 +70,9 @@ interface DashboardPageProps {
   onRefreshTelemetry: () => void;
   onLogMeasurement: (m: Partial<HealthMeasurement>) => void;
   onNavigate: (tab: string) => void;
+  anomalyState?: AnomalyInjectionState;
+  onInjectAnomaly?: (state: AnomalyInjectionState) => void;
+  onResetNominal?: () => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -73,7 +85,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onRefreshTelemetry,
   onLogMeasurement,
   onNavigate,
+  anomalyState,
+  onInjectAnomaly,
+  onResetNominal,
 }) => {
+  const [localAnomalyState, setLocalAnomalyState] = useState<AnomalyInjectionState>(NOMINAL_HEALTH_STATE);
+  const currentAnomaly = anomalyState || localAnomalyState;
+  const [isAnomalyModalOpen, setIsAnomalyModalOpen] = useState(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState<'24h' | '7d'>('7d');
   const [activeModuleTab, setActiveModuleTab] = useState<'briefing' | 'trends' | 'context' | 'timeline'>('briefing');
   const [showLogModal, setShowLogModal] = useState(false);
@@ -134,7 +153,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6 overflow-x-hidden">
       
       {/* SIMULATED DATA NOTICE STRIP */}
       <div className="p-3.5 rounded-2xl bg-[#0B1224]/90 border border-[#00E5FF]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
@@ -158,6 +177,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </button>
         </div>
       </div>
+
+      {/* AI DIAGNOSTIC ENGINE BANNER (CONTINUOUS TELEMETRY SCANNING & FLIGHT SURGEON COUNTERMEASURES) */}
+      <AiDiagnosticEngineBanner
+        anomalyState={currentAnomaly}
+        onExecuteCountermeasure={() => {
+          if (onResetNominal) onResetNominal();
+          else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
+        }}
+        onOpenConsultation={() => onNavigate('monito-ai')}
+        onOpenAuditLog={() => setIsAuditModalOpen(true)}
+      />
+
+      {/* TACTICAL GLASS COCKPIT HUD (CREW DRAGON / NASA GATEWAY SPECIFICATION) */}
+      <GlassCockpitHUD
+        anomalyState={currentAnomaly}
+        onOpenAnomalyPanel={() => setIsAnomalyModalOpen(true)}
+        onResetNominal={() => {
+          if (onResetNominal) onResetNominal();
+          else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
+        }}
+        onOpenAuditModal={() => setIsAuditModalOpen(true)}
+      />
 
       {/* DASHBOARD HERO: PROMINENT MISSION OVERVIEW SECTION */}
       <div className="relative rounded-3xl bg-gradient-to-r from-[#101B30] via-[#0B1224] to-[#101B30] border border-[#00E5FF]/30 p-6 sm:p-8 shadow-[0_0_35px_-5px_rgba(0,229,255,0.12)] overflow-hidden">
@@ -248,6 +289,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               className="px-4 py-3 rounded-xl bg-[#101B30] hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
             >
               Generate Report
+            </button>
+
+            <button
+              onClick={() => setIsAuditModalOpen(true)}
+              className="px-4 py-3 rounded-xl bg-[#09152B] hover:bg-[#0e2145] border border-cyan-500/40 text-cyan-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-2 shadow-sm"
+              title="Inspect Live Aerospace Mission Audit Ledger & Export CSV/JSON"
+            >
+              <FileText className="w-4 h-4 text-cyan-400" />
+              <span>Audit Log (CSV/JSON)</span>
             </button>
           </div>
 
@@ -868,6 +918,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
       )}
+
+      {/* INTERACTIVE SIMULATION ANOMALY INJECTION PANEL FOR JUDGES */}
+      <SimulationAnomalyPanel
+        currentState={currentAnomaly}
+        onInjectAnomaly={(newState) => {
+          if (onInjectAnomaly) onInjectAnomaly(newState);
+          else setLocalAnomalyState(newState);
+        }}
+        isOpen={isAnomalyModalOpen}
+        onClose={() => setIsAnomalyModalOpen(false)}
+      />
+
+      {/* MISSION AUDIT LEDGER MODAL & TELEMETRY EXPORT */}
+      <MissionAuditLogModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+      />
 
     </div>
   );

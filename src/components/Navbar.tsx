@@ -12,8 +12,12 @@ import {
   Activity,
   AlertOctagon,
   RefreshCw,
+  FileText,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { NetworkStatusIndicator } from './NetworkStatusIndicator';
+import { voiceAlertService } from '../services/voiceAlertService';
 
 interface NavbarProps {
   currentTab: string;
@@ -23,6 +27,8 @@ interface NavbarProps {
   onOpenProvenanceModal: () => void;
   onOpenLogVitals: () => void;
   onOpenEmergencyBeacon: () => void;
+  onOpenShiftHandover?: () => void;
+  onOpenAuditModal?: () => void;
   onSyncOffline: () => void;
   activeAlertCount: number;
 }
@@ -35,11 +41,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenProvenanceModal,
   onOpenLogVitals,
   onOpenEmergencyBeacon,
+  onOpenShiftHandover,
+  onOpenAuditModal,
   onSyncOffline,
   activeAlertCount,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(voiceAlertService.isVoiceEnabled());
+
+  React.useEffect(() => {
+    return voiceAlertService.subscribe((enabled) => setVoiceEnabled(enabled));
+  }, []);
 
   const primaryNavItems = [
     { id: 'landing', label: 'Mission Brief' },
@@ -190,8 +203,63 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <AlertOctagon className="w-4 h-4 text-rose-400" />
                   <div>
-                    <div className="font-bold text-rose-300">Emergency Beacon</div>
-                    <div className="text-[10px] text-rose-400/80 font-sans">Broadcast Mayday telemetry</div>
+                    <div className="font-bold text-rose-300">Simulated Emergency Beacon</div>
+                    <div className="text-[10px] text-rose-400/80 font-sans">Generate demo distress packet</div>
+                  </div>
+                </button>
+
+                {onOpenShiftHandover && (
+                  <button
+                    onClick={() => {
+                      onOpenShiftHandover();
+                      setIsQuickActionOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-cyan-300 hover:text-white hover:bg-cyan-950/60 transition-colors text-left cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4 text-cyan-400" />
+                    <div>
+                      <div className="font-bold text-cyan-300">Shift Handover Briefing</div>
+                      <div className="text-[10px] text-cyan-400/80 font-sans">Flight surgeon clinical sign-off</div>
+                    </div>
+                  </button>
+                )}
+
+                {onOpenAuditModal && (
+                  <button
+                    onClick={() => {
+                      onOpenAuditModal();
+                      setIsQuickActionOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-blue-300 hover:text-white hover:bg-blue-950/60 transition-colors text-left cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4 text-cyan-400" />
+                    <div>
+                      <div className="font-bold text-cyan-300">Mission Audit Ledger</div>
+                      <div className="text-[10px] text-slate-400 font-sans">Full telemetry export (CSV/JSON)</div>
+                    </div>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    const next = voiceAlertService.toggleVoiceAlerts();
+                    if (next) voiceAlertService.testVoiceAnnouncement();
+                    setIsQuickActionOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-200 hover:text-white hover:bg-slate-800/80 transition-colors text-left cursor-pointer"
+                >
+                  {voiceEnabled ? (
+                    <Volume2 className="w-4 h-4 text-cyan-400" />
+                  ) : (
+                    <VolumeX className="w-4 h-4 text-slate-500" />
+                  )}
+                  <div>
+                    <div className="font-bold text-white">
+                      Voice Callouts: {voiceEnabled ? 'ACTIVE' : 'MUTED'}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-sans">
+                      SpeechSynthesis tactical announcements
+                    </div>
                   </div>
                 </button>
 

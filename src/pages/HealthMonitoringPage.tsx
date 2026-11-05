@@ -13,7 +13,9 @@ import {
   ArrowUpDown,
   CheckCircle2,
   AlertTriangle,
+  Zap,
 } from 'lucide-react';
+import { AstronautDigitalTwin } from '../components/AstronautDigitalTwin';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -40,6 +42,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
   sleepRecords,
   activityRecords,
 }) => {
+  const [viewMode, setViewMode] = useState<'telemetry' | 'digital-twin'>('telemetry');
   const [selectedRange, setSelectedRange] = useState<'24h' | '7d' | '14d' | '30d'>('7d');
   const [activeFilter, setActiveFilter] = useState<'all' | 'cardiac' | 'respiratory' | 'thermal' | 'activity'>('all');
   const [searchDate, setSearchDate] = useState('');
@@ -77,7 +80,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
   const minHr = Math.min(...filteredTelemetry.map((m) => m.heartRate));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6 overflow-x-hidden">
       
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
@@ -94,28 +97,65 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
           </p>
         </div>
 
-        {/* Date Selector & Filters */}
-        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-            {(['24h', '7d', '14d', '30d'] as const).map((rng) => (
-              <button
-                key={rng}
-                onClick={() => setSelectedRange(rng)}
-                className={`px-3 py-1.5 rounded-lg uppercase transition-colors cursor-pointer ${
-                  selectedRange === rng
-                    ? 'bg-cyan-600 text-white font-bold'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {rng}
-              </button>
-            ))}
+        {/* View Mode & Date Selector */}
+        <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
+          <div className="flex items-center gap-1 bg-[#050816] p-1 rounded-xl border border-cyan-500/30">
+            <button
+              onClick={() => setViewMode('telemetry')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === 'telemetry'
+                  ? 'bg-cyan-600 text-white font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>Sensors & Trends</span>
+            </button>
+            <button
+              onClick={() => setViewMode('digital-twin')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === 'digital-twin'
+                  ? 'bg-cyan-600 text-white font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5 text-cyan-300" />
+              <span>Digital Twin Model</span>
+            </button>
           </div>
+
+          {viewMode === 'telemetry' && (
+            <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+              {(['24h', '7d', '14d', '30d'] as const).map((rng) => (
+                <button
+                  key={rng}
+                  onClick={() => setSelectedRange(rng)}
+                  className={`px-3 py-1.5 rounded-lg uppercase transition-colors cursor-pointer ${
+                    selectedRange === rng
+                      ? 'bg-cyan-600 text-white font-bold'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {rng}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* RENDER ASTRONAUT DIGITAL TWIN IF SELECTED */}
+      {viewMode === 'digital-twin' && (
+        <AstronautDigitalTwin
+          astronaut={astronaut}
+          latestTelemetry={telemetry[telemetry.length - 1]}
+        />
+      )}
+
       {/* FILTER & METRIC SELECTOR STRIP */}
-      <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_4px_24px_rgba(0,229,255,0.03)]">
+      {viewMode === 'telemetry' && (
+        <>
+          <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_4px_24px_rgba(0,229,255,0.03)]">
         
         {/* Category Filter Buttons */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto scrollbar-none">
@@ -306,6 +346,8 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
           </table>
         </div>
       </div>
+      </>
+      )}
 
     </div>
   );
