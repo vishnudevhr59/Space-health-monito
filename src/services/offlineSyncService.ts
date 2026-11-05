@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITO — Spacecraft Offline Synchronization Service
+ * SPACE HEALTH MONITOR — Spacecraft Offline Synchronization Service
  * 
  * Provides Earth-independent telemetry resilience for long-duration deep-space missions:
  * 1. Persistent IndexedDB / LocalStorage queue surviving browser restarts

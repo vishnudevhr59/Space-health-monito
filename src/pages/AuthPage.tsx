@@ -117,7 +117,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onNavigate, current
     };
 
     onLogin(authorizedUser);
-    setSuccessMessage(`Authorization verified. Welcome to SPACE HEALTH MONITO.`);
+    setSuccessMessage(`Authorization verified. Welcome to SPACE HEALTH MONITOR.`);
     setTimeout(() => {
       onNavigate('overview');
     }, 700);

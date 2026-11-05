@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITO - Mission Audit Trail Service
+ * SPACE HEALTH MONITOR - Mission Audit Trail Service
  * High-integrity event logging for all telemetry breaches, anomalies,
  * verbal voice callouts, and AI Flight Surgeon countermeasures.
  * Provides one-click CSV & JSON export compliant with NASA aerospace review standards.
@@ -191,7 +191,7 @@ class MissionAuditTrailService {
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute(
       'download',
-      filename || `SPACE_HEALTH_MONITO_MISSION_AUDIT_${Date.now()}.json`
+      filename || `SPACE_HEALTH_MONITOR_MISSION_AUDIT_${Date.now()}.json`
     );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
@@ -260,7 +260,7 @@ class MissionAuditTrailService {
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      filename || `SPACE_HEALTH_MONITO_TELEMETRY_AUDIT_${Date.now()}.csv`
+      filename || `SPACE_HEALTH_MONITOR_TELEMETRY_AUDIT_${Date.now()}.csv`
     );
     document.body.appendChild(link);
     link.click();

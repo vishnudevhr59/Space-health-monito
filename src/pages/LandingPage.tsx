@@ -318,7 +318,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
                   Grounded in Verified NASA Human Research Program Data
                 </h3>
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                  SPACE HEALTH MONITO does not invent findings. Every threshold, risk assessment, and decision-support recommendation is anchored in peer-reviewed aerospace evidence from NASA HRP, OSDR, and the NASA Twins Study.
+                  SPACE HEALTH MONITOR does not invent findings. Every threshold, risk assessment, and decision-support recommendation is anchored in peer-reviewed aerospace evidence from NASA HRP, OSDR, and the NASA Twins Study.
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 text-xs font-mono">

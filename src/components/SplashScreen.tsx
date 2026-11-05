@@ -111,7 +111,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       className={`fixed inset-0 z-50 flex flex-col items-center justify-between p-3 sm:p-5 md:p-8 bg-[#020515] overflow-y-auto overflow-x-hidden select-none transition-opacity duration-700 ease-in-out h-[100dvh] w-full max-w-full ${
         animationStage === 'exit' ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
-      aria-label="SPACE HEALTH MONITO Startup Intro"
+      aria-label="SPACE HEALTH MONITOR Startup Intro"
       role="banner"
     >
       {/* BACKGROUND COSMIC DEEP SPACE RADIAL GLOW & NEBULA */}
@@ -196,7 +196,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               SPACE HEALTH
             </span>
             <span className="text-[#00E5FF] drop-shadow-[0_0_12px_rgba(0,229,255,0.6)]">
-              MONITO
+              MONITOR
             </span>
           </div>
           <div className="text-[9px] xs:text-[10px] sm:text-xs font-mono tracking-[0.2em] uppercase text-slate-400">

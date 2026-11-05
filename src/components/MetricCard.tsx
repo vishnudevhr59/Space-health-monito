@@ -1,4 +1,5 @@
 import React from 'react';
+import { D3Sparkline } from './D3Sparkline';
 
 interface MetricCardProps {
   label: string;
@@ -57,20 +58,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     ? sparklineData 
     : [30, 45, 38, 55, 48, 62, 58, 65];
 
-  const minVal = Math.min(...points);
-  const maxVal = Math.max(...points);
-  const range = maxVal - minVal || 1;
-  const svgWidth = 80;
-  const svgHeight = 26;
-
-  const polylineCoords = points
-    .map((p, idx) => {
-      const x = (idx / (points.length - 1)) * svgWidth;
-      const y = svgHeight - ((p - minVal) / range) * (svgHeight - 6) - 3;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
-
   return (
     <div className="group relative rounded-2xl p-4.5 bg-[#101B30]/85 backdrop-blur-md border border-[#00E5FF]/15 hover:border-[#00E5FF]/45 transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_-5px_rgba(0,229,255,0.18)] hover:-translate-y-1 flex flex-col justify-between overflow-hidden">
       
@@ -120,27 +107,17 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           )}
         </div>
 
-        {/* Small SVG Sparkline Graph */}
-        <div className="shrink-0 w-20 h-7 flex items-center justify-center opacity-85 group-hover:opacity-100 transition-opacity">
-          <svg width={svgWidth} height={svgHeight} className="overflow-visible">
-            <polyline
-              fill="none"
-              stroke={sparklineStroke}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points={polylineCoords}
-            />
-            {/* End dot */}
-            {points.length > 0 && (
-              <circle
-                cx={svgWidth}
-                cy={svgHeight - ((points[points.length - 1] - minVal) / range) * (svgHeight - 6) - 3}
-                r="3"
-                fill={sparklineStroke}
-              />
-            )}
-          </svg>
+        {/* Dynamic D3 Animated Sparkline Graph */}
+        <div className="shrink-0 w-24 h-8 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
+          <D3Sparkline
+            data={points}
+            width={96}
+            height={30}
+            color={sparklineStroke}
+            showArea={false}
+            showGrid={false}
+            showLatestPoint={true}
+          />
         </div>
       </div>
 

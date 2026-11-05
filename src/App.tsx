@@ -37,13 +37,13 @@ import { EmergencyBeaconModal } from './components/EmergencyBeaconModal';
 import { ShiftHandoverModal } from './components/ShiftHandoverModal';
 import { SplashScreen } from './components/SplashScreen';
 import { MissionControlTicker } from './components/MissionControlTicker';
-import {
-  AnomalyInjectionState,
-  NOMINAL_HEALTH_STATE,
-} from './components/SimulationAnomalyPanel';
+import { AnomalyInjectionState, NOMINAL_HEALTH_STATE } from './components/SimulationAnomalyPanel';
 import { MissionAuditLogModal } from './components/MissionAuditLogModal';
+import { AutonomousSelfHealingBanner } from './components/AutonomousSelfHealingBanner';
+import { useAlertMonitoring } from './hooks/useAlertMonitoring';
 
 export default function App() {
+  useAlertMonitoring();
   const [showSplash, setShowSplash] = useState<boolean>(true);
   const [currentTab, setCurrentTab] = useState<string>('landing');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -322,6 +322,9 @@ export default function App() {
 
       {/* ROW 4: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
       <MissionSimulationBar onNavigateTab={(tab) => setCurrentTab(tab)} />
+
+      {/* AUTONOMOUS ANOMALY SELF-HEALING & FAIL-SAFE MITIGATION PROTOCOL ENGINE */}
+      <AutonomousSelfHealingBanner />
 
       {/* ROW 5: MAIN VIEWPORT STAGE */}
       <div className="flex-1 flex relative w-full overflow-x-hidden">

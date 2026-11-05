@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AstronautProfile, HealthMeasurement, SleepRecord, ActivityRecord } from '../types';
 import { MetricCard } from '../components/MetricCard';
+import { D3Sparkline } from '../components/D3Sparkline';
+import { telemetryStreamEngine, TelemetryFrame } from '../services/telemetryStreamEngine';
 import {
   Activity,
   Heart,
@@ -14,6 +16,12 @@ import {
   CheckCircle2,
   AlertTriangle,
   Zap,
+  Radio,
+  ChevronDown,
+  ChevronUp,
+  TrendingUp,
+  BarChart2,
+  ShieldCheck,
 } from 'lucide-react';
 import { AstronautDigitalTwin } from '../components/AstronautDigitalTwin';
 import {
@@ -46,6 +54,49 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
   const [selectedRange, setSelectedRange] = useState<'24h' | '7d' | '14d' | '30d'>('7d');
   const [activeFilter, setActiveFilter] = useState<'all' | 'cardiac' | 'respiratory' | 'thermal' | 'activity'>('all');
   const [searchDate, setSearchDate] = useState('');
+  const [showRawTable, setShowRawTable] = useState(false);
+
+  // 1Hz Real-Time Streaming Buffer (Rolling 50 frames)
+  const [liveStreamFrames, setLiveStreamFrames] = useState<TelemetryFrame[]>(() => [
+    telemetryStreamEngine.getCurrentFrame(),
+  ]);
+
+  useEffect(() => {
+    const unsubscribe = telemetryStreamEngine.subscribe((frame) => {
+      setLiveStreamFrames((prev) => {
+        const next = [...prev, frame];
+        return next.length > 50 ? next.slice(-50) : next;
+      });
+    });
+    return unsubscribe;
+  }, []);
+
+  const latestFrame = liveStreamFrames[liveStreamFrames.length - 1] || telemetryStreamEngine.getCurrentFrame();
+
+  // Dynamic D3 Series for live charts
+  const hrSeries = useMemo(() => liveStreamFrames.map((f) => f.heartRate), [liveStreamFrames]);
+  const spo2Series = useMemo(() => liveStreamFrames.map((f) => f.spo2), [liveStreamFrames]);
+  const bpSeries = useMemo(() => liveStreamFrames.map((f) => f.systolicBP), [liveStreamFrames]);
+  const tempSeries = useMemo(() => liveStreamFrames.map((f) => f.bodyTemperature), [liveStreamFrames]);
+
+  const calcStats = (arr: number[]) => {
+    if (!arr.length) return { min: 0, max: 0, avg: 0, std: 0 };
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+    const variance = arr.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / arr.length;
+    return {
+      min: +min.toFixed(1),
+      max: +max.toFixed(1),
+      avg: +avg.toFixed(1),
+      std: +Math.sqrt(variance).toFixed(2),
+    };
+  };
+
+  const hrStats = useMemo(() => calcStats(hrSeries), [hrSeries]);
+  const spo2Stats = useMemo(() => calcStats(spo2Series), [spo2Series]);
+  const bpStats = useMemo(() => calcStats(bpSeries), [bpSeries]);
+  const tempStats = useMemo(() => calcStats(tempSeries), [tempSeries]);
 
   // Sliced data based on time range
   const sliceCount = selectedRange === '24h' ? 8 : selectedRange === '7d' ? 28 : 60;
@@ -297,55 +348,355 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
         </div>
       </div>
 
-      {/* RECENT TELEMETRY RECORD TABLE */}
-      <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-6 sm:p-7 shadow-[0_4px_24px_rgba(0,229,255,0.03)]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-          <div>
-            <h3 className="text-base font-bold text-white tracking-wide">
-              Raw Biosensor Ingest Log
-            </h3>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
-              Calibrated demonstration telemetry time packets
+      {/* DYNAMIC D3 REAL-TIME BIOSENSOR TELEMETRY MATRIX (1HZ STREAM) */}
+      <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-6 sm:p-7 shadow-[0_4px_24px_rgba(0,229,255,0.03)] space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              </span>
+              <h3 className="text-base font-bold text-white tracking-wide">
+                Dynamic D3 Biosensor Telemetry Matrix
+              </h3>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 uppercase font-bold">
+                1Hz Streaming Engine
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 font-mono">
+              60fps GPU-accelerated d3.curveMonotoneX spline interpolation across 50 rolling telemetry frames
             </p>
           </div>
-          <span className="text-xs font-mono text-slate-400">
-            Showing {filteredTelemetry.length} recent packets
-          </span>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowRawTable(!showRawTable)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-white transition-all cursor-pointer"
+            >
+              <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{showRawTable ? 'Hide Raw Ingest Table' : 'Inspect Raw Ingest Table'}</span>
+              {showRawTable ? (
+                <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-[#0B1224] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-              <tr>
-                <th className="py-3 px-4">Packet Timestamp (UTC)</th>
-                <th className="py-3 px-4">Heart Rate</th>
-                <th className="py-3 px-4">SpO2</th>
-                <th className="py-3 px-4">Blood Pressure</th>
-                <th className="py-3 px-4">Core Temp</th>
-                <th className="py-3 px-4">HRV (RMSSD)</th>
-                <th className="py-3 px-4">Data Quality</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300 bg-[#101B30]/50">
-              {filteredTelemetry.slice(-10).reverse().map((m) => (
-                <tr key={m.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-white">
-                    {new Date(m.timestamp).toLocaleString()}
-                  </td>
-                  <td className="py-3 px-4 font-bold text-[#00E5FF] tabular-nums">{m.heartRate} BPM</td>
-                  <td className="py-3 px-4 text-sky-400 tabular-nums">{m.spo2}%</td>
-                  <td className="py-3 px-4 tabular-nums">{m.bloodPressure.systolic}/{m.bloodPressure.diastolic} mmHg</td>
-                  <td className="py-3 px-4 tabular-nums">{m.bodyTemperature} °C</td>
-                  <td className="py-3 px-4 tabular-nums">{m.hrv} ms</td>
-                  <td className="py-3 px-4">
-                    <span className="text-[#21D4A5] font-bold">{m.dataQuality}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* 4-Channel Live D3 Telemetry Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {/* Channel 1: Heart Rate */}
+          <div className="bg-[#0B1224] border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-cyan-500/40 transition-colors">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                  Cardiovascular (HR)
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-extrabold text-white font-mono tabular-nums">
+                    {latestFrame.heartRate}
+                  </span>
+                  <span className="text-xs font-mono text-cyan-400 font-bold">BPM</span>
+                </div>
+              </div>
+              <span
+                className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold border ${
+                  latestFrame.heartRate > 120
+                    ? 'bg-rose-950/80 text-rose-400 border-rose-800/80'
+                    : latestFrame.heartRate > 95
+                    ? 'bg-amber-950/80 text-amber-400 border-amber-800/80'
+                    : 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80'
+                }`}
+              >
+                {latestFrame.heartRate > 120 ? 'CRITICAL' : latestFrame.heartRate > 95 ? 'WARNING' : 'NOMINAL'}
+              </span>
+            </div>
+
+            {/* D3 Dynamic Sparkline */}
+            <div className="w-full flex justify-center py-1">
+              <D3Sparkline
+                data={hrSeries}
+                width={240}
+                height={68}
+                color="#00E5FF"
+                minDomain={45}
+                maxDomain={140}
+                thresholdWarning={95}
+                thresholdCritical={120}
+                unit="BPM"
+                showArea={true}
+                showGrid={true}
+                showLatestPoint={true}
+              />
+            </div>
+
+            {/* Rolling Frame Statistics */}
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-slate-400 border-t border-slate-800/80 pt-2 text-center">
+              <div>
+                <div className="text-[9px] text-slate-500">MIN</div>
+                <div className="text-white font-semibold tabular-nums">{hrStats.min}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">MAX</div>
+                <div className="text-white font-semibold tabular-nums">{hrStats.max}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">AVG</div>
+                <div className="text-cyan-400 font-semibold tabular-nums">{hrStats.avg}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">σ (STD)</div>
+                <div className="text-slate-300 font-semibold tabular-nums">±{hrStats.std}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Channel 2: Arterial Oxygenation (SpO2) */}
+          <div className="bg-[#0B1224] border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-cyan-500/40 transition-colors">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                  Oxygenation (SpO2)
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-extrabold text-white font-mono tabular-nums">
+                    {latestFrame.spo2}%
+                  </span>
+                  <span className="text-xs font-mono text-sky-400 font-bold">SAT</span>
+                </div>
+              </div>
+              <span
+                className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold border ${
+                  latestFrame.spo2 < 88
+                    ? 'bg-rose-950/80 text-rose-400 border-rose-800/80'
+                    : latestFrame.spo2 < 93
+                    ? 'bg-amber-950/80 text-amber-400 border-amber-800/80'
+                    : 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80'
+                }`}
+              >
+                {latestFrame.spo2 < 88 ? 'HYPOXIC' : latestFrame.spo2 < 93 ? 'ELEVATED' : 'NORMOXIC'}
+              </span>
+            </div>
+
+            {/* D3 Dynamic Sparkline */}
+            <div className="w-full flex justify-center py-1">
+              <D3Sparkline
+                data={spo2Series}
+                width={240}
+                height={68}
+                color="#38BDF8"
+                minDomain={82}
+                maxDomain={100}
+                thresholdWarning={92}
+                thresholdCritical={88}
+                unit="%"
+                showArea={true}
+                showGrid={true}
+                showLatestPoint={true}
+              />
+            </div>
+
+            {/* Rolling Frame Statistics */}
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-slate-400 border-t border-slate-800/80 pt-2 text-center">
+              <div>
+                <div className="text-[9px] text-slate-500">MIN</div>
+                <div className="text-white font-semibold tabular-nums">{spo2Stats.min}%</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">MAX</div>
+                <div className="text-white font-semibold tabular-nums">{spo2Stats.max}%</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">AVG</div>
+                <div className="text-sky-400 font-semibold tabular-nums">{spo2Stats.avg}%</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">σ (STD)</div>
+                <div className="text-slate-300 font-semibold tabular-nums">±{spo2Stats.std}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Channel 3: Blood Pressure & MAP */}
+          <div className="bg-[#0B1224] border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-cyan-500/40 transition-colors">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                  Hemodynamics (BP / MAP)
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-extrabold text-white font-mono tabular-nums">
+                    {latestFrame.systolicBP}/{latestFrame.diastolicBP}
+                  </span>
+                  <span className="text-xs font-mono text-emerald-400 font-bold">mmHg</span>
+                </div>
+              </div>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded font-bold border bg-slate-900 text-slate-300 border-slate-700">
+                MAP {Math.round(latestFrame.diastolicBP + (latestFrame.systolicBP - latestFrame.diastolicBP) / 3)}
+              </span>
+            </div>
+
+            {/* D3 Dynamic Sparkline */}
+            <div className="w-full flex justify-center py-1">
+              <D3Sparkline
+                data={bpSeries}
+                width={240}
+                height={68}
+                color="#21D4A5"
+                minDomain={80}
+                maxDomain={160}
+                thresholdWarning={135}
+                thresholdCritical={150}
+                unit="mmHg"
+                showArea={true}
+                showGrid={true}
+                showLatestPoint={true}
+              />
+            </div>
+
+            {/* Rolling Frame Statistics */}
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-slate-400 border-t border-slate-800/80 pt-2 text-center">
+              <div>
+                <div className="text-[9px] text-slate-500">MIN</div>
+                <div className="text-white font-semibold tabular-nums">{bpStats.min}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">MAX</div>
+                <div className="text-white font-semibold tabular-nums">{bpStats.max}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">AVG</div>
+                <div className="text-emerald-400 font-semibold tabular-nums">{bpStats.avg}</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">σ (STD)</div>
+                <div className="text-slate-300 font-semibold tabular-nums">±{bpStats.std}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Channel 4: Core Temperature */}
+          <div className="bg-[#0B1224] border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3 hover:border-cyan-500/40 transition-colors">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                  Core Temp (ThermoLab)
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-extrabold text-white font-mono tabular-nums">
+                    {latestFrame.bodyTemperature}°C
+                  </span>
+                  <span className="text-xs font-mono text-amber-400 font-bold">CORE</span>
+                </div>
+              </div>
+              <span
+                className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold border ${
+                  latestFrame.bodyTemperature > 38.5
+                    ? 'bg-rose-950/80 text-rose-400 border-rose-800/80'
+                    : latestFrame.bodyTemperature > 37.8
+                    ? 'bg-amber-950/80 text-amber-400 border-amber-800/80'
+                    : 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80'
+                }`}
+              >
+                {latestFrame.bodyTemperature > 38.5 ? 'PYREXIA' : latestFrame.bodyTemperature > 37.8 ? 'ELEVATED' : 'SPACE NORM'}
+              </span>
+            </div>
+
+            {/* D3 Dynamic Sparkline */}
+            <div className="w-full flex justify-center py-1">
+              <D3Sparkline
+                data={tempSeries}
+                width={240}
+                height={68}
+                color="#FFB547"
+                minDomain={35.5}
+                maxDomain={39.5}
+                thresholdWarning={37.8}
+                thresholdCritical={38.5}
+                unit="°C"
+                showArea={true}
+                showGrid={true}
+                showLatestPoint={true}
+              />
+            </div>
+
+            {/* Rolling Frame Statistics */}
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-slate-400 border-t border-slate-800/80 pt-2 text-center">
+              <div>
+                <div className="text-[9px] text-slate-500">MIN</div>
+                <div className="text-white font-semibold tabular-nums">{tempStats.min}°</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">MAX</div>
+                <div className="text-white font-semibold tabular-nums">{tempStats.max}°</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">AVG</div>
+                <div className="text-amber-400 font-semibold tabular-nums">{tempStats.avg}°</div>
+              </div>
+              <div>
+                <div className="text-[9px] text-slate-500">σ (STD)</div>
+                <div className="text-slate-300 font-semibold tabular-nums">±{tempStats.std}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* COLLAPSIBLE RAW BIOSENSOR INGEST PACKET AUDIT */}
+      {showRawTable && (
+        <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-6 sm:p-7 shadow-[0_4px_24px_rgba(0,229,255,0.03)] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-white tracking-wide flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Raw Biosensor Ingest Packet Ledger (RFC-4180 Audit)</span>
+              </h3>
+              <p className="text-xs text-slate-400 font-mono mt-0.5">
+                Calibrated demonstration telemetry time packets ingested via 1Hz spacecraft bus
+              </p>
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              Showing {filteredTelemetry.length} recent packets
+            </span>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+            <table className="w-full text-left text-xs font-mono">
+              <thead className="bg-[#0B1224] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th className="py-3 px-4">Packet Timestamp (UTC)</th>
+                  <th className="py-3 px-4">Heart Rate</th>
+                  <th className="py-3 px-4">SpO2</th>
+                  <th className="py-3 px-4">Blood Pressure</th>
+                  <th className="py-3 px-4">Core Temp</th>
+                  <th className="py-3 px-4">HRV (RMSSD)</th>
+                  <th className="py-3 px-4">Data Quality</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 text-slate-300 bg-[#101B30]/50">
+                {filteredTelemetry.slice(-10).reverse().map((m) => (
+                  <tr key={m.id} className="hover:bg-slate-800/40 transition-colors">
+                    <td className="py-3 px-4 font-semibold text-white">
+                      {new Date(m.timestamp).toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-[#00E5FF] tabular-nums">{m.heartRate} BPM</td>
+                    <td className="py-3 px-4 text-sky-400 tabular-nums">{m.spo2}%</td>
+                    <td className="py-3 px-4 tabular-nums">{m.bloodPressure.systolic}/{m.bloodPressure.diastolic} mmHg</td>
+                    <td className="py-3 px-4 tabular-nums">{m.bodyTemperature} °C</td>
+                    <td className="py-3 px-4 tabular-nums">{m.hrv} ms</td>
+                    <td className="py-3 px-4">
+                      <span className="text-[#21D4A5] font-bold">{m.dataQuality}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       </>
       )}
 

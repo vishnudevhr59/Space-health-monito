@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITO - Autonomous Telemetry Streaming Engine
+ * SPACE HEALTH MONITOR - Autonomous Telemetry Streaming Engine
  * Continuous 1,000ms multi-variate streaming loop with progressive drift algorithms,
  * physiological micro-variations, automatic voice alerts, and audit trail logging.
  */
