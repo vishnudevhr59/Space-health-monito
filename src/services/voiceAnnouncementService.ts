@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITOR — Flight Deck Voice Announcement Service
+ * SPACE HEALTH MONITO — Flight Deck Voice Announcement Service
  * Integrates Web Speech API (SpeechSynthesis) for tactical flight surgeon and mission control announcements.
  * Provides rapid situational awareness during critical biomedical alerts and ECLSS anomalies without looking at the screen.
  */

@@ -11,11 +11,11 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <Logo size="md" className="mb-3" />
             <p className="text-slate-400 text-xs leading-relaxed max-w-md">
-              SPACE HEALTH MONITOR is an AI-powered astronaut health-monitoring and clinical decision support platform developed for the NASA Space Apps Challenge 2026.
+              SPACE HEALTH MONITO is an AI-powered astronaut health-monitoring and clinical decision support platform developed for the NASA Space Apps Challenge 2026.
             </p>
             <div className="mt-3 flex items-center gap-2 text-[11px] font-mono text-cyan-400">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>NASA Space Apps Challenge 2026 Submission · Team SPACE HEALTH MONITOR</span>
+              <span>NASA Space Apps Challenge 2026 Submission · Team SPACE HEALTH MONITO</span>
             </div>
           </div>
 

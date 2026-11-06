@@ -59,6 +59,31 @@ import {
   NOMINAL_HEALTH_STATE,
 } from '../components/SimulationAnomalyPanel';
 import { MissionAuditLogModal } from '../components/MissionAuditLogModal';
+import { MissionHighlightsGrid } from '../components/MissionHighlightsGrid';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+
+const cardFadeUp: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.38,
+      ease: 'easeOut',
+    },
+  },
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.04,
+    },
+  },
+};
 
 interface DashboardPageProps {
   astronaut: AstronautProfile;
@@ -156,7 +181,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6 overflow-x-hidden">
       
       {/* SIMULATED DATA NOTICE STRIP */}
-      <div className="p-3.5 rounded-2xl bg-[#0B1224]/90 border border-[#00E5FF]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32 }}
+        className="p-3.5 rounded-2xl bg-[#0B1224]/90 border border-[#00E5FF]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+      >
         <div className="flex items-center gap-2.5">
           <Info className="w-4 h-4 text-[#00E5FF] shrink-0" />
           <span className="text-slate-300">
@@ -176,32 +206,49 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* AI DIAGNOSTIC ENGINE BANNER (CONTINUOUS TELEMETRY SCANNING & FLIGHT SURGEON COUNTERMEASURES) */}
-      <AiDiagnosticEngineBanner
-        anomalyState={currentAnomaly}
-        onExecuteCountermeasure={() => {
-          if (onResetNominal) onResetNominal();
-          else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
-        }}
-        onOpenConsultation={() => onNavigate('monito-ai')}
-        onOpenAuditLog={() => setIsAuditModalOpen(true)}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.36, delay: 0.05 }}
+      >
+        <AiDiagnosticEngineBanner
+          anomalyState={currentAnomaly}
+          onExecuteCountermeasure={() => {
+            if (onResetNominal) onResetNominal();
+            else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
+          }}
+          onOpenConsultation={() => onNavigate('monito-ai')}
+          onOpenAuditLog={() => setIsAuditModalOpen(true)}
+        />
+      </motion.div>
 
       {/* TACTICAL GLASS COCKPIT HUD (CREW DRAGON / NASA GATEWAY SPECIFICATION) */}
-      <GlassCockpitHUD
-        anomalyState={currentAnomaly}
-        onOpenAnomalyPanel={() => setIsAnomalyModalOpen(true)}
-        onResetNominal={() => {
-          if (onResetNominal) onResetNominal();
-          else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
-        }}
-        onOpenAuditModal={() => setIsAuditModalOpen(true)}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.36, delay: 0.08 }}
+      >
+        <GlassCockpitHUD
+          anomalyState={currentAnomaly}
+          onOpenAnomalyPanel={() => setIsAnomalyModalOpen(true)}
+          onResetNominal={() => {
+            if (onResetNominal) onResetNominal();
+            else setLocalAnomalyState(NOMINAL_HEALTH_STATE);
+          }}
+          onOpenAuditModal={() => setIsAuditModalOpen(true)}
+        />
+      </motion.div>
 
       {/* DASHBOARD HERO: PROMINENT MISSION OVERVIEW SECTION */}
-      <div className="relative rounded-3xl bg-gradient-to-r from-[#101B30] via-[#0B1224] to-[#101B30] border border-[#00E5FF]/30 p-6 sm:p-8 shadow-[0_0_35px_-5px_rgba(0,229,255,0.12)] overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.12 }}
+        className="relative rounded-3xl bg-gradient-to-r from-[#101B30] via-[#0B1224] to-[#101B30] border border-[#00E5FF]/30 p-6 sm:p-8 shadow-[0_0_35px_-5px_rgba(0,229,255,0.12)] overflow-hidden"
+      >
         
         {/* Subtle background glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-[#00E5FF]/5 rounded-full blur-3xl pointer-events-none" />
@@ -303,10 +350,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
         </div>
 
-      </div>
+      </motion.div>
+
+      {/* MISSION HIGHLIGHTS GRID (2x2 ON DESKTOP, SINGLE COLUMN ON MOBILE) */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.16 }}
+      >
+        <MissionHighlightsGrid
+          astronaut={astronaut}
+          activityRecords={activityRecords}
+          cabinPressurePsi={currentAnomaly.cabinPressurePsi}
+          cabinCo2MmHg={currentAnomaly.cabinCo2MmHg}
+        />
+      </motion.div>
 
       {/* 8 REQUIRED SOPHISTICATED HEALTH METRIC CARDS */}
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.2 }}
+      >
         <div className="flex items-center justify-between mb-3 font-mono text-xs text-slate-400">
           <span className="uppercase tracking-wider font-semibold">
             Real-Time Physiological Telemetry (8 Primary Biosensors)
@@ -316,133 +381,159 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
           
           {/* 1. Heart Rate */}
-          <MetricCard
-            label="Heart Rate"
-            value={latestVital.heartRate}
-            unit="BPM"
-            statusText="Nominal"
-            status="nominal"
-            trend="stable"
-            trendLabel="Resting: 58 BPM"
-            historicalComparison="Δ +6 BPM vs pre-flight"
-            icon={<Heart className="w-3.5 h-3.5" />}
-            sparklineData={[58, 62, 60, 68, 64, 72, 64]}
-            lastUpdated="Updated 2s ago"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Heart Rate"
+              value={latestVital.heartRate}
+              unit="BPM"
+              statusText="Nominal"
+              status="nominal"
+              trend="stable"
+              trendLabel="Resting: 58 BPM"
+              historicalComparison="Δ +6 BPM vs pre-flight"
+              icon={<Heart className="w-3.5 h-3.5" />}
+              sparklineData={[58, 62, 60, 68, 64, 72, 64]}
+              lastUpdated="Updated 2s ago"
+            />
+          </motion.div>
 
           {/* 2. SpO2 */}
-          <MetricCard
-            label="Oxygen Saturation"
-            value={latestVital.spo2}
-            unit="%"
-            statusText="Nominal"
-            status="nominal"
-            trend="stable"
-            trendLabel="Target > 95%"
-            historicalComparison="Normoxic range"
-            icon={<Droplets className="w-3.5 h-3.5" />}
-            sparklineData={[98.2, 98.6, 98.4, 98.1, 98.5, 98.4]}
-            lastUpdated="Updated 2s ago"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Oxygen Saturation"
+              value={latestVital.spo2}
+              unit="%"
+              statusText="Nominal"
+              status="nominal"
+              trend="stable"
+              trendLabel="Target > 95%"
+              historicalComparison="Normoxic range"
+              icon={<Droplets className="w-3.5 h-3.5" />}
+              sparklineData={[98.2, 98.6, 98.4, 98.1, 98.5, 98.4]}
+              lastUpdated="Updated 2s ago"
+            />
+          </motion.div>
 
           {/* 3. Body Temperature */}
-          <MetricCard
-            label="Core Temperature"
-            value={latestVital.bodyTemperature}
-            unit="°C"
-            statusText="Calibrated"
-            status="nominal"
-            trend="stable"
-            trendLabel="Baseline 36.6°C"
-            historicalComparison="Circadian: Normal"
-            icon={<Thermometer className="w-3.5 h-3.5" />}
-            sparklineData={[36.5, 36.6, 36.7, 36.6, 36.6]}
-            lastUpdated="Updated 2s ago"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Core Temperature"
+              value={latestVital.bodyTemperature}
+              unit="°C"
+              statusText="Calibrated"
+              status="nominal"
+              trend="stable"
+              trendLabel="Baseline 36.6°C"
+              historicalComparison="Circadian: Normal"
+              icon={<Thermometer className="w-3.5 h-3.5" />}
+              sparklineData={[36.5, 36.6, 36.7, 36.6, 36.6]}
+              lastUpdated="Updated 2s ago"
+            />
+          </motion.div>
 
           {/* 4. Blood Pressure */}
-          <MetricCard
-            label="Blood Pressure"
-            value={`${latestVital.bloodPressure.systolic}/${latestVital.bloodPressure.diastolic}`}
-            unit="mmHg"
-            statusText="Optimal"
-            status="nominal"
-            trend="stable"
-            trendLabel="MAP: 86 mmHg"
-            historicalComparison="Cephalad fluid stable"
-            icon={<Activity className="w-3.5 h-3.5" />}
-            sparklineData={[112, 114, 118, 114, 116]}
-            lastUpdated="Updated 1m ago"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Blood Pressure"
+              value={`${latestVital.bloodPressure.systolic}/${latestVital.bloodPressure.diastolic}`}
+              unit="mmHg"
+              statusText="Optimal"
+              status="nominal"
+              trend="stable"
+              trendLabel="MAP: 86 mmHg"
+              historicalComparison="Cephalad fluid stable"
+              icon={<Activity className="w-3.5 h-3.5" />}
+              sparklineData={[112, 114, 118, 114, 116]}
+              lastUpdated="Updated 1m ago"
+            />
+          </motion.div>
 
           {/* 5. Sleep Duration */}
-          <MetricCard
-            label="Sleep Duration"
-            value={latestSleep.totalDurationHours}
-            unit="Hours"
-            statusText={latestSleep.totalDurationHours >= 7 ? 'Restorative' : 'Shortened'}
-            status={latestSleep.totalDurationHours >= 7 ? 'nominal' : 'warning'}
-            trend={latestSleep.totalDurationHours >= 7 ? 'up' : 'down'}
-            trendLabel={`Efficiency: ${latestSleep.efficiencyPercent}%`}
-            historicalComparison="Target: > 7.0 Hours"
-            icon={<Moon className="w-3.5 h-3.5" />}
-            sparklineData={[6.2, 6.5, 7.1, 6.8, 7.4]}
-            lastUpdated="Last sleep cycle"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Sleep Duration"
+              value={latestSleep.totalDurationHours}
+              unit="Hours"
+              statusText={latestSleep.totalDurationHours >= 7 ? 'Restorative' : 'Shortened'}
+              status={latestSleep.totalDurationHours >= 7 ? 'nominal' : 'warning'}
+              trend={latestSleep.totalDurationHours >= 7 ? 'up' : 'down'}
+              trendLabel={`Efficiency: ${latestSleep.efficiencyPercent}%`}
+              historicalComparison="Target: > 7.0 Hours"
+              icon={<Moon className="w-3.5 h-3.5" />}
+              sparklineData={[6.2, 6.5, 7.1, 6.8, 7.4]}
+              lastUpdated="Last sleep cycle"
+            />
+          </motion.div>
 
           {/* 6. Physical Activity */}
-          <MetricCard
-            label="Daily Exercise"
-            value={latestExercise.durationMinutes}
-            unit="Mins"
-            statusText="Completed"
-            status="nominal"
-            trend="up"
-            trendLabel={latestExercise.exerciseType}
-            historicalComparison="100% Mandate goal"
-            icon={<Zap className="w-3.5 h-3.5" />}
-            sparklineData={[60, 65, 70, 65, 65]}
-            lastUpdated="ARED session logged"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Daily Exercise"
+              value={latestExercise.durationMinutes}
+              unit="Mins"
+              statusText="Completed"
+              status="nominal"
+              trend="up"
+              trendLabel={latestExercise.exerciseType}
+              historicalComparison="100% Mandate goal"
+              icon={<Zap className="w-3.5 h-3.5" />}
+              sparklineData={[60, 65, 70, 65, 65]}
+              lastUpdated="ARED session logged"
+            />
+          </motion.div>
 
           {/* 7. HRV (Heart Rate Variability) */}
-          <MetricCard
-            label="HRV (RMSSD)"
-            value={latestVital.hrv}
-            unit="ms"
-            statusText={latestVital.hrv < 48 ? 'Attenuated' : 'Nominal'}
-            status={latestVital.hrv < 48 ? 'warning' : 'nominal'}
-            trend={latestVital.hrv < 48 ? 'down' : 'stable'}
-            trendLabel="Autonomic Balance"
-            historicalComparison="Baseline: 65 ms"
-            icon={<TrendingUp className="w-3.5 h-3.5" />}
-            sparklineData={[65, 68, 62, 54, 48, 41, 64]}
-            lastUpdated="Updated 2s ago"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="HRV (RMSSD)"
+              value={latestVital.hrv}
+              unit="ms"
+              statusText={latestVital.hrv < 48 ? 'Attenuated' : 'Nominal'}
+              status={latestVital.hrv < 48 ? 'warning' : 'nominal'}
+              trend={latestVital.hrv < 48 ? 'down' : 'stable'}
+              trendLabel="Autonomic Balance"
+              historicalComparison="Baseline: 65 ms"
+              icon={<TrendingUp className="w-3.5 h-3.5" />}
+              sparklineData={[65, 68, 62, 54, 48, 41, 64]}
+              lastUpdated="Updated 2s ago"
+            />
+          </motion.div>
 
           {/* 8. Radiation Exposure */}
-          <MetricCard
-            label="Cumulative Radiation"
-            value={astronaut.radiationCumulativeMSv}
-            unit="mSv"
-            statusText="Monitored"
-            status="nominal"
-            trend="up"
-            trendLabel="0.55 mSv / day"
-            historicalComparison="31.4% of Mission Cap"
-            icon={<Radio className="w-3.5 h-3.5" />}
-            sparklineData={[74, 75, 76, 77, 78.4]}
-            lastUpdated="Active dosimeter"
-          />
+          <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
+            <MetricCard
+              label="Cumulative Radiation"
+              value={astronaut.radiationCumulativeMSv}
+              unit="mSv"
+              statusText="Monitored"
+              status="nominal"
+              trend="up"
+              trendLabel="0.55 mSv / day"
+              historicalComparison="31.4% of Mission Cap"
+              icon={<Radio className="w-3.5 h-3.5" />}
+              sparklineData={[74, 75, 76, 77, 78.4]}
+              lastUpdated="Active dosimeter"
+            />
+          </motion.div>
 
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* MISSION CONTROL WORKFLOW MODULE TABS */}
-      <div className="space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.24 }}
+        className="space-y-4"
+      >
         <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-[#0B1224] border border-slate-800 font-mono text-xs">
           <button
             onClick={() => setActiveModuleTab('briefing')}
@@ -516,10 +607,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {activeModuleTab === 'timeline' && (
           <MissionTimeline astronaut={astronaut} />
         )}
-      </div>
+      </motion.div>
 
       {/* HEALTH CORRELATION ANALYSIS (ADVANCED MULTI-VARIATE ASSOCIATIONS) */}
-      <div className="rounded-3xl bg-[#101B30]/80 border border-[#00E5FF]/20 p-6 shadow-xl space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.28 }}
+        className="rounded-3xl bg-[#101B30]/80 border border-[#00E5FF]/20 p-6 shadow-xl space-y-4"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-[#00E5FF] uppercase font-bold">
@@ -566,13 +662,22 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* 4-QUADRANT SCIENTIFIC VISUALIZATIONS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
         
         {/* Chart 1: Heart Rate & SpO2 Historical Trend */}
-        <div className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm">
+        <motion.div
+          variants={cardFadeUp}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-base font-bold text-white">
@@ -646,10 +751,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
             <span>Calibrated Baseline: 58 BPM</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Chart 2: Radiation Dosimetry & Daily Rate (GCR vs SPE) */}
-        <div className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm">
+        <motion.div
+          variants={cardFadeUp}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-base font-bold text-white">
@@ -695,10 +804,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <span className="text-slate-400">Sensor: Personal Active Silicon Dosimeter</span>
             <span className="text-[#FFB547]">Warning Limit: &gt; 30 μSv/h</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Chart 3: Weekly Sleep Architecture (Deep / REM / Light) */}
-        <div className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm">
+        <motion.div
+          variants={cardFadeUp}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-base font-bold text-white">
@@ -742,10 +855,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <span>Target: &ge; 7.0 Hours</span>
             <span className="text-[#21D4A5]">Circadian: Synchronized</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Chart 4: Physical Countermeasure Workload (ARED) */}
-        <div className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm">
+        <motion.div
+          variants={cardFadeUp}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="bg-[#101B30]/80 border border-slate-800 rounded-3xl p-6 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-base font-bold text-white">
@@ -785,12 +902,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <span>Mandate: 60–90 min/day</span>
             <span className="text-[#00E5FF]">7 of 7 Sessions Verified</span>
           </div>
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
       {/* RECENT ALERTS QUICK VIEW */}
-      <div className="rounded-3xl bg-[#101B30]/80 border border-slate-800 p-6 space-y-3">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.32 }}
+        className="rounded-3xl bg-[#101B30]/80 border border-slate-800 p-6 space-y-3"
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-[#FFB547]" />
@@ -830,7 +952,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* LOG TELEMETRY MODAL */}
       {showLogModal && (

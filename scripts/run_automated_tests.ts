@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITOR — Comprehensive Automated Test Suite
+ * SPACE HEALTH MONITO — Comprehensive Automated Test Suite
  * Validates Database, Telemetry Pipeline, Python ML Isolation Forest,
  * Security RBAC, Data Provenance, Daily Briefing, Context Explorer,
  * Mission Timeline, Offline Backoff, and Failure Scenarios.
@@ -31,7 +31,7 @@ function assert(condition: boolean, suite: string, name: string, details?: strin
 
 async function runTests() {
   console.log('\n===============================================================');
-  console.log('   SPACE HEALTH MONITOR — COMPREHENSIVE ACCEPTANCE TEST SUITE');
+  console.log('   SPACE HEALTH MONITO — COMPREHENSIVE ACCEPTANCE TEST SUITE');
   console.log('===============================================================\n');
 
   // -----------------------------------------------------------------

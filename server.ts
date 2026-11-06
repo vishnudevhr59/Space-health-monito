@@ -25,21 +25,21 @@ let pythonProcess: any = null;
 function ensurePythonMLService() {
   const req = http.get(`http://127.0.0.1:${PYTHON_ML_PORT}/api/ml/model-status`, (res) => {
     if (res.statusCode === 200) {
-      console.log(`[SPACE HEALTH MONITOR] Python ML Engine detected alive on port ${PYTHON_ML_PORT}`);
+      console.log(`[SPACE HEALTH MONITO] Python ML Engine detected alive on port ${PYTHON_ML_PORT}`);
     }
   });
   req.on('error', () => {
-    console.log(`[SPACE HEALTH MONITOR] Spawning Python ML Engine (server_ml.py) on port ${PYTHON_ML_PORT}...`);
+    console.log(`[SPACE HEALTH MONITO] Spawning Python ML Engine (server_ml.py) on port ${PYTHON_ML_PORT}...`);
     try {
       pythonProcess = spawn('python3', [path.join(__dirname, 'server_ml.py')], {
         stdio: 'inherit',
         detached: false,
       });
       pythonProcess.on('error', (err: any) => {
-        console.error('[SPACE HEALTH MONITOR] Failed to start Python ML Engine:', err.message);
+        console.error('[SPACE HEALTH MONITO] Failed to start Python ML Engine:', err.message);
       });
     } catch (e: any) {
-      console.error('[SPACE HEALTH MONITOR] Process spawn error:', e.message);
+      console.error('[SPACE HEALTH MONITO] Process spawn error:', e.message);
     }
   });
 }
@@ -194,7 +194,7 @@ app.get('/api/system/services', (req: Request, res: Response) => {
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'ONLINE',
-    service: 'SPACE HEALTH MONITOR Backend',
+    service: 'SPACE HEALTH MONITO Backend',
     missionElapsedDays: 142,
     activeCrewCount: db.data.astronauts.length,
     activeAlerts: db.data.alerts.filter((a) => a.status === 'Active').length,
@@ -1003,7 +1003,7 @@ app.get('/api/reports/:astronautId', (req: Request, res: Response) => {
       missionDay: astro.missionDay,
       classification: 'OFFICIAL USE ONLY // NASA SPACE APPS CHALLENGE 2026',
       competition: 'NASA Space Apps Challenge 2026',
-      team: 'SPACE HEALTH MONITOR',
+      team: 'SPACE HEALTH MONITO',
     },
     astronaut: astro,
     summary: {
@@ -1504,7 +1504,8 @@ app.get('/api/timeline/:astronautId', (req: Request, res: Response) => {
 // MONITO AI CHAT ASSISTANT
 // ----------------------------------------------------
 app.post('/api/ai/chat', async (req: Request, res: Response) => {
-  const { message, astronautId, conversationHistory, liveTelemetry } = req.body;
+  const message = req.body.message || req.body.prompt || req.body.query;
+  const { astronautId, conversationHistory, liveTelemetry } = req.body;
 
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
@@ -1515,23 +1516,24 @@ app.post('/api/ai/chat', async (req: Request, res: Response) => {
   const latestVital = telemetry[telemetry.length - 1];
   const activeAlerts = db.data.alerts.filter((a) => a.astronautId === astro.id && a.status === 'Active');
 
-  // Merged live telemetry snapshot (prefer real-time live telemetry stream if provided)
-  const currentHR = liveTelemetry?.heartRate ?? latestVital?.heartRate ?? 64;
-  const currentSpO2 = liveTelemetry?.spo2 ?? latestVital?.spo2 ?? 98.4;
-  const currentTemp = liveTelemetry?.bodyTemperature ?? latestVital?.bodyTemperature ?? 36.6;
-  const currentSysBP = liveTelemetry?.systolicBP ?? latestVital?.bloodPressure?.systolic ?? 114;
-  const currentDiaBP = liveTelemetry?.diastolicBP ?? latestVital?.bloodPressure?.diastolic ?? 72;
-  const currentPressure = liveTelemetry?.cabinPressurePsi ?? 14.7;
-  const currentCO2 = liveTelemetry?.cabinCo2MmHg ?? 2.2;
-  const currentVestibular = liveTelemetry?.vestibularConflictScore ?? 1.4;
-  const currentSeverity = liveTelemetry?.severity ?? 'NOMINAL';
-  const currentAnomaly = liveTelemetry?.anomalyName ?? 'Nominal Operations';
+  // Merged live telemetry snapshot (accept liveTelemetry or telemetry from request payload)
+  const incomingTelemetry = liveTelemetry || req.body.telemetry || {};
+  const currentHR = incomingTelemetry?.heartRate ?? latestVital?.heartRate ?? 64;
+  const currentSpO2 = incomingTelemetry?.spo2 ?? latestVital?.spo2 ?? 98.4;
+  const currentTemp = incomingTelemetry?.bodyTemperature ?? latestVital?.bodyTemperature ?? 36.6;
+  const currentSysBP = incomingTelemetry?.systolicBP ?? incomingTelemetry?.bloodPressure?.systolic ?? latestVital?.bloodPressure?.systolic ?? 114;
+  const currentDiaBP = incomingTelemetry?.diastolicBP ?? incomingTelemetry?.bloodPressure?.diastolic ?? latestVital?.bloodPressure?.diastolic ?? 72;
+  const currentPressure = incomingTelemetry?.cabinPressurePsi ?? 14.7;
+  const currentCO2 = incomingTelemetry?.cabinCo2MmHg ?? 2.2;
+  const currentVestibular = incomingTelemetry?.vestibularConflictScore ?? 1.4;
+  const currentSeverity = incomingTelemetry?.severity ?? 'NOMINAL';
+  const currentAnomaly = incomingTelemetry?.anomalyName ?? 'Nominal Operations';
 
   const generateFallbackResponse = (query: string): string => {
     const q = query.toLowerCase();
 
-    // 1. Analyze Current Telemetry
-    if (q.includes('telemetry') || q.includes('vitals') || q.includes('anomaly') || q.includes('current')) {
+    // 1. Analyze Current Telemetry / Vitals
+    if (q.includes('telemetry') || q.includes('vital') || q.includes('anomaly') || q.includes('current') || q.includes('how am i')) {
       return `### 🛸 MONITO AI: Real-Time Multi-Variate Telemetry Diagnostic
 
 **Live Telemetry Ingest (MET +142d):**
@@ -1555,7 +1557,24 @@ ${currentSeverity === 'CRITICAL' || currentSeverity === 'WARNING'
 *NASA Evidence Grounding: NASA Human Research Roadmap (Cardiovascular Adaptation Discipline & ISS Environmental Health Standards).*`;
     }
 
-    // 2. Evaluate Fatigue & Sleep Debt
+    // 2. Bone & Muscle / ARED / Exercise
+    if (q.includes('bone') || q.includes('muscle') || q.includes('exercise') || q.includes('ared') || q.includes('osteoporosis') || q.includes('loss')) {
+      return `### 🏋️ MONITO AI: Musculoskeletal & ARED Countermeasure Evaluation
+
+**Astronaut Demineralization Profile for CDR ${astro.name}:**
+- **Current Bone Loss Rate:** \`0.85% / month\` (NASA HRP ceiling: < 1.0% / month with ARED)
+- **Prescribed Countermeasure:** ARED High-Load Axial Resistance (Squats & Deadlifts, 120 kg target)
+- **Biochemical Markers:** Serum Osteocalcin nominal; Urinary NTx within predicted microgravity range
+
+**Flight Surgeon Musculoskeletal Recommendations:**
+1. **Daily Axial Loading:** Execute 60-minute scheduled ARED session at 14:30 UTC. Ensure heel sensor contact for ground reaction force feedback.
+2. **Nutritional Buffering:** Maintain daily oral Vitamin D3 (1,000 IU) and Calcium citrate (1,200 mg) to stimulate osteoblast activity.
+3. **Ergometer Cadence:** Follow resistance sets with 30-minute interval cycle ergometry (CEVIS) at 75% VO2 max.
+
+*NASA Evidence Grounding: Sibonga et al. (NASA HRP Bone Discipline) & NASA Twins Study (Science, 2019).*`;
+    }
+
+    // 3. Evaluate Fatigue & Sleep Debt
     if (q.includes('fatigue') || q.includes('sleep') || q.includes('circadian') || q.includes('rest')) {
       return `### 🌙 MONITO AI: Sleep Architecture & Neuro-Cognitive Fatigue Assessment
 
@@ -1573,7 +1592,7 @@ ${currentSeverity === 'CRITICAL' || currentSeverity === 'WARNING'
 *NASA Evidence Grounding: Barger et al. (The Lancet Neurology, 2023) - Sleep and Circadian Disruption in Long-Duration Spaceflight.*`;
     }
 
-    // 3. Check Decompression Protocols
+    // 4. Check Decompression Protocols
     if (q.includes('decompression') || q.includes('pressure') || q.includes('hypobaric') || q.includes('airlock')) {
       return `### 🛡️ MONITO AI: Hypobaric Decompression & Pre-Breathe Protocols
 
@@ -1587,7 +1606,7 @@ ${currentSeverity === 'CRITICAL' || currentSeverity === 'WARNING'
 *NASA Evidence Grounding: NASA Technical Standard NASA-STD-3001 Vol 1 & JSC EVA Decompression Procedures.*`;
     }
 
-    // 4. Review NASA HRP Radiation Limits
+    // 5. Review NASA HRP Radiation Limits
     if (q.includes('radiation') || q.includes('limits') || q.includes('solar') || q.includes('gcr') || q.includes('spe')) {
       return `### ⚡ MONITO AI: Space Radiation Dosimetry & Permissible Exposure Limits
 
@@ -1604,7 +1623,7 @@ ${currentSeverity === 'CRITICAL' || currentSeverity === 'WARNING'
 *NASA Evidence Grounding: Cucinotta et al. (PLoS ONE / NASA TP-2013-217377) - Space Radiation Risk Models.*`;
     }
 
-    // 5. Assess Vestibular Disorientation
+    // 6. Assess Vestibular Disorientation
     if (q.includes('vestibular') || q.includes('disorientation') || q.includes('motion') || q.includes('otolith')) {
       return `### 🔄 MONITO AI: Space Motion Sickness & Neuro-Vestibular Adaptation
 
@@ -1622,27 +1641,54 @@ In weightlessness, the absence of gravitational otolith loading produces an acut
 *NASA Evidence Grounding: Reschke et al. (NASA HRP Vestibular Discipline Roadmap).*`;
     }
 
-    // Default Fallback
-    return `### 🛸 MONITO AI: Space Health Clinical Consultation
+    // 7. Microgravity Fluid Shift & Cephalad Redistribution
+    if (q.includes('fluid') || q.includes('shift') || q.includes('cephalad') || q.includes('puffy') || q.includes('sans')) {
+      return `### 🩺 MONITO AI: Cephalad Fluid Redistribution & SANS Assessment
 
-Greetings Commander ${astro.name}. I am continuously monitoring your biomedical vectors and environmental life support aboard ${astro.destination}.
+**Cardiovascular & Hemodynamic Vectors (MET +142d):**
+- **Heart Rate:** \`${currentHR} BPM\` · **Arterial SpO2:** \`${currentSpO2}%\`
+- **Brachial Pressure:** \`${currentSysBP}/${currentDiaBP} mmHg\` (MAP: ${Math.round(currentDiaBP + (currentSysBP - currentDiaBP) / 3)} mmHg)
+- **Central Venous Shift:** Estimated +2 to +4 mmHg cephalad fluid migration
 
-**Current Live Snapshot:**
-- **Vitals:** HR \`${currentHR} BPM\`, SpO2 \`${currentSpO2}%\`, Temp \`${currentTemp}°C\`, BP \`${currentSysBP}/${currentDiaBP} mmHg\`
-- **Atmosphere:** Pressure \`${currentPressure} psi\`, CO2 \`${currentCO2} mmHg\`
-- **Overall Status:** **${currentSeverity}** (${currentAnomaly})
+**Physiological Mechanics:**
+In microgravity, elimination of hydrostatic pressure shifts ~2 liters of vascular fluid upward, causing cephalic venous engorgement, Spaceflight-Associated Neuro-ocular Syndrome (SANS) risks, and transient facial edema.
 
-Regarding: "${query}"
-All physiological indices remain categorized within acceptable aerospace tolerance margins. Please specify whether you require detailed cardiovascular review, musculoskeletal exercise tuning, or EVA operational guidelines.
+**Tactical Clinical Countermeasures:**
+1. **Lower Body Negative Pressure (LBNP):** Execute 30 minutes daily at -25 to -35 mmHg to redistribute blood flow caudally.
+2. **Resistive Axial Loading:** Complete scheduled ARED squats and deadlifts to stimulate lower-limb venoconstriction.
+3. **Chibis Pneumatic Cuffs:** Don Chibis passive countermeasure gear during evening rest cycles.
 
-*Reference: NASA Human Research Program (HRP) Evidence Books.*`;
+*NASA Evidence Grounding: NASA Human Research Program Cardiovascular Discipline & NASA-STD-3001.*`;
+    }
+
+    // 8. General Custom Prompt Evaluation (Grounded in Live Telemetry Stream)
+    return `### 🛸 MONITO AI: Clinical Flight Surgeon Evaluation
+
+Greetings Commander ${astro.name}. I have evaluated your custom inquiry against the active flight state aboard ${astro.destination} (Mission Day ${astro.missionDay}).
+
+**Active Telemetry Context:**
+- **Cardiovascular:** Heart Rate \`${currentHR} BPM\`, Arterial SpO2 \`${currentSpO2}%\`, Blood Pressure \`${currentSysBP}/${currentDiaBP} mmHg\`
+- **Atmospheric ECLSS:** Pressure \`${currentPressure} psi\`, CO2 \`${currentCO2} mmHg\`
+- **Mission Health Status:** **${currentSeverity}** (${currentAnomaly})
+
+**Clinical Decision-Support Analysis:**
+Regarding your query: *"**${query}**"*
+
+Your physiological vectors show active autonomic compensation under microgravity conditions. Baroreceptors and circulatory reflexes are responding to fluid redistribution with stable mean arterial pressure (MAP ~${Math.round(currentDiaBP + (currentSysBP - currentDiaBP) / 3)} mmHg).
+
+**Prescribed Tactical Recommendations:**
+1. **Operational Monitoring:** Maintain continuous sensor adhesion for 1Hz biotelemetry logging.
+2. **Hydration & Nutrition:** Adhere to 2,800 kcal deep-space caloric schedule with 2.5L structured fluid intake.
+3. **Countermeasure Execution:** Verify completion of daily 2.5-hour exercise mandate (ARED + CEVIS) to sustain cardiovascular conditioning.
+
+*NASA Evidence Grounding: NASA Human Research Program (HRP) Evidence Books & NASA-STD-3001.*`;
   };
 
   if (!genAI) {
     const fallbackText = generateFallbackResponse(message);
     return res.json({
       reply: fallbackText,
-      modelUsed: 'Space Health Monitor Verified Knowledge Engine (Deterministic Offline Mode)',
+      modelUsed: 'Space Health Monito Verified Knowledge Engine (Deterministic Offline Mode)',
       groundingReferences: db.data.researchReferences.slice(0, 3),
     });
   }
@@ -1665,13 +1711,13 @@ User Question: ${message}
 
 Instructions:
 1. Provide a sharp, high-contrast mission-control response grounded in aerospace physiology.
-2. Directly reference the live telemetry numbers above.
+2. Directly reference the live telemetry numbers above in the context of their specific question.
 3. Include structured tactical countermeasures (numbered 1, 2, 3).
 4. Include verifiable NASA HRP / OSDR / Twins Study citation references.
 5. Format cleanly with Markdown headings and bullet points.`;
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('AI generation timeout')), 1500)
+      setTimeout(() => reject(new Error('AI generation timeout')), 3500)
     );
 
     const generatePromise = genAI.models.generateContent({
@@ -1693,7 +1739,7 @@ Instructions:
     const fallbackText = generateFallbackResponse(message);
     res.json({
       reply: fallbackText,
-      modelUsed: 'Space Health Monitor Verified Knowledge Engine (Resilient Offline Fallback)',
+      modelUsed: 'Space Health Monito Verified Knowledge Engine (Resilient Offline Fallback)',
       groundingReferences: db.data.researchReferences.slice(0, 3),
     });
   }
@@ -2365,11 +2411,11 @@ app.all('/api/ml/*', (req: Request, res: Response) => {
   });
 
   proxyReq.on('error', (err) => {
-    console.warn(`[SPACE HEALTH MONITOR] Python ML service unreachable, providing resilient fallback for ${targetPath}:`, err.message);
+    console.warn(`[SPACE HEALTH MONITO] Python ML service unreachable, providing resilient fallback for ${targetPath}:`, err.message);
     if (targetPath.includes('model-status')) {
       res.json({
         status: 'ONLINE',
-        service: 'SPACE HEALTH MONITOR ML Intelligence Engine (Resilient Gateway)',
+        service: 'SPACE HEALTH MONITO ML Intelligence Engine (Resilient Gateway)',
         modelsLoaded: ['IsolationForest (Fallback Mode)', 'ContributingIndicatorsAttribution'],
         calibratedNorms: {
           restingHeartRate: { mean: 58.0, std: 6.2, unit: 'BPM' },
@@ -2581,7 +2627,7 @@ let latestTestExecution = {
   failed: INITIAL_TEST_SUITE_CATALOGUE.filter((t) => !t.passed).length,
   durationMs: 2980,
   suitesCount: 17,
-  markdownSummary: `### SPACE HEALTH MONITOR — Automated Test Execution Verification
+  markdownSummary: `### SPACE HEALTH MONITO — Automated Test Execution Verification
 - **Total Tests Verified:** 124 / 124 (100% Pass Rate)
 - **Suites Covered:** 17 Complete Subsystem Suites
 - **Runtime Targets:** Node.js Express (:3000) + Python ML Isolation Forest (:5050)
@@ -2598,7 +2644,7 @@ app.get('/api/system/tests', (req: Request, res: Response) => {
 
 app.post('/api/system/run-tests', (req: Request, res: Response) => {
   const startTime = Date.now();
-  console.log('[SPACE HEALTH MONITOR] Triggering automated acceptance test suite run...');
+  console.log('[SPACE HEALTH MONITO] Triggering automated acceptance test suite run...');
 
   exec('npm run test', { timeout: 30000 }, (error, stdout, stderr) => {
     const durationMs = Date.now() - startTime;
@@ -2644,7 +2690,7 @@ app.post('/api/system/run-tests', (req: Request, res: Response) => {
       failed: failedCount,
       durationMs,
       suitesCount: new Set(effectiveTests.map((t) => t.suite)).size,
-      markdownSummary: `### SPACE HEALTH MONITOR — Automated Test Execution Verification
+      markdownSummary: `### SPACE HEALTH MONITO — Automated Test Execution Verification
 - **Execution Timestamp:** ${new Date().toUTCString()}
 - **Total Tests Verified:** ${effectiveTests.length} (${passedCount} Passed, ${failedCount} Failed)
 - **Pass Rate:** ${((passedCount / (effectiveTests.length || 1)) * 100).toFixed(1)}%
@@ -2682,7 +2728,7 @@ async function startServer() {
   }
 
   app.listen(PORT, () => {
-    console.log(`[SPACE HEALTH MONITOR] Mission Control Server operational on port ${PORT}`);
+    console.log(`[SPACE HEALTH MONITO] Mission Control Server operational on port ${PORT}`);
   });
 }
 

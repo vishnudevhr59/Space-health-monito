@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITOR - Mission Audit Trail Service
+ * SPACE HEALTH MONITO - Mission Audit Trail Service
  * High-integrity event logging for all telemetry breaches, anomalies,
  * verbal voice callouts, and AI Flight Surgeon countermeasures.
  * Provides one-click CSV & JSON export compliant with NASA aerospace review standards.

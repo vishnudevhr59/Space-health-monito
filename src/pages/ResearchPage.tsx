@@ -85,7 +85,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
         'Subclinical cardiovascular and autonomic tone changes require individual baseline comparisons rather than population averages.',
         'Telomeres lengthened during spaceflight and rapidly shortened within 48 hours of Earth return.',
       ],
-      relevanceToAstronautMonitoring: 'Grounds SPACE HEALTH MONITOR individual baseline drift metrics and multi-phase baseline comparison engine.',
+      relevanceToAstronautMonitoring: 'Grounds SPACE HEALTH MONITO individual baseline drift metrics and multi-phase baseline comparison engine.',
       provenanceType: 'REAL_RESEARCH_DATA',
       methodology: 'Integrated longitudinal pre-, in-, and post-flight physiological and multi-omics profiling',
       knownLimitations: 'Single monozygotic twin pair (N=1 flight, N=1 control); cannot define universal clinical thresholds.',
@@ -109,7 +109,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
         'Core temperature setpoint elevation correlates with chronic low-grade systemic inflammation (interleukin-6).',
         'Vitals evaluation must calibrate for elevated baseline temperature (37.2°C nominal in space vs 36.6°C on Earth).',
       ],
-      relevanceToAstronautMonitoring: 'Directly calibrates core body temperature nominal setpoint and pyrexia threshold alarms in SPACE HEALTH MONITOR.',
+      relevanceToAstronautMonitoring: 'Directly calibrates core body temperature nominal setpoint and pyrexia threshold alarms in SPACE HEALTH MONITO.',
       provenanceType: 'REAL_RESEARCH_DATA',
       methodology: 'Non-invasive double-sensor forehead heat flux thermometry during rest and cycle ergometer exercise',
       knownLimitations: 'Microgravity forced-air ventilation constraints; limited sample size (N=11).',
@@ -133,7 +133,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
         'High-load ARED exercise combined with nutritional countermeasures (calcium + Vitamin D3) preserves cortical shell geometry.',
         'Exercise adherence directly correlates with post-flight trabecular microarchitecture retention.',
       ],
-      relevanceToAstronautMonitoring: 'Calibrates the Bone & Muscle Health prediction models and countermeasure prescription tracking in SPACE HEALTH MONITOR.',
+      relevanceToAstronautMonitoring: 'Calibrates the Bone & Muscle Health prediction models and countermeasure prescription tracking in SPACE HEALTH MONITO.',
       provenanceType: 'REAL_RESEARCH_DATA',
       methodology: 'Longitudinal pre- and post-flight DXA imaging, peripheral quantitative computed tomography (pQCT), and biochemical bone turnover markers',
       knownLimitations: 'High-resolution in-flight bone scanning unavailable; relies on pre/post terrestrial DXA.',
@@ -181,7 +181,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
         'Solar Particle Events (SPE) can deliver acute life-threatening doses (>500 mSv) requiring immediate habitat shelter.',
         'Cumulative dosimetric monitoring is mandatory to prevent acute radiation syndrome and long-term radiogenic risks.',
       ],
-      relevanceToAstronautMonitoring: 'Drives the Space Environment radiation dosimeter alerts, career exposure gauges, and SPE storm shelters in SPACE HEALTH MONITOR.',
+      relevanceToAstronautMonitoring: 'Drives the Space Environment radiation dosimeter alerts, career exposure gauges, and SPE storm shelters in SPACE HEALTH MONITO.',
       provenanceType: 'REAL_RESEARCH_DATA',
       methodology: 'Active silicon dosimeters, passive thermoluminescent detectors (TLD), and Monte Carlo radiation transport simulations (HZETRN)',
       knownLimitations: 'Biological relative biological effectiveness (RBE) of high-energy heavy ions contains significant epistemic uncertainty.',
@@ -242,7 +242,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
             NASA Space Health Research Provenance
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
-            Every health threshold, anomaly baseline, circadian setpoint, and MONITO AI assistant insight in SPACE HEALTH MONITOR is traceable to verified peer-reviewed publications and official NASA repositories.
+            Every health threshold, anomaly baseline, circadian setpoint, and MONITO AI assistant insight in SPACE HEALTH MONITO is traceable to verified peer-reviewed publications and official NASA repositories.
           </p>
         </div>
 
@@ -435,7 +435,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
           <span>NASA Open Science & Verified Spaceflight Portals</span>
         </h3>
         <p className="text-xs sm:text-sm text-slate-300 mb-6 max-w-3xl leading-relaxed">
-          SPACE HEALTH MONITOR adheres to strict aerospace scientific integrity. All physiological baseline algorithms utilize publicly released NASA repositories:
+          SPACE HEALTH MONITO adheres to strict aerospace scientific integrity. All physiological baseline algorithms utilize publicly released NASA repositories:
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">

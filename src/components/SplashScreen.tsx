@@ -111,7 +111,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       className={`fixed inset-0 z-50 flex flex-col items-center justify-between p-3 sm:p-5 md:p-8 bg-[#020515] overflow-y-auto overflow-x-hidden select-none transition-opacity duration-700 ease-in-out h-[100dvh] w-full max-w-full ${
         animationStage === 'exit' ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
-      aria-label="SPACE HEALTH MONITOR Startup Intro"
+      aria-label="SPACE HEALTH MONITO Startup Intro"
       role="banner"
     >
       {/* BACKGROUND COSMIC DEEP SPACE RADIAL GLOW & NEBULA */}
@@ -196,7 +196,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               SPACE HEALTH
             </span>
             <span className="text-[#00E5FF] drop-shadow-[0_0_12px_rgba(0,229,255,0.6)]">
-              MONITOR
+              MONITO
             </span>
           </div>
           <div className="text-[9px] xs:text-[10px] sm:text-xs font-mono tracking-[0.2em] uppercase text-slate-400">
@@ -230,13 +230,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       </div>
 
       {/* BOTTOM ACTION BAR: TOUCH-OPTIMIZED SKIP BUTTON */}
-      <div className="relative z-10 w-full max-w-4xl flex items-center justify-between text-xs font-mono px-1 shrink-0 pt-2">
+      <div className="relative z-10 w-full max-w-4xl flex items-center justify-between text-xs font-mono px-1 shrink-0 pt-2 pb-1">
         <div className="text-[10px] text-slate-500 hidden sm:block">
           NASA Space Apps 2026 · Mission Decision Support
         </div>
         <button
           onClick={handleSkip}
-          className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-200 font-bold transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)] cursor-pointer text-xs active:scale-95"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border-2 border-cyan-500/70 text-cyan-200 font-bold transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)] cursor-pointer text-xs active:scale-95 min-h-[44px] focus-visible:ring-2 focus-visible:ring-[#00E5FF] focus-visible:outline-none"
         >
           <span>Open Mission Control</span>
           <ChevronRight className="w-4 h-4 text-cyan-400" />

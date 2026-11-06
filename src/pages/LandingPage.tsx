@@ -72,7 +72,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
   ];
 
   return (
-    <div className="min-h-screen text-slate-100 space-stars-bg">
+    <div className="min-h-screen w-full overflow-x-hidden text-slate-100 space-stars-bg">
       
       {/* FULL-SCREEN CINEMATIC HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-36 border-b border-[#00E5FF]/20 bg-gradient-to-b from-[#050816] via-[#0B1224] to-[#050816]">
@@ -318,7 +318,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
                   Grounded in Verified NASA Human Research Program Data
                 </h3>
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                  SPACE HEALTH MONITOR does not invent findings. Every threshold, risk assessment, and decision-support recommendation is anchored in peer-reviewed aerospace evidence from NASA HRP, OSDR, and the NASA Twins Study.
+                  SPACE HEALTH MONITO does not invent findings. Every threshold, risk assessment, and decision-support recommendation is anchored in peer-reviewed aerospace evidence from NASA HRP, OSDR, and the NASA Twins Study.
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 text-xs font-mono">

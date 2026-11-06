@@ -14,7 +14,7 @@ Returns health status of all 5 subsystems:
 - **Data Ingestion:** Validation boundary engine status.
 
 ### `GET /api/system/readiness`
-- **Response 200:** `{ "ready": true, "message": "Space Health Monito is ready to accept mission telemetry." }`
+- **Response 200:** `{ "ready": true, "message": "Space Health Monitor is ready to accept mission telemetry." }`
 - **Response 503:** `{ "ready": false, "message": "Database initialization in progress." }`
 
 ---

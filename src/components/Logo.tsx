@@ -98,7 +98,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
               SPACE HEALTH
             </span>
             <span className="font-bold tracking-wider text-cyan-400 text-xs sm:text-base md:text-lg">
-              MONITOR
+              MONITO
             </span>
           </div>
           <span className="text-[8px] sm:text-[10px] tracking-widest uppercase text-slate-400 font-mono mt-0.5 hidden sm:block whitespace-nowrap">

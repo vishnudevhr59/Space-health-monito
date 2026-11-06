@@ -72,6 +72,12 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
   ]);
 
   const [inputQuery, setInputQuery] = useState('');
+  const inputQueryRef = useRef(inputQuery);
+
+  useEffect(() => {
+    inputQueryRef.current = inputQuery;
+  }, [inputQuery]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedReferencesId, setExpandedReferencesId] = useState<string | null>(null);
@@ -99,6 +105,18 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
     return () => clearTimeout(scrollTimer);
   }, [messages, isLoading]);
 
+  // Listen for programmatic query triggers from Demo Assistant or external controls
+  useEffect(() => {
+    const handleTrigger = (e: Event) => {
+      const customEvent = e as CustomEvent<{ query?: string }>;
+      if (customEvent.detail?.query) {
+        handleSendMessage(customEvent.detail.query);
+      }
+    };
+    window.addEventListener('monito-ai-trigger-query', handleTrigger);
+    return () => window.removeEventListener('monito-ai-trigger-query', handleTrigger);
+  }, [currentFrame, isLoading]);
+
   const handleCopyText = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -106,10 +124,31 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
   };
 
   const handleSendMessage = async (queryText?: string) => {
-    const query = queryText || inputQuery;
-    if (!query.trim() || isLoading) return;
+    const rawText = typeof queryText === 'string' ? queryText : inputQueryRef.current;
+    const query = (rawText || '').trim();
+    if (!query || isLoading) return;
 
-    const frameSnapshot = { ...currentFrame };
+    // Immediately clear input query both in state and ref to prevent race conditions or double-submits
+    setInputQuery('');
+    inputQueryRef.current = '';
+
+    // Fetch freshest live telemetry frame directly from the streaming engine
+    const engineFrame = telemetryStreamEngine.getCurrentFrame();
+    const frameSnapshot: TelemetryFrame = {
+      ...engineFrame,
+      heartRate: engineFrame.heartRate || 64,
+      spo2: engineFrame.spo2 || 98.4,
+      cabinPressurePsi: engineFrame.cabinPressurePsi || 14.7,
+      cabinCo2MmHg: engineFrame.cabinCo2MmHg || 2.2,
+      vestibularConflictScore: engineFrame.vestibularConflictScore || 1.4,
+      severity: engineFrame.severity || 'NOMINAL',
+      anomalyName: engineFrame.anomalyName || 'Nominal Operations',
+      systolicBP: engineFrame.systolicBP || 114,
+      diastolicBP: engineFrame.diastolicBP || 72,
+      bodyTemperature: engineFrame.bodyTemperature || 36.6,
+      hrv: engineFrame.hrv || 64,
+      respiratoryRate: engineFrame.respiratoryRate || 14,
+    };
 
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -119,7 +158,6 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputQuery('');
     setIsLoading(true);
 
     try {
@@ -128,9 +166,12 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: query,
+          prompt: query,
+          query: query,
           astronautId: astronaut.id,
           liveTelemetry: frameSnapshot,
-          conversationHistory: messages.map((m) => ({
+          telemetry: frameSnapshot,
+          conversationHistory: messages.slice(-10).map((m) => ({
             role: m.sender,
             content: m.text,
           })),
@@ -155,21 +196,26 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (err: any) {
-      console.error('Chat error:', err);
+      console.warn('MONITO AI query failed or delayed, engaging deterministic NASA HRP offline engine:', err);
       const errorMessage: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: 'assistant',
-        text: `### 🛸 Space Health Knowledge Engine Synthesis (Offline Fallback)
+        text: `### 🛸 Space Health Monito — Clinical Decision Support (Resilient Offline Mode)
 
-Based on your active biotelemetry stream on **Mission Day ${astronaut.missionDay}**:
+Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated against your active **1Hz biotelemetry stream** on **Mission Day ${astronaut.missionDay}**:
 
-- **Real-Time Stream:** Heart Rate \`${frameSnapshot.heartRate} BPM\`, SpO2 \`${frameSnapshot.spo2}%\`, Cabin Pressure \`${frameSnapshot.cabinPressurePsi} psi\`, CO2 \`${frameSnapshot.cabinCo2MmHg} mmHg\`.
-- **System Severity:** **${frameSnapshot.severity}** [${frameSnapshot.anomalyName}].
-- **NASA HRP Clinical Recommendation:** Maintain countermeasure protocols (ARED resistive exercise + hydration + 460nm circadian phase lighting).
+- **Active Biosensors:** Heart Rate \`${frameSnapshot.heartRate} BPM\`, SpO2 \`${frameSnapshot.spo2}%\`, Hemodynamics \`${frameSnapshot.systolicBP}/${frameSnapshot.diastolicBP} mmHg\` (MAP: ${Math.round(frameSnapshot.diastolicBP + (frameSnapshot.systolicBP - frameSnapshot.diastolicBP) / 3)} mmHg).
+- **ECLSS Atmosphere:** Cabin Pressure \`${frameSnapshot.cabinPressurePsi} psi\`, Partial CO2 \`${frameSnapshot.cabinCo2MmHg} mmHg\`.
+- **Mission Health Status:** **${frameSnapshot.severity}** [${frameSnapshot.anomalyName}].
 
-*NASA Human Research Roadmap (Evidence-Based Grounding).*`,
+**NASA HRP Operational Recommendations:**
+1. **Autonomic Balance:** Maintain fluid loading (400 mL isotonic saline buffer with electrolytes) to support central arterial volume.
+2. **Atmospheric Verification:** Verify OGA cycle status and active charcoal / amine scrubbing efficiency.
+3. **Countermeasure Protocol:** Execute scheduled ARED resistive loading (60 min) and CEVIS cycle ergometry to protect musculoskeletal integrity.
+
+*NASA Human Research Program (HRP) Evidence Books & Flight Medicine Guidelines.*`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: 'Space Health Monitor Local Engine',
+        modelUsed: 'Space Health Monito Local Engine (NASA HRP Rulebook)',
         telemetrySnapshot: frameSnapshot,
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -450,13 +496,19 @@ Based on your active biotelemetry stream on **Mission Day ${astronaut.missionDay
             }}
             className="flex items-center gap-3"
           >
-            <input
-              type="text"
+            <textarea
+              rows={1}
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               placeholder="Ask MONITO AI about spaceflight physiology, radiation hazards, or your live biotelemetry..."
               disabled={isLoading}
-              className="flex-1 min-w-0 px-3.5 sm:px-4 py-3 sm:py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] font-sans"
+              className="flex-1 min-w-0 px-3.5 sm:px-4 py-3 sm:py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] font-sans resize-none leading-relaxed"
             />
             <button
               type="submit"

@@ -109,7 +109,7 @@ export const EmergencyBeaconModal: React.FC<EmergencyBeaconModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-rose-300 hover:text-white hover:bg-rose-900/40 transition-colors cursor-pointer"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl text-rose-300 hover:text-white hover:bg-rose-900/40 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />

@@ -162,7 +162,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <div className="text-[11px] font-mono uppercase tracking-widest text-[#00E5FF] print:text-cyan-800 font-bold mb-1">
-                SPACE HEALTH MONITOR · NASA SPACE APPS CHALLENGE 2026
+                SPACE HEALTH MONITO · NASA SPACE APPS CHALLENGE 2026
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white print:text-slate-950 tracking-tight">
                 {reportPeriod} Astronaut Clinical Telemetry Dossier
@@ -343,7 +343,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
         {/* NASA Scientific Evidence Sign-Off */}
         <div className="pt-6 border-t border-slate-800 print:border-slate-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-mono text-slate-400 print:text-slate-600">
           <div>
-            <div>System: SPACE HEALTH MONITOR Decision Support Platform</div>
+            <div>System: SPACE HEALTH MONITO Decision Support Platform</div>
             <div>Knowledge Base: NASA HRP, OSDR, GeneLab, NTRS</div>
           </div>
           <div className="text-left sm:text-right">

@@ -40,12 +40,20 @@ import { MissionControlTicker } from './components/MissionControlTicker';
 import { AnomalyInjectionState, NOMINAL_HEALTH_STATE } from './components/SimulationAnomalyPanel';
 import { MissionAuditLogModal } from './components/MissionAuditLogModal';
 import { AutonomousSelfHealingBanner } from './components/AutonomousSelfHealingBanner';
+import { DemoAssistantToolbar } from './components/DemoAssistantToolbar';
 import { useAlertMonitoring } from './hooks/useAlertMonitoring';
+import { telemetryStreamEngine } from './services/telemetryStreamEngine';
+
+const isKioskOrDemoReady = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash.toLowerCase();
+  return hash.includes('demo-ready') || hash.includes('kiosk');
+};
 
 export default function App() {
   useAlertMonitoring();
-  const [showSplash, setShowSplash] = useState<boolean>(true);
-  const [currentTab, setCurrentTab] = useState<string>('landing');
+  const [showSplash, setShowSplash] = useState<boolean>(() => !isKioskOrDemoReady());
+  const [currentTab, setCurrentTab] = useState<string>(() => (isKioskOrDemoReady() ? 'dashboard' : 'landing'));
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProvenanceModalOpen, setIsProvenanceModalOpen] = useState(false);
   const [isLogVitalsModalOpen, setIsLogVitalsModalOpen] = useState(false);
@@ -54,6 +62,22 @@ export default function App() {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [anomalyState, setAnomalyState] = useState<AnomalyInjectionState>(NOMINAL_HEALTH_STATE);
+
+  useEffect(() => {
+    const handleHashCheck = () => {
+      if (isKioskOrDemoReady()) {
+        setShowSplash(false);
+        setCurrentTab('dashboard');
+        setIsAuthModalOpen(false);
+        telemetryStreamEngine.setTargetState(NOMINAL_HEALTH_STATE);
+        setAnomalyState(NOMINAL_HEALTH_STATE);
+      }
+    };
+
+    handleHashCheck();
+    window.addEventListener('hashchange', handleHashCheck);
+    return () => window.removeEventListener('hashchange', handleHashCheck);
+  }, []);
 
   // Active User session (Default: CDR Sarah Chen)
   const [currentUser, setCurrentUser] = useState<User>({
@@ -500,6 +524,18 @@ export default function App() {
       <MissionAuditLogModal
         isOpen={isAuditModalOpen}
         onClose={() => setIsAuditModalOpen(false)}
+      />
+
+      {/* HACKATHON DEMO ASSISTANT & QUICK-CHECK SCRIPT SUITE */}
+      <DemoAssistantToolbar
+        currentTab={currentTab}
+        onNavigateTab={(tab) => setCurrentTab(tab)}
+        astronaut={astronaut}
+        telemetry={telemetry}
+        sleepRecords={sleepRecords}
+        activityRecords={activityRecords}
+        radiation={radiation}
+        alerts={alerts}
       />
 
     </div>

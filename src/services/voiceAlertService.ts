@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITOR - Tactical Voice Alert Synthesizer
+ * SPACE HEALTH MONITO - Tactical Voice Alert Synthesizer
  * Grounded in Browser SpeechSynthesis API for rapid aerospace situational awareness.
  * Provides crisp, authoritative verbal callouts for critical health anomalies.
  */

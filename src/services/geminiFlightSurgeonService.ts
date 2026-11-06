@@ -1,5 +1,5 @@
 /**
- * SPACE HEALTH MONITOR - Secure Gemini API Adapter & Deterministic Offline Medical Diagnostic Engine
+ * SPACE HEALTH MONITO - Secure Gemini API Adapter & Deterministic Offline Medical Diagnostic Engine
  * Grounded in NASA TRISH / NASA HRP Clinical Countermeasure Guidelines.
  * Guarantees zero-hang, zero-crash diagnostics even during complete network or API outages.
  */

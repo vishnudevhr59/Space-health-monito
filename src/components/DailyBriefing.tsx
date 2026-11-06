@@ -475,7 +475,7 @@ export const DailyBriefing: React.FC<DailyBriefingProps> = ({ astronaut, onNavig
       <div className="p-2.5 rounded-xl bg-[#050816]/70 border border-slate-800/80 text-[10px] text-slate-500 flex items-center gap-2">
         <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         <span>
-          <strong>Non-Diagnostic Research Prototype:</strong> SPACE HEALTH MONITOR provides automated statistical pattern analysis for flight surgeon review and crew situational awareness. Does not constitute certified clinical diagnosis.
+          <strong>Non-Diagnostic Research Prototype:</strong> SPACE HEALTH MONITO provides automated statistical pattern analysis for flight surgeon review and crew situational awareness. Does not constitute certified clinical diagnosis.
         </span>
       </div>
 

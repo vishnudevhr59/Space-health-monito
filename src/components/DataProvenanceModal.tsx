@@ -84,7 +84,8 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({ isOpen
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00E5FF] focus-visible:outline-none"
+            title="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
