@@ -1,5 +1,5 @@
 # Personalized Baseline Methodology & Statistical Validation
-**SPACE HEALTH MONITO — NASA Space Apps Challenge 2026**  
+**SPACE HEALTH MONITOR — NASA Space Apps Challenge 2026**  
 **Document Reference:** `SHM-DOC-METH-2026-02`
 
 ---
@@ -18,7 +18,7 @@ Consequently, **individualized, longitudinal baseline modeling** is a non-negoti
 
 ## 2. Longitudinal Three-Phase Baseline Architecture
 
-SPACE HEALTH MONITO establishes three distinct baseline epochs for every crew member:
+SPACE HEALTH MONITOR establishes three distinct baseline epochs for every crew member:
 
 ```text
 ┌────────────────────────────────┐     ┌────────────────────────────────┐     ┌────────────────────────────────┐
@@ -43,7 +43,7 @@ Where:
 - $\sigma_{\text{baseline}}$ is the sample standard deviation.
 
 ### 3.2. Safe Zero-Variance Handling
-In static sensors or homogeneous testing windows, sample variance $s^2$ may approach zero ($\sigma \to 0$), which would cause catastrophic division-by-zero errors. SPACE HEALTH MONITO enforces a **biophysically grounded minimum variance floor** ($\sigma_{\min}$):
+In static sensors or homogeneous testing windows, sample variance $s^2$ may approach zero ($\sigma \to 0$), which would cause catastrophic division-by-zero errors. SPACE HEALTH MONITOR enforces a **biophysically grounded minimum variance floor** ($\sigma_{\min}$):
 
 $$\sigma_{\text{effective}} = \max\left(\sigma_{\text{computed}}, \sigma_{\min}\right)$$
 
@@ -78,4 +78,4 @@ To prevent spurious statistical alerts caused by inadequate sample sizes:
 > **MANDATORY AEROSPACE MEDICAL NOTICE:**  
 > A statistical deviation ($|Z| \ge 2.0\sigma$) is **not** inherently a medical emergency. Transient physiological deviations routinely occur in response to circadian phase shifts, high-workload EVA tasks, sleep phase awakenings, and habitat temperature fluctuations.  
 > 
-> SPACE HEALTH MONITO provides decision support triage to guide structured clinician review; it does not replace the clinical judgment of the assigned Flight Surgeon or Space Medicine Operations Division.
+> SPACE HEALTH MONITOR provides decision support triage to guide structured clinician review; it does not replace the clinical judgment of the assigned Flight Surgeon or Space Medicine Operations Division.

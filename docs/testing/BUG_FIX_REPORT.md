@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Prompt 8 Bug Fix & Diagnostic Report
+# SPACE HEALTH MONITOR — Prompt 8 Bug Fix & Diagnostic Report
 
 ## 1. Executive Summary
 

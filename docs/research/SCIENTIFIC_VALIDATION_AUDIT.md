@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Scientific and Data Validation Audit
+# SPACE HEALTH MONITOR — Scientific and Data Validation Audit
 **NASA Space Apps Challenge 2026**  
 **Document Reference:** `SHM-DOC-SCI-2026-01`  
 **Classification:** Scientific Traceability, Data Provenance & Methodological Audit
@@ -7,7 +7,7 @@
 
 ## 1. Executive Summary & Audit Mandate
 
-This document provides a rigorous, transparent audit of all physiological data sources, NASA research datasets, statistical derivation pipelines, and machine learning models integrated into **SPACE HEALTH MONITO**.
+This document provides a rigorous, transparent audit of all physiological data sources, NASA research datasets, statistical derivation pipelines, and machine learning models integrated into **SPACE HEALTH MONITOR**.
 
 ### Core Scientific Principles Enforced
 1. **Zero Data Fabrications:** No synthetic demonstration data is masqueraded as live in-flight human telemetry.
@@ -59,7 +59,7 @@ This document provides a rigorous, transparent audit of all physiological data s
 
 ## 4. Distinction Between Direct Measurements, Statistical Derivations & AI
 
-To ensure clinical and operational clarity, SPACE HEALTH MONITO maintains explicit architectural distinctions:
+To ensure clinical and operational clarity, SPACE HEALTH MONITOR maintains explicit architectural distinctions:
 1. **Directly Observed Telemetry:** Sensor-transmitted biometric metrics timestamped with high data quality (`VERIFIED`).
 2. **Statistical Deviations:** Standardized Z-scores ($Z = \frac{x - \mu}{\sigma}$) calculated against the astronaut's individual pre-flight baseline setpoint.
 3. **ML Anomaly Scores:** Multi-variate outlier scores (0.0 to 1.0) computed by the Pure-Python Vectorized Isolation Forest (`server_ml.py`).
@@ -70,4 +70,4 @@ To ensure clinical and operational clarity, SPACE HEALTH MONITO maintains explic
 
 ## 5. Audit Conclusion
 
-All 5 core NASA studies integrated into SPACE HEALTH MONITO have been verified with working DOIs, genuine experimental sample sizes, and documented limitations. No clinical claims are made without supporting evidence, satisfying all NASA Space Apps Challenge 2026 technical and scientific standards.
+All 5 core NASA studies integrated into SPACE HEALTH MONITOR have been verified with working DOIs, genuine experimental sample sizes, and documented limitations. No clinical claims are made without supporting evidence, satisfying all NASA Space Apps Challenge 2026 technical and scientific standards.

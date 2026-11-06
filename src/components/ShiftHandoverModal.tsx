@@ -98,7 +98,8 @@ export const ShiftHandoverModal: React.FC<ShiftHandoverModalProps> = ({
 
   const handleDownloadMarkdown = () => {
     if (!submittedRecord) return;
-    const md = `# LUNAR GATEWAY FLIGHT SURGEON SHIFT HANDOVER
+    const md = `# NASA GATEWAY EXPEDITION / ORION LIFE SCIENCES DIVISION — FLIGHT SURGEON CONSOLE
+## CLINICAL SHIFT HANDOVER BRIEFING
 **Shift Record ID:** ${submittedRecord.id}
 **Date:** ${submittedRecord.shiftDate}
 **Shift Period:** ${submittedRecord.shiftPeriod}

@@ -47,7 +47,7 @@ const INITIAL_AUDIT_SEED: MissionAuditEntry[] = [
     eventType: 'SYSTEM_NOMINAL_RESTORED',
     severity: 'NOMINAL',
     title: 'Orbital Gateway Telemetry Stream Lock Established',
-    description: 'Ground lock acquired through ISRO ISTRAC-BLR and NASA Houston MCC Ka-band antenna array. 256 Mbps SNR 34 dB.',
+    description: 'Ground lock acquired through NASA Houston MCC and DSN Goldstone 70m antenna array. 256 Mbps SNR 38 dB.',
     actor: 'Autonomous Flight Controller',
     telemetrySnapshot: {
       heartRate: 60,

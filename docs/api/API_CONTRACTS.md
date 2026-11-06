@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — API Contracts & Documentation
+# SPACE HEALTH MONITOR — API Contracts & Documentation
 **Host:** `http://127.0.0.1:3000` (Reverse Proxied to Python ML at `http://127.0.0.1:5050`)
 
 ---

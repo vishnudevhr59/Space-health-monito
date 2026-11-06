@@ -1,5 +1,5 @@
-# SPACE HEALTH MONITO — Automated Testing Strategy & Verification Plan
-**Project:** SPACE HEALTH MONITO  
+# SPACE HEALTH MONITOR — Automated Testing Strategy & Verification Plan
+**Project:** SPACE HEALTH MONITOR  
 **Target:** NASA Space Apps Challenge 2026  
 
 ---

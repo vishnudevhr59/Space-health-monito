@@ -85,7 +85,7 @@ export const ResearchPage: React.FC<ResearchPageProps> = ({ researchList }) => {
         'Subclinical cardiovascular and autonomic tone changes require individual baseline comparisons rather than population averages.',
         'Telomeres lengthened during spaceflight and rapidly shortened within 48 hours of Earth return.',
       ],
-      relevanceToAstronautMonitoring: 'Grounds MONITO individual baseline drift metrics and multi-phase baseline comparison engine.',
+      relevanceToAstronautMonitoring: 'Grounds SPACE HEALTH MONITOR individual baseline drift metrics and multi-phase baseline comparison engine.',
       provenanceType: 'REAL_RESEARCH_DATA',
       methodology: 'Integrated longitudinal pre-, in-, and post-flight physiological and multi-omics profiling',
       knownLimitations: 'Single monozygotic twin pair (N=1 flight, N=1 control); cannot define universal clinical thresholds.',

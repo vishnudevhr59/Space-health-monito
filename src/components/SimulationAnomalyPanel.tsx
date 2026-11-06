@@ -87,7 +87,7 @@ export const SimulationAnomalyPanel: React.FC<SimulationAnomalyPanelProps> = ({
         countermeasures: [
           'Immediate cessation of high-g activity and transition to 15° head-up sleep rack',
           'Oral saline rehydration salt bolus 750 mL within 30 minutes',
-          'Initiate continuous 12-lead ECG telemetry downlink to Houston MCC / ISTRAC',
+          'Initiate continuous 12-lead ECG telemetry downlink to NASA Houston MCC / DSN Goldstone',
           'Perform 20-minute resonant diaphragmatic breathing biofeedback',
         ],
       },

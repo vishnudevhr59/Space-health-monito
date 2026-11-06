@@ -303,7 +303,7 @@ export default function App() {
         activeAlertCount={activeAlertCount}
       />
 
-      {/* ROW 3: MISSION CONTROL LIVE TICKER (MET, Ka-BAND LATENCY, ISTRAC/HOUSTON GROUND LOCK, ECLSS, STATUS TOGGLE) */}
+      {/* ROW 3: MISSION CONTROL LIVE TICKER (MET, TDRS Ka-BAND LATENCY, NASA MCC-H / DSN GOLDSTONE GROUND LOCK, ECLSS, STATUS TOGGLE) */}
       <MissionControlTicker
         missionDay={astronaut.missionDay}
         habitatPressurePsi={anomalyState.cabinPressurePsi}

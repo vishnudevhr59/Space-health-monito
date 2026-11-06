@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Demonstration Scenarios & Expected Results Matrix
+# SPACE HEALTH MONITOR — Demonstration Scenarios & Expected Results Matrix
 **Document:** `DEMO_SCENARIO_AND_EXPECTED_RESULTS.md`  
 **Classification:** Spaceflight Medical Simulation Reference  
 **Mission Habitat:** Lunar Gateway (HALO Module, Node 2)  
@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-SPACE HEALTH MONITO embeds four deterministic, pre-configured spaceflight simulation scenarios accessible from the persistent **Mission Simulation Bar** (Row 3). This document defines the exact telemetry inputs, expected physiological responses, anomaly detection scores, and clinical alerts triggered across each step of every scenario.
+SPACE HEALTH MONITOR embeds four deterministic, pre-configured spaceflight simulation scenarios accessible from the persistent **Mission Simulation Bar** (Row 3). This document defines the exact telemetry inputs, expected physiological responses, anomaly detection scores, and clinical alerts triggered across each step of every scenario.
 
 ---
 
@@ -30,7 +30,7 @@ SPACE HEALTH MONITO embeds four deterministic, pre-configured spaceflight simula
 ## 3. Scenario B: Gradual Health Measurement Deviation (ACTIVE DEFAULT)
 
 - **Scenario Identifier:** `SCENARIO_B`
-- **Objective:** Demonstrate the core value proposition of SPACE HEALTH MONITO: detecting subtle multi-variate autonomic fatigue and resting tachycardia before acute clinical failure occurs.
+- **Objective:** Demonstrate the core value proposition of SPACE HEALTH MONITOR: detecting subtle multi-variate autonomic fatigue and resting tachycardia before acute clinical failure occurs.
 - **Max Steps:** 6 steps
 - **Comm Link Status:** Continuous `ONLINE`
 

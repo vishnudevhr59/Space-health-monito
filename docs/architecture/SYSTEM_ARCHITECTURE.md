@@ -1,8 +1,8 @@
-# SPACE HEALTH MONITO — System Architecture & Topology
+# SPACE HEALTH MONITOR — System Architecture & Topology
 
 ```text
 +-----------------------------------------------------------------------------------+
-|                        SPACE HEALTH MONITO SYSTEM TOPOLOGY                        |
+|                        SPACE HEALTH MONITOR SYSTEM TOPOLOGY                        |
 +-----------------------------------------------------------------------------------+
 
        +-------------------------------------------------------------+

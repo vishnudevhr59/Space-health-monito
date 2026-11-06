@@ -25,7 +25,7 @@ interface MissionControlTickerProps {
 
 export const MissionControlTicker: React.FC<MissionControlTickerProps> = ({
   missionDay = 142,
-  groundStationName = 'ISTRAC-BLR / HOUSTON MCC',
+  groundStationName = 'NASA MCC-H / DSN GOLDSTONE',
   commLatency = 1240,
   habitatPressurePsi = 14.7,
   cabinCo2MmHg = 2.2,
@@ -87,12 +87,12 @@ export const MissionControlTicker: React.FC<MissionControlTickerProps> = ({
         </span>
       </div>
 
-      {/* Ground Station Lock Status (ISRO ISTRAC / NASA Houston MCC) */}
+      {/* Ground Station Lock Status (NASA MCC-H / NASA DSN GOLDSTONE) */}
       <div className="flex items-center gap-1.5 shrink-0">
         <Compass className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
         <span className="text-slate-400 hidden sm:inline">GROUND LOCK:</span>
         <span className="text-emerald-300 font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/30">
-          [{groundStationName} ACTIVE]
+          [{groundStationName} ACTIVE] (EL: 52° / AZ: 188° / SNR: 38 dB)
         </span>
       </div>
 
@@ -102,7 +102,7 @@ export const MissionControlTicker: React.FC<MissionControlTickerProps> = ({
         <span className="text-slate-400">RTT:</span>
         <span className="text-cyan-300 font-bold tabular-nums">{dynamicLatency} ms</span>
         <span className="text-slate-600">·</span>
-        <span className="text-slate-400">Ka-BAND 256 Mbps</span>
+        <span className="text-slate-400">TDRS / Ka-BAND 256 Mbps</span>
       </div>
 
       {/* Habitat Life Support Summary */}

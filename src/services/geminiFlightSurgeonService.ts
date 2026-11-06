@@ -32,7 +32,7 @@ const DETERMINISTIC_OFFLINE_RULES: Record<string, Partial<FlightSurgeonReport>> 
       'Immediate cessation of high-g and strenuous operational tasks',
       'Deploy 15° head-up sleep rack position to re-equilibrate venous pooling',
       'Administer oral saline rehydration salt solution (750 mL within 30 min)',
-      'Continuous 12-lead telemetry downlink to Houston MCC / ISTRAC-BLR flight surgeon',
+      'Continuous 12-lead telemetry downlink to NASA Houston MCC / DSN Goldstone flight surgeon',
     ],
     priority: 'P1 - CRITICAL MEDICAL INTERVENTION',
   },
@@ -125,9 +125,9 @@ export class GeminiFlightSurgeonService {
       };
     }
 
-    // Attempt online API call with 2500ms timeout
+    // Attempt online API call with 1500ms timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
 
     try {
       const res = await fetch('/api/ai/flight-surgeon-diagnostic', {

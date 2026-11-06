@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Database Architecture & Persistence Audit
+# SPACE HEALTH MONITOR — Database Architecture & Persistence Audit
 **Document:** Database Engineering & ACID Concurrency Audit  
 **Classification:** Spaceflight Software Reliability & Data Architecture  
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary & Storage Choice
 
-SPACE HEALTH MONITO currently utilizes a **file-backed atomic JSON database** located at `data/space_health_db.json`, managed by `PersistentDatabase` in `server/db/persistence.ts`. 
+SPACE HEALTH MONITOR currently utilizes a **file-backed atomic JSON database** located at `data/space_health_db.json`, managed by `PersistentDatabase` in `server/db/persistence.ts`. 
 
 ### Operational Rationale for Spaceflight Prototype
 1. **Zero External Dependency Daemon:** Unlike a separate database daemon (e.g., MongoDB, PostgreSQL), an embedded storage engine runs entirely within the Node.js process. On air-gapped deep-space spacecraft (Orion, Gateway, Starship), reducing required background service daemons minimizes operating system memory footprints, CPU contention, and inter-process IPC failure modes.
@@ -44,7 +44,7 @@ In Node.js's single-threaded event loop:
 
 While optimal for single-spacecraft edge computing, the file-backed JSON store has distinct limitations compared to an enterprise document database like MongoDB:
 
-| Metric / Capability | SPACE HEALTH MONITO (File JSON) | MongoDB / Document DB |
+| Metric / Capability | SPACE HEALTH MONITOR (File JSON) | MongoDB / Document DB |
 | :--- | :--- | :--- |
 | **Write Concurrency** | Serialized disk flushing (Coarse-grained full file rewrite). | Multi-Granular Concurrency Control (WiredTiger document-level locking). |
 | **Scalability Limit** | Up to ~50,000 telemetry records before JSON serialization latency exceeds 50ms. | Millions of records with B-tree disk paging. |

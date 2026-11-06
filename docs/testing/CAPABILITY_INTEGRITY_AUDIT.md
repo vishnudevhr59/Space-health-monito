@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Capability Integrity Audit
+# SPACE HEALTH MONITOR — Capability Integrity Audit
 **Document:** `CAPABILITY_INTEGRITY_AUDIT.md`  
 **Standard:** NASA Software Engineering & Ethical AI Compliance Guidelines  
 **Audit Date:** November 2026  
@@ -10,7 +10,7 @@
 
 A fundamental principle of aerospace software development is **Capability Integrity**: an application must never overclaim its operational capabilities, misrepresent synthetic simulations as live hardware links, or omit critical clinical disclaimers.
 
-This audit inspects every user-facing feature, button, communication badge, and machine-learning algorithm in SPACE HEALTH MONITO to ensure complete transparency, honest labeling, and rigorous medical ethics.
+This audit inspects every user-facing feature, button, communication badge, and machine-learning algorithm in SPACE HEALTH MONITOR to ensure complete transparency, honest labeling, and rigorous medical ethics.
 
 ---
 
@@ -78,4 +78,4 @@ This audit inspects every user-facing feature, button, communication badge, and 
 
 ## 4. Conclusion
 
-SPACE HEALTH MONITO conforms fully to NASA Capability Integrity standards. Every synthetic component is transparently disclosed, simulated distress packets are cryptographically isolated, and all statistical inferences enforce medical safety guardrails.
+SPACE HEALTH MONITOR conforms fully to NASA Capability Integrity standards. Every synthetic component is transparently disclosed, simulated distress packets are cryptographically isolated, and all statistical inferences enforce medical safety guardrails.

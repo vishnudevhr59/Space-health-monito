@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — File Ownership & Modification Guide
+# SPACE HEALTH MONITOR — File Ownership & Modification Guide
 
 This document clarifies file ownership, concurrency boundaries, and coordination requirements across the five team members.
 

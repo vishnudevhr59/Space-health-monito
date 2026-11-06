@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Security & Privacy Audit
+# SPACE HEALTH MONITOR — Security & Privacy Audit
 **NASA Space Apps Challenge 2026**
 **Document Reference:** SEC-AUD-2026-V1
 

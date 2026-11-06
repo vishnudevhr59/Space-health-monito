@@ -1,13 +1,13 @@
-# SPACE HEALTH MONITO — Team Responsibilities & Matrix
+# SPACE HEALTH MONITOR — Team Responsibilities & Matrix
 **Competition:** NASA Space Apps Challenge 2026  
-**Project:** SPACE HEALTH MONITO — AI-Powered Astronaut Health Monitoring & Decision Support System  
+**Project:** SPACE HEALTH MONITOR — AI-Powered Astronaut Health Monitoring & Decision Support System  
 **Tagline:** "Monitoring Human Health Beyond Earth."  
 
 ---
 
 ## 1. Five-Member Team Structure
 
-SPACE HEALTH MONITO is engineered by an interdisciplinary team combining full-stack web engineering, biomedical data science, machine learning, and spaceflight domain expertise.
+SPACE HEALTH MONITOR is engineered by an interdisciplinary team combining full-stack web engineering, biomedical data science, machine learning, and spaceflight domain expertise.
 
 | Team Member | Role Title | Core Specialization | Primary Deliverables |
 | :--- | :--- | :--- | :--- |

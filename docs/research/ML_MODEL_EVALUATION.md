@@ -1,5 +1,5 @@
 # Machine Learning Model Evaluation & Anomaly Detection Validation
-**SPACE HEALTH MONITO — NASA Space Apps Challenge 2026**  
+**SPACE HEALTH MONITOR — NASA Space Apps Challenge 2026**  
 **Document Reference:** `SHM-DOC-ML-2026-03`  
 **Model Architecture:** Pure-Python Vectorized Isolation Forest (`server_ml.py`)  
 **Engine Version:** `v4.3.0-isolation-forest`
@@ -8,7 +8,7 @@
 
 ## 1. Mathematical Architecture & Verification
 
-The anomaly detection engine in SPACE HEALTH MONITO is an optimized, standalone Python microservice implementing the foundational Isolation Forest algorithm developed by Liu, Ting, and Zhou (IEEE ICDM 2008).
+The anomaly detection engine in SPACE HEALTH MONITOR is an optimized, standalone Python microservice implementing the foundational Isolation Forest algorithm developed by Liu, Ting, and Zhou (IEEE ICDM 2008).
 
 ### 1.1. Core Mathematical Formulation
 Unlike density- or distance-based anomaly detectors (which suffer from the curse of dimensionality and high computational complexity), Isolation Forest exploits two quantitative properties of anomalies:
@@ -47,7 +47,7 @@ The isolation forest evaluates a 4-dimensional normalized physiological space:
 4. `hrv`: Parasympathetic autonomic tone (ms RMSSD)
 
 ### 2.2. Missing-Value Handling via Adaptive Imputation
-In spaceflight, sensor motion artifacts, battery swaps, and radio occultation cause intermittent packet dropouts. SPACE HEALTH MONITO enforces an **adaptive baseline imputation** strategy:
+In spaceflight, sensor motion artifacts, battery swaps, and radio occultation cause intermittent packet dropouts. SPACE HEALTH MONITOR enforces an **adaptive baseline imputation** strategy:
 - Missing dimensions are imputed using the astronaut's individualized rolling baseline mean $\mu_{\text{baseline}}$.
 - **Epistemic Uncertainty Penalty:** To prevent the model from under-estimating risk due to imputed values, an epistemic confidence penalty is applied:
 

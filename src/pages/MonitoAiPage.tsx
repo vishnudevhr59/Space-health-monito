@@ -87,12 +87,16 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
     'Explain Microgravity Bone Loss',
   ];
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior, block: 'end' });
   };
 
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom('smooth');
+    const scrollTimer = setTimeout(() => {
+      scrollToBottom('auto');
+    }, 60);
+    return () => clearTimeout(scrollTimer);
   }, [messages, isLoading]);
 
   const handleCopyText = (text: string, id: string) => {
@@ -283,7 +287,7 @@ Based on your active biotelemetry stream on **Mission Day ${astronaut.missionDay
               )}
 
               <div
-                className={`relative max-w-2xl rounded-3xl p-5 text-sm leading-relaxed shadow-lg ${
+                className={`relative max-w-2xl rounded-3xl p-4 sm:p-5 text-sm leading-relaxed shadow-lg break-words overflow-hidden ${
                   msg.sender === 'user'
                     ? 'bg-gradient-to-r from-[#00E5FF] to-[#438BFF] text-[#050816] font-medium rounded-tr-none'
                     : 'bg-[#0B1224] border border-slate-800 text-slate-200 rounded-tl-none'
@@ -452,7 +456,7 @@ Based on your active biotelemetry stream on **Mission Day ${astronaut.missionDay
               onChange={(e) => setInputQuery(e.target.value)}
               placeholder="Ask MONITO AI about spaceflight physiology, radiation hazards, or your live biotelemetry..."
               disabled={isLoading}
-              className="flex-1 px-4 py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] font-sans"
+              className="flex-1 min-w-0 px-3.5 sm:px-4 py-3 sm:py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] font-sans"
             />
             <button
               type="submit"

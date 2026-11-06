@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Team Development Workflow
+# SPACE HEALTH MONITOR — Team Development Workflow
 
 This document describes how our 5-member team develops, tests, and integrates code without conflicts or broken builds.
 

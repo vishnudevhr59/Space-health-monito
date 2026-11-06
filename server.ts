@@ -25,21 +25,21 @@ let pythonProcess: any = null;
 function ensurePythonMLService() {
   const req = http.get(`http://127.0.0.1:${PYTHON_ML_PORT}/api/ml/model-status`, (res) => {
     if (res.statusCode === 200) {
-      console.log(`[SPACE HEALTH MONITO] Python ML Engine detected alive on port ${PYTHON_ML_PORT}`);
+      console.log(`[SPACE HEALTH MONITOR] Python ML Engine detected alive on port ${PYTHON_ML_PORT}`);
     }
   });
   req.on('error', () => {
-    console.log(`[SPACE HEALTH MONITO] Spawning Python ML Engine (server_ml.py) on port ${PYTHON_ML_PORT}...`);
+    console.log(`[SPACE HEALTH MONITOR] Spawning Python ML Engine (server_ml.py) on port ${PYTHON_ML_PORT}...`);
     try {
       pythonProcess = spawn('python3', [path.join(__dirname, 'server_ml.py')], {
         stdio: 'inherit',
         detached: false,
       });
       pythonProcess.on('error', (err: any) => {
-        console.error('[SPACE HEALTH MONITO] Failed to start Python ML Engine:', err.message);
+        console.error('[SPACE HEALTH MONITOR] Failed to start Python ML Engine:', err.message);
       });
     } catch (e: any) {
-      console.error('[SPACE HEALTH MONITO] Process spawn error:', e.message);
+      console.error('[SPACE HEALTH MONITOR] Process spawn error:', e.message);
     }
   });
 }
@@ -194,7 +194,7 @@ app.get('/api/system/services', (req: Request, res: Response) => {
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'ONLINE',
-    service: 'SPACE HEALTH MONITO Backend',
+    service: 'SPACE HEALTH MONITOR Backend',
     missionElapsedDays: 142,
     activeCrewCount: db.data.astronauts.length,
     activeAlerts: db.data.alerts.filter((a) => a.status === 'Active').length,
@@ -1003,7 +1003,7 @@ app.get('/api/reports/:astronautId', (req: Request, res: Response) => {
       missionDay: astro.missionDay,
       classification: 'OFFICIAL USE ONLY // NASA SPACE APPS CHALLENGE 2026',
       competition: 'NASA Space Apps Challenge 2026',
-      team: 'SPACE HEALTH MONITO',
+      team: 'SPACE HEALTH MONITOR',
     },
     astronaut: astro,
     summary: {
@@ -1671,7 +1671,7 @@ Instructions:
 5. Format cleanly with Markdown headings and bullet points.`;
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('AI generation timeout')), 2500)
+      setTimeout(() => reject(new Error('AI generation timeout')), 1500)
     );
 
     const generatePromise = genAI.models.generateContent({
@@ -1760,7 +1760,7 @@ Do not include any surrounding markdown fences or extra commentary. Return only 
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API call timed out')), 1800)
+      setTimeout(() => reject(new Error('Gemini API call timed out')), 1500)
     );
 
     const response: any = await Promise.race([generatePromise, timeoutPromise]);
@@ -2365,11 +2365,11 @@ app.all('/api/ml/*', (req: Request, res: Response) => {
   });
 
   proxyReq.on('error', (err) => {
-    console.warn(`[SPACE HEALTH MONITO] Python ML service unreachable, providing resilient fallback for ${targetPath}:`, err.message);
+    console.warn(`[SPACE HEALTH MONITOR] Python ML service unreachable, providing resilient fallback for ${targetPath}:`, err.message);
     if (targetPath.includes('model-status')) {
       res.json({
         status: 'ONLINE',
-        service: 'SPACE HEALTH MONITO ML Intelligence Engine (Resilient Gateway)',
+        service: 'SPACE HEALTH MONITOR ML Intelligence Engine (Resilient Gateway)',
         modelsLoaded: ['IsolationForest (Fallback Mode)', 'ContributingIndicatorsAttribution'],
         calibratedNorms: {
           restingHeartRate: { mean: 58.0, std: 6.2, unit: 'BPM' },
@@ -2581,7 +2581,7 @@ let latestTestExecution = {
   failed: INITIAL_TEST_SUITE_CATALOGUE.filter((t) => !t.passed).length,
   durationMs: 2980,
   suitesCount: 17,
-  markdownSummary: `### SPACE HEALTH MONITO — Automated Test Execution Verification
+  markdownSummary: `### SPACE HEALTH MONITOR — Automated Test Execution Verification
 - **Total Tests Verified:** 124 / 124 (100% Pass Rate)
 - **Suites Covered:** 17 Complete Subsystem Suites
 - **Runtime Targets:** Node.js Express (:3000) + Python ML Isolation Forest (:5050)
@@ -2598,7 +2598,7 @@ app.get('/api/system/tests', (req: Request, res: Response) => {
 
 app.post('/api/system/run-tests', (req: Request, res: Response) => {
   const startTime = Date.now();
-  console.log('[SPACE HEALTH MONITO] Triggering automated acceptance test suite run...');
+  console.log('[SPACE HEALTH MONITOR] Triggering automated acceptance test suite run...');
 
   exec('npm run test', { timeout: 30000 }, (error, stdout, stderr) => {
     const durationMs = Date.now() - startTime;
@@ -2644,7 +2644,7 @@ app.post('/api/system/run-tests', (req: Request, res: Response) => {
       failed: failedCount,
       durationMs,
       suitesCount: new Set(effectiveTests.map((t) => t.suite)).size,
-      markdownSummary: `### SPACE HEALTH MONITO — Automated Test Execution Verification
+      markdownSummary: `### SPACE HEALTH MONITOR — Automated Test Execution Verification
 - **Execution Timestamp:** ${new Date().toUTCString()}
 - **Total Tests Verified:** ${effectiveTests.length} (${passedCount} Passed, ${failedCount} Failed)
 - **Pass Rate:** ${((passedCount / (effectiveTests.length || 1)) * 100).toFixed(1)}%
@@ -2682,7 +2682,7 @@ async function startServer() {
   }
 
   app.listen(PORT, () => {
-    console.log(`[SPACE HEALTH MONITO] Mission Control Server operational on port ${PORT}`);
+    console.log(`[SPACE HEALTH MONITOR] Mission Control Server operational on port ${PORT}`);
   });
 }
 

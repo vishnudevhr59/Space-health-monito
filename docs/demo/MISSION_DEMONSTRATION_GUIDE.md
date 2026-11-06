@@ -1,5 +1,5 @@
-# SPACE HEALTH MONITO — End-to-End Mission Demonstration Guide
-**Project:** SPACE HEALTH MONITO  
+# SPACE HEALTH MONITOR — End-to-End Mission Demonstration Guide
+**Project:** SPACE HEALTH MONITOR  
 **Challenge:** NASA Space Apps Challenge 2026 — Long-Duration Astronaut Health & Decision Support  
 **Target Habitat:** Lunar Orbital Gateway (HALO Module, Node 2)  
 **Evaluator Target Audience:** NASA Space Apps Challenge Judges, Aerospace Engineers, Biomedical Evaluators  
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Evaluation Philosophy
 
-SPACE HEALTH MONITO is not an ordinary healthcare dashboard. It is an aerospace-grade **health-monitoring, multi-variate anomaly detection, and autonomous clinical decision-support application** engineered specifically for the extreme conditions of deep-space exploration.
+SPACE HEALTH MONITOR is not an ordinary healthcare dashboard. It is an aerospace-grade **health-monitoring, multi-variate anomaly detection, and autonomous clinical decision-support application** engineered specifically for the extreme conditions of deep-space exploration.
 
 To ensure transparent and rigorous evaluation, the application provides an integrated **7-Stage Guided Mission Tour** that walks judges and evaluators through every operational capability without requiring manual configuration or guesswork.
 

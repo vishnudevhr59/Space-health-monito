@@ -1,5 +1,5 @@
 # NASA Research Provenance, Literature Grounding & Evidence Catalog
-**SPACE HEALTH MONITO — NASA Space Apps Challenge 2026**  
+**SPACE HEALTH MONITOR — NASA Space Apps Challenge 2026**  
 **Document Reference:** `SHM-DOC-REF-2026-04`
 
 ---
@@ -24,7 +24,7 @@
 - **Experiment Repository:** ESA / DLR / NASA ISS Columbus Module Investigation `ThermoLab-ISS-09`
 - **Physiological System:** Thermoregulation, Metabolic Convection, Interleukin-6 Inflammatory Response
 - **Study Population:** $N = 11$ ISS crew members during long-duration space increments
-- **Application Integration:** Calibrates the nominal in-flight core body temperature setpoint in SPACE HEALTH MONITO ($37.2^\circ\text{C}$ nominal in space vs $36.6^\circ\text{C}$ terrestrial baseline), preventing false-positive pyrexia alerts.
+- **Application Integration:** Calibrates the nominal in-flight core body temperature setpoint in SPACE HEALTH MONITOR ($37.2^\circ\text{C}$ nominal in space vs $36.6^\circ\text{C}$ terrestrial baseline), preventing false-positive pyrexia alerts.
 
 ---
 

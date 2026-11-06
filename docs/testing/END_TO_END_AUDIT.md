@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — End-to-End System Audit
+# SPACE HEALTH MONITOR — End-to-End System Audit
 **NASA Space Apps Challenge 2026**
 **Date:** March 2026 / Mission Day 142
 **Target:** Artemis Gateway Expedition 04 Prototype Assessment
@@ -7,7 +7,7 @@
 
 ## 1. Executive Summary
 
-This audit provides a comprehensive, rigorous assessment of all software modules, integration boundaries, data pipelines, security layers, and machine-learning models within the SPACE HEALTH MONITO system.
+This audit provides a comprehensive, rigorous assessment of all software modules, integration boundaries, data pipelines, security layers, and machine-learning models within the SPACE HEALTH MONITOR system.
 
 ---
 

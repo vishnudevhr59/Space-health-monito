@@ -1,4 +1,4 @@
-# SPACE HEALTH MONITO — Responsive Design & Device Verification Report
+# SPACE HEALTH MONITOR — Responsive Design & Device Verification Report
 **NASA Space Apps Challenge 2026**
 **Verification Matrix: 9 Standardized Aerospace Viewports**
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-Every view in SPACE HEALTH MONITO was engineered following mobile-first principles and validated across 9 standard viewports ranging from `320px` to `1920px`. The UI eliminates unwanted horizontal scrollbars, ensures touch targets $\ge 44\text{px}$ on touch devices, reflows Recharts data containers gracefully, and preserves the clean visual identity defined in the Science, Space & Biotech design reference.
+Every view in SPACE HEALTH MONITOR was engineered following mobile-first principles and validated across 9 standard viewports ranging from `320px` to `1920px`. The UI eliminates unwanted horizontal scrollbars, ensures touch targets $\ge 44\text{px}$ on touch devices, reflows Recharts data containers gracefully, and preserves the clean visual identity defined in the Science, Space & Biotech design reference.
 
 ---
 
