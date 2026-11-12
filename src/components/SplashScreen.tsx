@@ -65,6 +65,18 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
     >
       {/* CINEMATIC HOTSTAR-STYLE AURORA STREAMS & PARTICLES */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* ASTRONAUT WALKING ON MOON WITH USA FLAG - BACKGROUND CINEMATIC LAYER */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="/assets/images/astronaut_moon_flag.jpg"
+            alt="Astronaut walking on moon surface with American flag"
+            className="w-full h-full object-cover object-center opacity-35 mix-blend-screen scale-105 filter brightness-110 contrast-125 transition-transform duration-1000"
+          />
+          {/* Deep space cosmic vignettes to keep central emblem & title high-contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-[#020617]/90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#020617_80%)]" />
+        </div>
+
         {/* Animated Radial Energy Cones */}
         <div
           className={`absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[110px] transition-all duration-1000 ${

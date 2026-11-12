@@ -12,7 +12,6 @@ import {
 import { Navbar } from './components/Navbar';
 import { BottomNavBar } from './components/BottomNavBar';
 import { Sidebar } from './components/Sidebar';
-import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
 import { DataProvenanceModal } from './components/DataProvenanceModal';
 import { offlineSyncService } from './services/offlineSyncService';
@@ -498,9 +497,6 @@ export default function App() {
           )}
         </main>
       </div>
-
-      {/* MISSION CONTROL FOOTER */}
-      <Footer />
 
       {/* PERMANENT TOP-TIER PRODUCTION 5-CORE BOTTOM NAVIGATION BAR */}
       <BottomNavBar
