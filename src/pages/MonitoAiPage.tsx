@@ -105,18 +105,32 @@ const PEOPLE_ALSO_ASK_ITEMS = [
       'Deep-space spacecraft transmit encrypted biomedical telemetry frames via 32.05 GHz Ka-band or 8.4 GHz X-band radio frequencies to NASA’s Deep Space Network 70-meter antennas at Goldstone (California), Madrid (Spain), or Canberra (Australia). Telemetry is demodulated, verified via SHA-256 cryptographic hashes, and routed in real time to the Flight Surgeon Console at NASA Johnson Space Center (Houston, TX).',
     suggestedQuery: 'Check Deep Space Network Ground Uplink Status',
   },
+  {
+    id: 'paa-6',
+    question: 'How were Sunita Williams (Exp 71/72) and Shubhanshu Shukla (Axiom-4) monitored in space?',
+    answer:
+      'Sunita Williams was monitored over her 286-day ISS mission using the NASA Actiwatch Spectrum (circadian phototherapy & actigraphy), the CSA Bio-Monitor / Hexoskin (streaming continuous ECG, respiration, SpO2, and skin temperature to ISS tablets), and regular encrypted Private Medical Conferences (PMCs). Group Captain Shubhanshu Shukla (Axiom-4 / ISRO) tested next-generation edge-computing health tools: an Oura Ring with Booz Allen onboard edge readiness scoring (computing 0-100 readiness from HRV, RHR, sleep, and skin temp locally), TrialX TESH motion/cardiovascular tracking, Suite Ride Continuous Glucose Monitors (CGM), and ISRO Voyager Displays cognitive eye-tracking.',
+    suggestedQuery: 'Explain Sunita Williams & Shubhanshu Shukla Space Telemetry Architecture',
+  },
+  {
+    id: 'paa-7',
+    question: 'How does the offline-first Edge Mission Readiness algorithm calculate scores?',
+    answer:
+      'The edge algorithm calculates a 0-100 score locally on the astronaut tablet without cloud latency using 4 weighted physiological factors compared against the astronaut personal baseline: 1. Heart Rate Variability (HRV RMSSD, 35% weight); 2. Resting Heart Rate elevation (RHR, 25% weight); 3. Sleep Duration and Efficiency (25% weight); and 4. Skin Temperature deviation (15% weight). Scores >=80 are GREEN (cleared for EVA prep), 60-79 are YELLOW (maintenance only), and <60 are RED (EVA suspended).',
+    suggestedQuery: 'Calculate Edge Mission Readiness Score & 4-Factor Breakdown',
+  },
 ];
 
 // "People also search for" 2-Column Tactical Grid (matching Google Search image)
 const PEOPLE_ALSO_SEARCH_FOR_ITEMS = [
+  { label: 'Axiom-4 Edge Readiness', query: 'Explain Axiom-4 Shubhanshu Shukla Oura Ring edge readiness algorithm' },
+  { label: 'Sunita Williams Actiwatch', query: 'Detail Sunita Williams Expedition 71/72 Actiwatch Spectrum and Bio-Monitor' },
+  { label: 'CGM Metabolic Glucose', query: 'Analyze Suite Ride Continuous Glucose Monitor stability in microgravity' },
   { label: 'Space Radiation Dose', query: 'Evaluate space radiation dosimetry and GCR absorbed dose limits' },
   { label: 'Live Biotelemetry Ingest', query: 'Analyze current live 1Hz biotelemetry and vital signs' },
   { label: 'Microgravity Bone Loss', query: 'Explain microgravity bone density loss and ARED resistance loading' },
   { label: 'SANS Visual Acuity', query: 'Evaluate Spaceflight-Associated Neuro-ocular Syndrome optic sheath pressure' },
-  { label: 'ARED Resistance Workout', query: 'Review scheduled ARED resistive conditioning and cycle ergometer protocol' },
-  { label: 'Deep Space Sleep Debt', query: 'Assess circadian sleep debt, REM phases, and 460nm phototherapy' },
   { label: 'NASA Houston Uplink', query: 'Check Deep Space Network Goldstone telemetry lock and ground station status' },
-  { label: 'EVA Pre-Breathe Protocol', query: 'Explain 100% O2 airlock pre-breathe protocol for EVA decompression sickness prevention' },
 ];
 
 export const MonitoAiPage: React.FC<MonitoAiPageProps> = ({ astronaut, telemetry, onNavigate }) => {

@@ -263,6 +263,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               q: 'How do point-of-care medical devices (e.g. Butterfly iQ ultrasound, i-STAT) operate in weightlessness?',
               a: 'Point-of-care ultrasound uses handheld piezo-electric array transducers with specialized acoustic gel pads designed for zero-g surface tension. Blood gas and lactate analyzers (i-STAT) utilize closed microfluidic cartridges where capillary action draws blood samples without requiring gravity-dependent fluid settling.',
             },
+            {
+              q: 'How were Sunita Williams (Exp 71/72) and Gp Capt Shubhanshu Shukla (Axiom-4) monitored in space?',
+              a: 'Astronauts rely on specialized multi-tier ecosystems rather than single consumer apps. Sunita Williams (during her 286-day ISS mission) wore the NASA Actiwatch Spectrum for circadian tracking, a non-invasive Sensor-Embedded Smart Vest during sleep, and the CSA Bio-Monitor (Hexoskin) streaming continuous ECG, SpO2, and skin temperature to ISS tablets alongside encrypted weekly Private Medical Conferences (PMCs) with Houston flight surgeons. Gp Capt Shubhanshu Shukla (Axiom-4 / ISRO Gaganyaan) tested next-generation edge-computing systems: an Oura Ring with Booz Allen edge readiness software (computing a 0–100 readiness score locally from HRV, RHR, sleep, and skin temp without Earth servers), TrialX Telemetric Health AI (TESH) motion/cardiovascular tracking, Suite Ride Continuous Glucose Monitors (CGM), and ISRO Voyager Displays cognitive eye-tracking.',
+            },
+            {
+              q: 'How does the offline-first Edge-Computing Mission Readiness Score (0-100) work without ground cloud servers?',
+              a: 'The algorithm compares live biometric readings against the crew member 7-day rolling orbital baseline across 4 weighted indicators: 1. Heart Rate Variability (HRV RMSSD, 35% weight: ratio of current to baseline, penalizing drops below 85%); 2. Resting Heart Rate (RHR, 25% weight: 4 pts penalty per bpm elevation above baseline); 3. Sleep Score (25% weight: duration factored against 7.5h target multiplied by sleep efficiency percentage); and 4. Skin Temperature Stability (15% weight: 60 pts penalty per 1.0°C deviation from baseline). Scores >=80 indicate GREEN (cleared for EVA extravehicular activity and complex docked maneuvers), 60-79 indicate YELLOW (station maintenance and 30-min sleep extension), and <60 indicate RED (cardiorespiratory fatigue; delay EVA and initiate medical consult).',
+            },
           ].map((faq, i) => (
             <details
               key={i}

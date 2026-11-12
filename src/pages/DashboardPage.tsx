@@ -64,6 +64,7 @@ import { D3PolarRadarChart } from '../components/D3PolarRadarChart';
 import { SolarStormShieldingEngine } from '../components/SolarStormShieldingEngine';
 import { CrewBiometricMuxMatrix } from '../components/CrewBiometricMuxMatrix';
 import { HardwareDiagnosticSuite } from '../components/HardwareDiagnosticSuite';
+import { EdgeMissionReadinessCard } from '../components/EdgeMissionReadinessCard';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const cardFadeUp: Variants = {
@@ -385,6 +386,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               onSelectAstronaut(p);
             }
           }}
+        />
+      </motion.div>
+
+      {/* AXIOM-4 & ISS EDGE-COMPUTING MISSION READINESS ENGINE (SUNITA WILLIAMS & SHUBHANSHU SHUKLA) */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.185 }}
+      >
+        <EdgeMissionReadinessCard
+          astronaut={astronaut}
+          latestVital={latestVital}
         />
       </motion.div>
 
