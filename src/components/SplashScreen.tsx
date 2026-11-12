@@ -189,17 +189,17 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           </div>
         </div>
 
-        {/* Energetic Typography Wordmark */}
-        <div className="mt-6 space-y-2">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight">
-            <span className="text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.4)]">
+        {/* Energetic Typography Wordmark - Guaranteed Single Line */}
+        <div className="mt-6 space-y-2 w-full max-w-3xl px-2 text-center">
+          <h1 className="inline-flex items-center justify-center whitespace-nowrap flex-nowrap text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-none select-none mx-auto">
+            <span className="text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.4)] whitespace-nowrap">
               SPACE HEALTH
             </span>
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(6,182,212,0.6)]">
+            <span className="ml-2 sm:ml-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] whitespace-nowrap">
               MONITO
             </span>
-          </div>
-          <p className="text-xs sm:text-sm text-cyan-200/90 font-medium tracking-wide max-w-md mx-auto">
+          </h1>
+          <p className="text-xs sm:text-sm text-cyan-200/90 font-medium tracking-wide max-w-lg mx-auto">
             Deep-Space Medical Telemetry & Autonomous Clinical Intelligence
           </p>
         </div>

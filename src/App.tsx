@@ -10,6 +10,7 @@ import {
   ResearchReference,
 } from './types';
 import { Navbar } from './components/Navbar';
+import { BottomNavBar } from './components/BottomNavBar';
 import { Sidebar } from './components/Sidebar';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
@@ -354,7 +355,7 @@ export default function App() {
       <AutonomousSelfHealingBanner />
 
       {/* ROW 5: MAIN VIEWPORT STAGE */}
-      <div className="flex-1 flex relative w-full overflow-x-hidden">
+      <div className="flex-1 flex relative w-full overflow-x-hidden pb-24 sm:pb-28">
         <main className="w-full flex-1 min-w-0 transition-all duration-300">
           {/* PAGE 1: LANDING PAGE */}
           {currentTab === 'landing' && (
@@ -484,6 +485,13 @@ export default function App() {
 
       {/* MISSION CONTROL FOOTER */}
       <Footer />
+
+      {/* PERMANENT TOP-TIER PRODUCTION 5-CORE BOTTOM NAVIGATION BAR */}
+      <BottomNavBar
+        currentTab={currentTab}
+        onSelectTab={setCurrentTab}
+        activeAlertCount={activeAlertCount}
+      />
 
       {/* RBAC AUTHENTICATION & QUICK DEMO ROLE SWITCHER MODAL */}
       <AuthModal

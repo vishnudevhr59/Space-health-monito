@@ -298,7 +298,7 @@ export const DemoAssistantToolbar: React.FC<DemoAssistantToolbarProps> = ({
   ];
 
   return (
-    <div className="fixed bottom-4 right-3 sm:right-6 z-50 select-none font-sans">
+    <div className="fixed bottom-20 right-3 sm:right-6 z-40 select-none font-sans">
       {/* FLOATING COLLAPSED BADGE / TOGGLE TRIGGER */}
       {!isExpanded ? (
         <button

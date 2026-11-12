@@ -93,11 +93,11 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
 
       {showText && (
         <div className="flex flex-col select-none min-w-0">
-          <div className="flex items-center gap-1 sm:gap-1.5 leading-none">
+          <div className="flex items-center flex-nowrap whitespace-nowrap gap-1.5 leading-none">
             <span className="font-extrabold tracking-wider text-white text-xs sm:text-base md:text-lg whitespace-nowrap">
               SPACE HEALTH
             </span>
-            <span className="font-bold tracking-wider text-cyan-400 text-xs sm:text-base md:text-lg">
+            <span className="font-bold tracking-wider text-cyan-400 text-xs sm:text-base md:text-lg whitespace-nowrap">
               MONITO
             </span>
           </div>
