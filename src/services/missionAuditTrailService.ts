@@ -5,6 +5,8 @@
  * Provides one-click CSV & JSON export compliant with NASA aerospace review standards.
  */
 
+import { offlineSyncService } from './offlineSyncService';
+
 export interface TelemetrySnapshot {
   heartRate: number;
   spo2: number;
@@ -169,6 +171,14 @@ class MissionAuditTrailService {
     this.auditLog.unshift(newEntry);
     this.saveToStorage();
     this.notifyListeners();
+
+    // If simulated orbital occultation is active, queue into cryptographic ledger
+    if (offlineSyncService.isOccultationActive()) {
+      offlineSyncService.enqueueAuditRecord(newEntry).catch((err) => {
+        console.warn('Failed to queue audit entry to offline ledger:', err);
+      });
+    }
+
     return newEntry;
   }
 

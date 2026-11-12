@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { offlineSyncService } from '../services/offlineSyncService';
 import { Wifi, WifiOff, RefreshCw, Database, CloudUpload, AlertCircle, RotateCcw } from 'lucide-react';
 
-export const NetworkStatusIndicator: React.FC = () => {
+interface NetworkStatusIndicatorProps {
+  onOpenVault?: () => void;
+}
+
+export const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({ onOpenVault }) => {
   const [syncState, setSyncState] = useState(offlineSyncService.getState());
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -91,8 +95,11 @@ export const NetworkStatusIndicator: React.FC = () => {
   return (
     <div className="flex items-center gap-1 sm:gap-2 font-mono text-xs shrink-0">
       <div
-        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full border ${badge.colorClass} shadow-sm transition-all`}
-        title={badge.description}
+        onClick={onOpenVault}
+        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full border ${badge.colorClass} shadow-sm transition-all ${
+          onOpenVault ? 'cursor-pointer hover:brightness-110 active:scale-95' : ''
+        }`}
+        title={`${badge.description}${onOpenVault ? ' · Click to open Cryptographic Disaster Recovery Vault' : ''}`}
       >
         <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor} shrink-0`} />
         {badge.icon}

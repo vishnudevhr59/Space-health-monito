@@ -60,6 +60,10 @@ import {
 } from '../components/SimulationAnomalyPanel';
 import { MissionAuditLogModal } from '../components/MissionAuditLogModal';
 import { MissionHighlightsGrid } from '../components/MissionHighlightsGrid';
+import { D3PolarRadarChart } from '../components/D3PolarRadarChart';
+import { SolarStormShieldingEngine } from '../components/SolarStormShieldingEngine';
+import { CrewBiometricMuxMatrix } from '../components/CrewBiometricMuxMatrix';
+import { HardwareDiagnosticSuite } from '../components/HardwareDiagnosticSuite';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const cardFadeUp: Variants = {
@@ -98,6 +102,7 @@ interface DashboardPageProps {
   anomalyState?: AnomalyInjectionState;
   onInjectAnomaly?: (state: AnomalyInjectionState) => void;
   onResetNominal?: () => void;
+  onSelectAstronaut?: (profile: AstronautProfile) => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -113,6 +118,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   anomalyState,
   onInjectAnomaly,
   onResetNominal,
+  onSelectAstronaut,
 }) => {
   const [localAnomalyState, setLocalAnomalyState] = useState<AnomalyInjectionState>(NOMINAL_HEALTH_STATE);
   const currentAnomaly = anomalyState || localAnomalyState;
@@ -308,11 +314,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           {/* Quick Mission Actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             {/* Notification Center */}
             <button
               onClick={() => onNavigate('alerts')}
-              className="relative p-3 rounded-xl bg-[#050816] border border-slate-700 hover:border-[#00E5FF]/50 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              className="relative min-h-[44px] min-w-[44px] p-3 rounded-xl bg-[#050816] border border-slate-700 hover:border-[#00E5FF]/50 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
               title="Active Threshold Notifications"
             >
               <Bell className="w-5 h-5 text-[#00E5FF]" />
@@ -325,7 +331,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
             <button
               onClick={() => setShowLogModal(true)}
-              className="px-4 py-3 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#438BFF] text-[#050816] font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_20px_-3px_rgba(0,229,255,0.4)] cursor-pointer hover:opacity-95"
+              className="min-h-[44px] px-4 py-3 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#438BFF] text-[#050816] font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_20px_-3px_rgba(0,229,255,0.4)] cursor-pointer hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             >
               <PlusCircle className="w-4 h-4 text-[#050816]" />
               <span>Log Telemetry</span>
@@ -333,14 +339,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
             <button
               onClick={() => onNavigate('reports')}
-              className="px-4 py-3 rounded-xl bg-[#101B30] hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              className="min-h-[44px] px-4 py-3 rounded-xl bg-[#101B30] hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             >
               Generate Report
             </button>
 
             <button
               onClick={() => setIsAuditModalOpen(true)}
-              className="px-4 py-3 rounded-xl bg-[#09152B] hover:bg-[#0e2145] border border-cyan-500/40 text-cyan-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-2 shadow-sm"
+              className="min-h-[44px] px-4 py-3 rounded-xl bg-[#09152B] hover:bg-[#0e2145] border border-cyan-500/40 text-cyan-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-2 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
               title="Inspect Live Aerospace Mission Audit Ledger & Export CSV/JSON"
             >
               <FileText className="w-4 h-4 text-cyan-400" />
@@ -366,6 +372,34 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         />
       </motion.div>
 
+      {/* REAL-TIME MULTI-ASTRONAUT TELEMETRY MATRIX & CREW MUX */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.18 }}
+      >
+        <CrewBiometricMuxMatrix
+          activeAstronaut={astronaut}
+          onSelectAstronaut={(p) => {
+            if (onSelectAstronaut) {
+              onSelectAstronaut(p);
+            }
+          }}
+        />
+      </motion.div>
+
+      {/* ASTRONAUT HARDWARE MEDICAL SUITE & WEARABLE DIAGNOSTIC INTEGRATION */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.19 }}
+      >
+        <HardwareDiagnosticSuite
+          astronaut={astronaut}
+          onLogMeasurement={onLogMeasurement}
+        />
+      </motion.div>
+
       {/* 8 REQUIRED SOPHISTICATED HEALTH METRIC CARDS */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -388,14 +422,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           className="grid grid-cols-2 md:grid-cols-4 gap-4"
         >
           
-          {/* 1. Heart Rate */}
+          {/* 1. Heart Rate - Dynamic Danger/Warning or Health Green */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Heart Rate"
               value={latestVital.heartRate}
               unit="BPM"
-              statusText="Nominal"
-              status="nominal"
+              statusText={latestVital.heartRate > 105 ? 'Tachycardia' : latestVital.heartRate > 90 ? 'Elevated' : 'Nominal'}
+              status={latestVital.heartRate > 105 ? 'critical' : latestVital.heartRate > 90 ? 'warning' : 'nominal'}
+              theme={latestVital.heartRate > 105 ? 'danger' : latestVital.heartRate > 90 ? 'amber' : 'health'}
               trend="stable"
               trendLabel="Resting: 58 BPM"
               historicalComparison="Δ +6 BPM vs pre-flight"
@@ -405,14 +440,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 2. SpO2 */}
+          {/* 2. SpO2 - Green Health / Red Danger */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Oxygen Saturation"
               value={latestVital.spo2}
               unit="%"
-              statusText="Nominal"
-              status="nominal"
+              statusText={latestVital.spo2 < 90 ? 'Hypoxia' : latestVital.spo2 < 95 ? 'Caution' : 'Nominal'}
+              status={latestVital.spo2 < 90 ? 'critical' : latestVital.spo2 < 95 ? 'warning' : 'nominal'}
+              theme={latestVital.spo2 < 90 ? 'danger' : latestVital.spo2 < 95 ? 'amber' : 'health'}
               trend="stable"
               trendLabel="Target > 95%"
               historicalComparison="Normoxic range"
@@ -422,7 +458,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 3. Body Temperature */}
+          {/* 3. Body Temperature - Cyan / Purple */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Core Temperature"
@@ -430,6 +466,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="°C"
               statusText="Calibrated"
               status="nominal"
+              theme="purple"
               trend="stable"
               trendLabel="Baseline 36.6°C"
               historicalComparison="Circadian: Normal"
@@ -439,7 +476,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 4. Blood Pressure */}
+          {/* 4. Blood Pressure - Space Blue */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Blood Pressure"
@@ -447,6 +484,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="mmHg"
               statusText="Optimal"
               status="nominal"
+              theme="space"
               trend="stable"
               trendLabel="MAP: 86 mmHg"
               historicalComparison="Cephalad fluid stable"
@@ -456,7 +494,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 5. Sleep Duration */}
+          {/* 5. Sleep Duration - Purple Mind/Rest */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Sleep Duration"
@@ -464,6 +502,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="Hours"
               statusText={latestSleep.totalDurationHours >= 7 ? 'Restorative' : 'Shortened'}
               status={latestSleep.totalDurationHours >= 7 ? 'nominal' : 'warning'}
+              theme={latestSleep.totalDurationHours >= 7 ? 'purple' : 'amber'}
               trend={latestSleep.totalDurationHours >= 7 ? 'up' : 'down'}
               trendLabel={`Efficiency: ${latestSleep.efficiencyPercent}%`}
               historicalComparison="Target: > 7.0 Hours"
@@ -473,7 +512,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 6. Physical Activity */}
+          {/* 6. Physical Activity - Space Blue Component */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Daily Exercise"
@@ -481,6 +520,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="Mins"
               statusText="Completed"
               status="nominal"
+              theme="space"
               trend="up"
               trendLabel={latestExercise.exerciseType}
               historicalComparison="100% Mandate goal"
@@ -490,7 +530,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 7. HRV (Heart Rate Variability) */}
+          {/* 7. HRV (Heart Rate Variability) - Health Green */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="HRV (RMSSD)"
@@ -498,6 +538,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="ms"
               statusText={latestVital.hrv < 48 ? 'Attenuated' : 'Nominal'}
               status={latestVital.hrv < 48 ? 'warning' : 'nominal'}
+              theme={latestVital.hrv < 48 ? 'amber' : 'health'}
               trend={latestVital.hrv < 48 ? 'down' : 'stable'}
               trendLabel="Autonomic Balance"
               historicalComparison="Baseline: 65 ms"
@@ -507,7 +548,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             />
           </motion.div>
 
-          {/* 8. Radiation Exposure */}
+          {/* 8. Radiation Exposure - Warning Amber / Space Blue */}
           <motion.div variants={cardFadeUp} whileHover={{ y: -3, transition: { duration: 0.18 } }}>
             <MetricCard
               label="Cumulative Radiation"
@@ -515,6 +556,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               unit="mSv"
               statusText="Monitored"
               status="nominal"
+              theme="amber"
               trend="up"
               trendLabel="0.55 mSv / day"
               historicalComparison="31.4% of Mission Cap"
@@ -663,6 +705,34 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
       </motion.div>
+
+      {/* D3.JS POLAR RADAR CHART & AUTONOMOUS SOLAR STORM SHIELDING ENGINE */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.38, delay: 0.28 }}
+        >
+          <D3PolarRadarChart
+            astronaut={astronaut}
+            telemetryHistory={telemetry}
+            sleepRecords={sleepRecords}
+            activityRecords={activityRecords}
+            radiationRecords={radiation}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.38, delay: 0.32 }}
+        >
+          <SolarStormShieldingEngine
+            astronaut={astronaut}
+            radiationRecords={radiation}
+          />
+        </motion.div>
+      </div>
 
       {/* 4-QUADRANT SCIENTIFIC VISUALIZATIONS */}
       <motion.div

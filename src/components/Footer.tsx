@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
             "Monitoring Human Health Beyond Earth." · NASA Space Apps Challenge 2026
           </div>
           <div>
-            MERN + Python ML Engine + Gemini AI Decision Support
+            NASA Deep Space Biotelemetry & Flight Surgeon Architecture
           </div>
         </div>
       </div>

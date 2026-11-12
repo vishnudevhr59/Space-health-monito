@@ -124,30 +124,34 @@ I am continuously synchronized with your **1Hz biotelemetry stream** and grounde
   };
 
   const handleSendMessage = async (queryText?: string) => {
-    const rawText = typeof queryText === 'string' ? queryText : inputQueryRef.current;
-    const query = (rawText || '').trim();
+    // Extract query text with priority: explicit parameter -> inputQuery state -> inputQueryRef
+    const candidateText =
+      typeof queryText === 'string' && queryText.trim().length > 0
+        ? queryText
+        : (inputQuery || inputQueryRef.current || '');
+    const query = candidateText.trim();
     if (!query || isLoading) return;
 
-    // Immediately clear input query both in state and ref to prevent race conditions or double-submits
+    // Immediately clear input query both in state and ref synchronously to prevent race conditions
     setInputQuery('');
     inputQueryRef.current = '';
 
-    // Fetch freshest live telemetry frame directly from the streaming engine
+    // Fetch freshest live 1Hz telemetry frame directly from the streaming engine
     const engineFrame = telemetryStreamEngine.getCurrentFrame();
     const frameSnapshot: TelemetryFrame = {
       ...engineFrame,
-      heartRate: engineFrame.heartRate || 64,
-      spo2: engineFrame.spo2 || 98.4,
-      cabinPressurePsi: engineFrame.cabinPressurePsi || 14.7,
-      cabinCo2MmHg: engineFrame.cabinCo2MmHg || 2.2,
-      vestibularConflictScore: engineFrame.vestibularConflictScore || 1.4,
+      heartRate: Number(engineFrame.heartRate) || 64,
+      spo2: Number(engineFrame.spo2) || 98.4,
+      cabinPressurePsi: Number(engineFrame.cabinPressurePsi) || 14.7,
+      cabinCo2MmHg: Number(engineFrame.cabinCo2MmHg) || 2.2,
+      vestibularConflictScore: Number(engineFrame.vestibularConflictScore) || 1.4,
       severity: engineFrame.severity || 'NOMINAL',
       anomalyName: engineFrame.anomalyName || 'Nominal Operations',
-      systolicBP: engineFrame.systolicBP || 114,
-      diastolicBP: engineFrame.diastolicBP || 72,
-      bodyTemperature: engineFrame.bodyTemperature || 36.6,
-      hrv: engineFrame.hrv || 64,
-      respiratoryRate: engineFrame.respiratoryRate || 14,
+      systolicBP: Number(engineFrame.systolicBP) || 114,
+      diastolicBP: Number(engineFrame.diastolicBP) || 72,
+      bodyTemperature: Number(engineFrame.bodyTemperature) || 36.6,
+      hrv: Number(engineFrame.hrv) || 64,
+      respiratoryRate: Number(engineFrame.respiratoryRate) || 14,
     };
 
     const userMessage: ChatMessage = {
@@ -263,7 +267,7 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
 
           <button
             onClick={handleClearConversation}
-            className="px-3 py-1.5 rounded-xl bg-[#101B30] hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+            className="min-h-[44px] px-3.5 py-2 rounded-xl bg-[#101B30] hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             title="Reset conversation"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
@@ -480,7 +484,7 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
               key={idx}
               onClick={() => handleSendMessage(q)}
               disabled={isLoading}
-              className="px-3 py-1.5 rounded-full bg-[#101B30] hover:bg-[#00E5FF]/10 text-slate-300 hover:text-[#00E5FF] border border-slate-700 hover:border-[#00E5FF]/40 text-xs whitespace-nowrap transition-all cursor-pointer shrink-0 font-medium"
+              className="min-h-[38px] px-3.5 py-1.5 rounded-full bg-[#101B30] hover:bg-[#00E5FF]/10 text-slate-300 hover:text-[#00E5FF] border border-slate-700 hover:border-[#00E5FF]/40 text-xs whitespace-nowrap transition-all cursor-pointer shrink-0 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             >
               {q}
             </button>
@@ -492,7 +496,7 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSendMessage();
+              handleSendMessage(inputQuery);
             }}
             className="flex items-center gap-3"
           >
@@ -503,17 +507,18 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSendMessage();
+                  handleSendMessage(inputQuery);
                 }
               }}
               placeholder="Ask MONITO AI about spaceflight physiology, radiation hazards, or your live biotelemetry..."
               disabled={isLoading}
-              className="flex-1 min-w-0 px-3.5 sm:px-4 py-3 sm:py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] font-sans resize-none leading-relaxed"
+              className="flex-1 min-w-0 px-3.5 sm:px-4 py-3 sm:py-3.5 bg-[#101B30] border border-slate-700 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF] focus-visible:ring-2 focus-visible:ring-[#00E5FF]/50 font-sans resize-none leading-relaxed"
             />
             <button
               type="submit"
               disabled={isLoading || !inputQuery.trim()}
-              className="p-3.5 bg-gradient-to-r from-[#00E5FF] to-[#438BFF] text-[#050816] rounded-2xl font-bold transition-all shadow-[0_0_20px_-3px_rgba(0,229,255,0.4)] disabled:opacity-40 cursor-pointer shrink-0"
+              className="min-h-[44px] min-w-[44px] p-3.5 bg-gradient-to-r from-[#00E5FF] to-[#438BFF] text-[#050816] rounded-2xl font-bold transition-all shadow-[0_0_20px_-3px_rgba(0,229,255,0.4)] disabled:opacity-40 cursor-pointer shrink-0 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
+              title="Send query to MONITO AI"
             >
               <Send className="w-4 h-4 text-[#050816]" />
             </button>

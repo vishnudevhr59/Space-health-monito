@@ -13,6 +13,7 @@ interface MetricCardProps {
   statusText?: string;
   secondaryInfo?: string;
   sparklineData?: number[];
+  theme?: 'danger' | 'space' | 'health' | 'purple' | 'amber' | 'cyan';
   icon?: React.ReactNode;
   lastUpdated?: string;
 }
@@ -29,14 +30,26 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   statusText,
   secondaryInfo,
   sparklineData,
+  theme,
   icon,
   lastUpdated,
 }) => {
+  // Color configuration:
+  // Red for Danger/Alerts, Blue for Space/Physical, Green for Health Suggestions, Purple for Neuro/Sleep, Amber for Warnings
+  const themeCardBorder = {
+    danger: 'border-rose-500/40 bg-gradient-to-b from-rose-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(244,63,94,0.15)] hover:border-rose-400',
+    space: 'border-blue-500/40 bg-gradient-to-b from-blue-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:border-blue-400',
+    health: 'border-emerald-500/40 bg-gradient-to-b from-emerald-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-400',
+    purple: 'border-purple-500/40 bg-gradient-to-b from-purple-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:border-purple-400',
+    amber: 'border-amber-500/40 bg-gradient-to-b from-amber-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:border-amber-400',
+    cyan: 'border-cyan-500/40 bg-gradient-to-b from-cyan-950/30 to-[#0A1024] shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:border-cyan-400',
+  }[theme || (status === 'critical' ? 'danger' : status === 'warning' ? 'amber' : 'cyan')];
+
   const statusColor = {
-    nominal: 'text-[#21D4A5] bg-[#21D4A5]/10 border-[#21D4A5]/30',
-    warning: 'text-[#FFB547] bg-[#FFB547]/10 border-[#FFB547]/30',
-    critical: 'text-[#FF5368] bg-[#FF5368]/10 border-[#FF5368]/30',
-    info: 'text-[#00E5FF] bg-[#00E5FF]/10 border-[#00E5FF]/30',
+    nominal: 'text-emerald-400 bg-emerald-950/40 border-emerald-500/40',
+    warning: 'text-amber-300 bg-amber-950/40 border-amber-500/40',
+    critical: 'text-rose-400 bg-rose-950/50 border-rose-500/50 animate-pulse',
+    info: 'text-cyan-300 bg-cyan-950/40 border-cyan-500/40',
   }[status];
 
   const statusGlyph = {
@@ -47,11 +60,20 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   }[status];
 
   const sparklineStroke = {
-    nominal: '#21D4A5',
-    warning: '#FFB547',
-    critical: '#FF5368',
-    info: '#00E5FF',
+    nominal: '#10B981',
+    warning: '#F59E0B',
+    critical: '#F43F5E',
+    info: '#06B6D4',
   }[status];
+
+  const themeIconBox = {
+    danger: 'bg-rose-950/60 text-rose-400 border-rose-500/40',
+    space: 'bg-blue-950/60 text-blue-400 border-blue-500/40',
+    health: 'bg-emerald-950/60 text-emerald-400 border-emerald-500/40',
+    purple: 'bg-purple-950/60 text-purple-400 border-purple-500/40',
+    amber: 'bg-amber-950/60 text-amber-400 border-amber-500/40',
+    cyan: 'bg-cyan-950/60 text-cyan-400 border-cyan-500/40',
+  }[theme || (status === 'critical' ? 'danger' : status === 'warning' ? 'amber' : 'cyan')];
 
   // Fallback sparkline if none provided
   const points = sparklineData && sparklineData.length >= 4 
@@ -59,11 +81,11 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     : [30, 45, 38, 55, 48, 62, 58, 65];
 
   return (
-    <div className="group relative rounded-2xl p-4.5 bg-[#101B30]/85 backdrop-blur-md border border-[#00E5FF]/15 hover:border-[#00E5FF]/45 transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_-5px_rgba(0,229,255,0.18)] hover:-translate-y-1 flex flex-col justify-between overflow-hidden">
+    <div className={`group relative rounded-2xl p-4.5 backdrop-blur-md border transition-all duration-300 shadow-lg hover:-translate-y-1 flex flex-col justify-between overflow-hidden ${themeCardBorder}`}>
       
       {/* Subtle corner tech accent */}
       <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none opacity-30 group-hover:opacity-80 transition-opacity">
-        <svg viewBox="0 0 32 32" fill="none" className="w-full h-full text-[#00E5FF]">
+        <svg viewBox="0 0 32 32" fill="none" className="w-full h-full text-current">
           <path d="M0 0 L32 0 L32 32" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </div>
@@ -72,11 +94,11 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           {icon && (
-            <div className="p-1 rounded-lg bg-[#0B1224] text-[#00E5FF] border border-[#00E5FF]/20">
+            <div className={`p-1.5 rounded-lg border ${themeIconBox}`}>
               {icon}
             </div>
           )}
-          <span className="text-[11px] uppercase tracking-wider font-mono text-slate-300 font-semibold truncate">
+          <span className="text-[11px] uppercase tracking-wider font-mono text-slate-200 font-bold truncate">
             {label}
           </span>
         </div>

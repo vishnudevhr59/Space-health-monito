@@ -15,6 +15,7 @@ import {
   FileText,
   Volume2,
   VolumeX,
+  Lock,
 } from 'lucide-react';
 import { NetworkStatusIndicator } from './NetworkStatusIndicator';
 import { voiceAlertService } from '../services/voiceAlertService';
@@ -29,6 +30,7 @@ interface NavbarProps {
   onOpenEmergencyBeacon: () => void;
   onOpenShiftHandover?: () => void;
   onOpenAuditModal?: () => void;
+  onOpenVault?: () => void;
   onSyncOffline: () => void;
   activeAlertCount: number;
 }
@@ -43,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenEmergencyBeacon,
   onOpenShiftHandover,
   onOpenAuditModal,
+  onOpenVault,
   onSyncOffline,
   activeAlertCount,
 }) => {
@@ -55,25 +58,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   const primaryNavItems = [
-    { id: 'landing', label: 'Mission Brief' },
     { id: 'dashboard', label: 'Mission Dashboard', aliases: ['overview'] },
     { id: 'monitoring', label: 'Health Monitoring' },
     { id: 'ai-analysis', label: 'AI Health Analysis', aliases: ['analytics'] },
     { id: 'monito-ai', label: 'MONITO AI' },
-    { id: 'reports', label: 'Reports' },
+    { id: 'reports', label: 'Medical Reports', aliases: ['research'] },
   ];
 
   const secondaryNavItems = [
-    { id: 'dashboard', label: 'Overview', aliases: ['overview'] },
-    { id: 'monitoring', label: 'Health Monitoring' },
-    { id: 'ai-analysis', label: 'AI Analysis', aliases: ['analytics'] },
-    { id: 'environment', label: 'Space Environment' },
-    { id: 'bone-muscle', label: 'Bone & Muscle' },
-    { id: 'sleep-wellness', label: 'Sleep & Mind' },
-    { id: 'monito-ai', label: 'MONITO AI' },
-    { id: 'reports', label: 'Reports' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'system-health', label: 'System Health' },
+    { id: 'dashboard', label: 'Dashboard', aliases: ['overview'] },
+    { id: 'monitoring', label: 'Telemetry Vitals' },
+    { id: 'ai-analysis', label: 'Anomaly AI' },
+    { id: 'monito-ai', label: 'MONITO AI Doctor' },
+    { id: 'reports', label: 'Clinical Reports' },
   ];
 
   const isPrimaryActive = (item: { id: string; aliases?: string[] }) => {
@@ -128,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right: DSN status + Provenance + Notification Bell + User Profile + Quick Action */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* DSN Connection Status Badge */}
-          <NetworkStatusIndicator />
+          <NetworkStatusIndicator onOpenVault={onOpenVault} />
 
           {/* NASA Provenance Button */}
           <button
@@ -143,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Notification Center Icon */}
           <button
             onClick={() => handleNavClick('alerts')}
-            className="relative p-2 rounded-xl bg-[#101B30] border border-slate-700 hover:border-[#00E5FF]/40 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="relative min-h-[44px] min-w-[44px] p-2.5 rounded-xl bg-[#101B30] border border-slate-700 hover:border-[#00E5FF]/40 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             title="Active Health Threshold Alerts"
           >
             <Bell className="w-4 h-4 text-[#00E5FF]" />
@@ -157,7 +154,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* User Profile and Role Pill */}
           <button
             onClick={onOpenAuthModal}
-            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-xl border border-[#00E5FF]/30 bg-[#101B30] hover:bg-[#101B30]/80 text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF]"
+            className="flex items-center gap-1 sm:gap-2 min-h-[44px] px-2.5 sm:px-3 py-2 rounded-xl border border-[#00E5FF]/30 bg-[#101B30] hover:bg-[#101B30]/80 text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
           >
             <UserCheck className="w-3.5 h-3.5 text-[#00E5FF]" />
             <span className="font-mono text-xs hidden sm:inline">CDR</span>
@@ -170,7 +167,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative">
             <button
               onClick={() => setIsQuickActionOpen(!isQuickActionOpen)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-950/20 hover:bg-amber-900/30 text-xs font-medium text-amber-300 transition-all cursor-pointer shadow-sm hover:border-amber-400"
+              className="flex items-center gap-1 sm:gap-1.5 min-h-[44px] px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-950/20 hover:bg-amber-900/30 text-xs font-medium text-amber-300 transition-all cursor-pointer shadow-sm hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               title="Quick Mission Actions"
             >
               <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -240,6 +237,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
                 )}
 
+                {onOpenVault && (
+                  <button
+                    onClick={() => {
+                      onOpenVault();
+                      setIsQuickActionOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-emerald-300 hover:text-white hover:bg-emerald-950/60 transition-colors text-left cursor-pointer"
+                  >
+                    <Lock className="w-4 h-4 text-emerald-400" />
+                    <div>
+                      <div className="font-bold text-emerald-300">Disaster Recovery Vault</div>
+                      <div className="text-[10px] text-slate-400 font-sans">SHA-256 cryptographic ledger & occultation</div>
+                    </div>
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     const next = voiceAlertService.toggleVoiceAlerts();
@@ -283,7 +296,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Menu Hamburger Toggle (Visible only on < md screens) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-[#101B30] border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="md:hidden min-h-[44px] min-w-[44px] p-2.5 rounded-xl bg-[#101B30] border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]"
             aria-label="Toggle mobile navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-4 h-4 text-[#00E5FF]" /> : <Menu className="w-4 h-4" />}

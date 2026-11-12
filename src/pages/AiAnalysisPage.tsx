@@ -33,6 +33,8 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from 'recharts';
+import { motion } from 'framer-motion';
+import { D3MultiLineCorrelationChart } from '../components/D3MultiLineCorrelationChart';
 
 interface AiAnalysisPageProps {
   astronaut: AstronautProfile;
@@ -245,6 +247,15 @@ export const AiAnalysisPage: React.FC<AiAnalysisPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* D3.JS REAL-TIME MULTI-LINE TELEMETRY CORRELATION CHART */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, ease: 'easeOut' }}
+      >
+        <D3MultiLineCorrelationChart telemetryHistory={telemetry} />
+      </motion.div>
 
       {/* 4 ANALYSIS TIME WINDOWS (FEATURE 1) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-2xl bg-[#101B30] border border-[#00E5FF]/20 gap-3 font-mono text-xs">

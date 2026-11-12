@@ -49,8 +49,10 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
   const gradientId = `spark-grad-${uniqueId}`;
   const areaGradId = `spark-area-${uniqueId}`;
 
-  // Extract raw numerical values
-  const values: number[] = data.map((d) => (typeof d === 'number' ? d : d.value));
+  // Extract raw numerical values safely, filtering out NaN or undefined
+  const values: number[] = data
+    .map((d) => (typeof d === 'number' ? d : d?.value))
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v));
   const latestValue = values.length > 0 ? values[values.length - 1] : 0;
 
   // Determine dynamic color based on thresholds if provided

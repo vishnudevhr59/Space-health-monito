@@ -39,6 +39,7 @@ import { SplashScreen } from './components/SplashScreen';
 import { MissionControlTicker } from './components/MissionControlTicker';
 import { AnomalyInjectionState, NOMINAL_HEALTH_STATE } from './components/SimulationAnomalyPanel';
 import { MissionAuditLogModal } from './components/MissionAuditLogModal';
+import { DisasterRecoveryVaultModal } from './components/DisasterRecoveryVaultModal';
 import { AutonomousSelfHealingBanner } from './components/AutonomousSelfHealingBanner';
 import { DemoAssistantToolbar } from './components/DemoAssistantToolbar';
 import { useAlertMonitoring } from './hooks/useAlertMonitoring';
@@ -60,6 +61,7 @@ export default function App() {
   const [isEmergencyBeaconOpen, setIsEmergencyBeaconOpen] = useState(false);
   const [isShiftHandoverOpen, setIsShiftHandoverOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [anomalyState, setAnomalyState] = useState<AnomalyInjectionState>(NOMINAL_HEALTH_STATE);
 
@@ -320,6 +322,7 @@ export default function App() {
         onOpenEmergencyBeacon={() => setIsEmergencyBeaconOpen(true)}
         onOpenShiftHandover={() => setIsShiftHandoverOpen(true)}
         onOpenAuditModal={() => setIsAuditModalOpen(true)}
+        onOpenVault={() => setIsVaultModalOpen(true)}
         onSyncOffline={() => {
           offlineSyncService.startBackgroundSync();
           loadInitialData();
@@ -385,6 +388,7 @@ export default function App() {
               anomalyState={anomalyState}
               onInjectAnomaly={setAnomalyState}
               onResetNominal={() => setAnomalyState(NOMINAL_HEALTH_STATE)}
+              onSelectAstronaut={(newAstro) => setAstronaut(newAstro)}
             />
           )}
 
@@ -524,6 +528,12 @@ export default function App() {
       <MissionAuditLogModal
         isOpen={isAuditModalOpen}
         onClose={() => setIsAuditModalOpen(false)}
+      />
+
+      {/* DISASTER RECOVERY VAULT & CRYPTOGRAPHIC LEDGER MODAL */}
+      <DisasterRecoveryVaultModal
+        isOpen={isVaultModalOpen}
+        onClose={() => setIsVaultModalOpen(false)}
       />
 
       {/* HACKATHON DEMO ASSISTANT & QUICK-CHECK SCRIPT SUITE */}
