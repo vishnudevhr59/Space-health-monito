@@ -221,3 +221,48 @@ export interface SimulatedEmergencyBeaconPacket {
   packetChecksumSha256: string;
   disclosure: string;
 }
+
+export interface NasaGroundDispatchPacket {
+  id: string;
+  packetSerial: string;
+  astronautId: string;
+  astronautName: string;
+  destinationGroundTeam: string;
+  dsnStation: string;
+  owltLatencySeconds: number;
+  carrierFrequencyGhz: number;
+  priority: 'Routine Telemetry Briefing' | 'Priority Medical Advisory' | 'Urgent Flight Surgeon Intervention (P1)';
+  hrpFiveHazardsAssessment: {
+    radiationExposure: string;
+    isolationConfinement: string;
+    distanceFromEarth: string;
+    gravityFields: string;
+    hostileEnvironment: string;
+  };
+  pointOfCareBiometrics: {
+    bloodSugarMgDl?: number;
+    ultrasoundExamNotes?: string;
+    subjectiveSymptoms: string[];
+    cognitiveMoodScore: number;
+  };
+  liveVitalsSnapshot: {
+    heartRate: number;
+    spo2: number;
+    bloodPressure: string;
+    coreTempC: number;
+    cabinPressurePsi: number;
+    cabinCo2MmHg: number;
+  };
+  astronautNotes: string;
+  sha256Checksum: string;
+  status: 'PENDING_TRANSMISSION' | 'UPLINK_IN_TRANSIT' | 'RECEIVED_MCC_HOUSTON' | 'SIGNED_BY_FLIGHT_SURGEON';
+  groundPhysicianResponse?: {
+    reviewedBy: string;
+    clinicalAssessment: string;
+    actionableDirectives: string[];
+    approvedCountermeasures: string[];
+    signOffTimestamp: string;
+  };
+  dispatchedAt: string;
+}
+

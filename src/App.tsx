@@ -29,6 +29,7 @@ import { BoneMusclePage } from './pages/BoneMusclePage';
 import { SleepWellnessPage } from './pages/SleepWellnessPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { NasaGroundUplinkPage } from './pages/NasaGroundUplinkPage';
 import { ResearchPage } from './pages/ResearchPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SystemHealthPage } from './pages/SystemHealthPage';
@@ -439,6 +440,7 @@ export default function App() {
             <MonitoAiPage
               astronaut={astronaut}
               telemetry={telemetry}
+              onNavigate={setCurrentTab}
             />
           )}
 
@@ -451,6 +453,20 @@ export default function App() {
               activityRecords={activityRecords}
               radiation={radiation}
               alerts={alerts}
+              onNavigate={setCurrentTab}
+            />
+          )}
+
+          {/* PAGE 11: NASA GROUND FLIGHT SURGEON DIRECT UPLINK (HOUSTON MCC-H) */}
+          {(currentTab === 'ground-uplink' || currentTab === 'nasa-uplink') && (
+            <NasaGroundUplinkPage
+              astronaut={astronaut}
+              telemetry={telemetry}
+              sleepRecords={sleepRecords}
+              activityRecords={activityRecords}
+              radiation={radiation}
+              alerts={alerts}
+              onNavigate={setCurrentTab}
             />
           )}
 

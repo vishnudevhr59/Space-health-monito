@@ -800,6 +800,68 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
+  // SUITE 19: NASA GROUND FLIGHT SURGEON UPLINK (MCC HOUSTON)
+  // -----------------------------------------------------------------
+  console.log('Running Suite 19: NASA Ground Flight Surgeon Uplink...');
+  try {
+    // 19.1 Dispatch Health Report to NASA Houston
+    const dispatchPayload = {
+      astronautId: 'astro-1',
+      astronautName: 'CDR Sarah Chen',
+      destinationGroundTeam: 'NASA MCC-H Flight Surgeon Console (Houston, TX, USA)',
+      dsnStation: 'Goldstone DSS-14 (California, USA)',
+      priority: 'Routine Telemetry Briefing',
+      pointOfCareBiometrics: {
+        bloodSugarMgDl: 95,
+        ultrasoundExamNotes: 'ONSD 5.2 mm nominal',
+        subjectiveSymptoms: ['Mild Cephalic Fullness'],
+        cognitiveMoodScore: 9,
+      },
+      liveVitalsSnapshot: {
+        heartRate: 64,
+        spo2: 98.4,
+        bloodPressure: '114/72',
+        coreTempC: 36.6,
+        cabinPressurePsi: 14.7,
+        cabinCo2MmHg: 2.2,
+      },
+      astronautNotes: 'Mission Day 142 routine clinical health assessment.',
+    };
+
+    const dispatchRes = await fetch(`${BASE_URL}/api/nasa-ground-dispatch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dispatchPayload),
+    });
+    assert(dispatchRes.status === 201, 'NASA Ground Uplink', 'Dispatch endpoint accepts report and returns HTTP 201');
+    const dispatchData = await dispatchRes.json();
+    assert(Boolean(dispatchData.packet?.packetSerial), 'NASA Ground Uplink', 'Packet serial generated');
+    assert(Boolean(dispatchData.packet?.groundPhysicianResponse?.reviewedBy), 'NASA Ground Uplink', 'Signed by NASA Chief Flight Surgeon');
+
+    // 19.2 Retrieve Uplink Dispatches
+    const listRes = await fetch(`${BASE_URL}/api/nasa-ground-dispatch`);
+    assert(listRes.status === 200, 'NASA Ground Uplink', 'Uplink dispatches list returns HTTP 200');
+    const listData = await listRes.json();
+    assert(Array.isArray(listData.dispatches) && listData.dispatches.length >= 1, 'NASA Ground Uplink', 'Dispatches list populated');
+
+    // 19.3 Retrieve Latest Uplink Dispatch
+    const latestRes = await fetch(`${BASE_URL}/api/nasa-ground-dispatch/latest`);
+    assert(latestRes.status === 200, 'NASA Ground Uplink', 'Latest dispatch endpoint returns HTTP 200');
+    const latestData = await latestRes.json();
+    assert(Boolean(latestData.latest?.packetSerial), 'NASA Ground Uplink', 'Latest dispatch packet retrieved');
+
+    // 19.4 Reject Missing Astronaut ID
+    const invalidDispatchRes = await fetch(`${BASE_URL}/api/nasa-ground-dispatch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    assert(invalidDispatchRes.status === 400, 'NASA Ground Uplink', 'Rejects missing astronautId with HTTP 400');
+  } catch (err: any) {
+    assert(false, 'NASA Ground Uplink', 'NASA Ground Uplink test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
   // SUMMARY REPORT
   // -----------------------------------------------------------------
   console.log('\n===============================================================');

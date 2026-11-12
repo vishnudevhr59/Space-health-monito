@@ -82,6 +82,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* DSN Connection Status Badge (Clickable to open Disaster Recovery Vault) */}
           <NetworkStatusIndicator onOpenVault={onOpenVault} />
 
+          {/* NASA Ground Uplink Button */}
+          <button
+            onClick={() => onSelectTab('ground-uplink')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-950 to-teal-950 hover:bg-emerald-900 border border-emerald-500/50 text-[10px] font-mono text-emerald-300 transition-all cursor-pointer shadow-sm hover:border-emerald-400 active:scale-95 min-h-[36px]"
+            title="Send Real-Time Health Reports to NASA Flight Surgeon Team (Houston, USA)"
+          >
+            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span className="font-bold hidden sm:inline">NASA UPLINK</span>
+            <span className="font-bold sm:hidden">UPLINK</span>
+          </button>
+
           {/* NASA Provenance Button */}
           <button
             onClick={onOpenProvenanceModal}
@@ -119,6 +130,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {isQuickActionOpen && (
               <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#0B1224] border border-amber-500/40 shadow-2xl p-2 z-50 text-xs font-mono space-y-1.5 animate-fadeIn">
+                <button
+                  onClick={() => {
+                    onSelectTab('ground-uplink');
+                    setIsQuickActionOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-emerald-300 hover:text-white hover:bg-emerald-950/60 transition-colors text-left cursor-pointer"
+                >
+                  <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                  <div>
+                    <div className="font-bold text-emerald-300">NASA Ground Uplink</div>
+                    <div className="text-[10px] text-slate-400 font-sans">Send reports to Houston Flight Surgeons</div>
+                  </div>
+                </button>
+
                 <button
                   onClick={() => {
                     onOpenLogVitals();

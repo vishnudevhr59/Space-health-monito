@@ -43,7 +43,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
       id: 'ai-analysis',
       label: 'AI Analysis',
       icon: Cpu,
-      aliases: ['analytics'],
+      aliases: ['analytics', 'monito-ai'],
     },
     {
       id: 'alerts',

@@ -25,6 +25,7 @@ import {
   FileDown,
   Activity,
   Zap,
+  ChevronRight,
 } from 'lucide-react';
 
 interface ReportsPageProps {
@@ -34,6 +35,7 @@ interface ReportsPageProps {
   activityRecords: ActivityRecord[];
   radiation: RadiationRecord[];
   alerts: HealthAlert[];
+  onNavigate?: (tab: string) => void;
 }
 
 export const ReportsPage: React.FC<ReportsPageProps> = ({
@@ -43,9 +45,11 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
   activityRecords,
   radiation,
   alerts,
+  onNavigate,
 }) => {
   const [reportPeriod, setReportPeriod] = useState<'Daily' | 'Weekly'>('Weekly');
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [uplinkSuccess, setUplinkSuccess] = useState(false);
 
   const liveFrame = telemetryStreamEngine.getCurrentFrame();
   const auditLogs = missionAuditTrailService.getAuditLog();
@@ -94,6 +98,37 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
     setTimeout(() => setDownloadSuccess(false), 3000);
   };
 
+  const handleDirectUplinkToNasa = async () => {
+    try {
+      const res = await fetch('/api/nasa-ground-dispatch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          astronautId: astronaut.id,
+          astronautName: astronaut.name,
+          destinationGroundTeam: 'NASA MCC-H Flight Surgeon Console (Houston, TX, USA)',
+          dsnStation: 'Goldstone DSS-14 (California, USA)',
+          priority: 'Routine Telemetry Briefing',
+          astronautNotes: `Direct telemetry dossier submission for Sol 142 from Reports Console.`,
+          liveVitalsSnapshot: {
+            heartRate: liveFrame.heartRate,
+            spo2: liveFrame.spo2,
+            bloodPressure: `${liveFrame.systolicBP}/${liveFrame.diastolicBP}`,
+            coreTempC: liveFrame.bodyTemperature,
+            cabinPressurePsi: liveFrame.cabinPressurePsi,
+            cabinCo2MmHg: liveFrame.cabinCo2MmHg,
+          },
+        }),
+      });
+      if (res.ok) {
+        setUplinkSuccess(true);
+        setTimeout(() => setUplinkSuccess(false), 4000);
+      }
+    } catch (e) {
+      console.warn('Uplink error:', e);
+    }
+  };
+
   return (
     <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6 overflow-x-hidden">
       
@@ -105,7 +140,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <span>Mission Health Intelligence Dossier</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Astronaut Health Report & PDF Generator
+            Astronaut Health Report & NASA Ground Uplink
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-2xl">
             Compile standardized clinical telemetry summaries for NASA Johnson Space Center flight surgeons and international ground stations.
@@ -136,6 +171,24 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             </button>
           </div>
 
+          {onNavigate ? (
+            <button
+              onClick={() => onNavigate('ground-uplink')}
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-mono text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+            >
+              <Radio className="w-4 h-4 animate-pulse" />
+              <span>Send to NASA Team (Houston) &rarr;</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleDirectUplinkToNasa}
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-mono text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Radio className="w-4 h-4 animate-pulse" />
+              <span>{uplinkSuccess ? 'Uplink Sent to Houston!' : 'Send to NASA Team'}</span>
+            </button>
+          )}
+
           <button
             onClick={handleDownloadMarkdownDossier}
             className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500 text-white font-mono text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
@@ -152,6 +205,34 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <span>Export / Print PDF</span>
           </button>
         </div>
+      </div>
+
+      {/* NASA GROUND FLIGHT SURGEON UPLINK NOTIFICATION BANNER */}
+      <div className="no-print p-4 rounded-2xl bg-gradient-to-r from-[#09152B] via-[#051A2E] to-[#0B2533] border-2 border-emerald-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_0_25px_rgba(16,185,129,0.15)]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+            <Radio className="w-5 h-5 text-emerald-400 animate-pulse" />
+          </div>
+          <div>
+            <div className="text-xs font-mono font-bold text-white flex items-center gap-2">
+              <span>NASA MCC-HOUSTON GROUND MONITORING UPLINK READY</span>
+              <span className="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-600">
+                DSN GOLDSTONE ACTIVE
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 font-sans mt-0.5">
+              Transmit live 1Hz telemetry, point-of-care ultrasound, and NASA HRP 5-hazard evaluations to Flight Surgeons in Houston, Texas, USA.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => onNavigate && onNavigate('ground-uplink')}
+          className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#050816] font-mono text-xs font-black transition-all cursor-pointer flex items-center gap-2 shrink-0 self-start sm:self-auto shadow-md"
+        >
+          <span>Open Ground Uplink Console</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
       {/* PRINTABLE CLINICAL REPORT DOCUMENT */}
