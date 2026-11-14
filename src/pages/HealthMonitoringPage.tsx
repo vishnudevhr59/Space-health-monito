@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { AstronautDigitalTwin } from '../components/AstronautDigitalTwin';
 import { IotEdgeHardwareGrid } from '../components/IotEdgeHardwareGrid';
+import { calculateEdgeReadinessScore } from '../utils/readinessScore';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -877,23 +878,26 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
               <div className="sm:hidden space-y-3">
                 {ledgerRows.map((m) => {
                   const hrvVal = m.hrv || baseHrv;
-                  const hrvRatio = Math.min(hrvVal / baseHrv, 1.15);
-                  const hrvScore = Math.min((hrvRatio / 1.0) * 100, 100);
-                  const rhrDiff = m.heartRate - baseRhr;
-                  const rhrScore = Math.max(0, Math.min(100, 100 - rhrDiff * 4));
-                  const sleepScore = Math.min(sleepHoursDisplay / 7.5, 1.0) * sleepEffDisplay;
-                  const tempDiff = Math.abs(m.bodyTemperature - baseTemp);
-                  const tempScore = Math.max(0, 100 - tempDiff * 60);
-                  const total = hrvScore * 0.35 + rhrScore * 0.25 + sleepScore * 0.25 + tempScore * 0.15;
-                  const readinessScore = Math.round(total * 10) / 10;
-                  const readinessStatus = readinessScore >= 80 ? 'GREEN' : readinessScore >= 60 ? 'YELLOW' : 'RED';
+                  const evalResult = calculateEdgeReadinessScore({
+                    heartRate: m.heartRate,
+                    hrv: hrvVal,
+                    sleepHours: sleepHoursDisplay,
+                    sleepEfficiency: sleepEffDisplay,
+                    skinTempC: m.bodyTemperature,
+                    baselineHrv: baseHrv,
+                    baselineRhr: baseRhr,
+                    baselineTempC: baseTemp,
+                  });
+                  const {
+                    readinessScore,
+                    status: readinessStatus,
+                    hrvScore,
+                    rhrScore,
+                    sleepScore,
+                    tempScore,
+                    whyExplanation,
+                  } = evalResult;
                   const isExpanded = activeRowFactorsId === m.id;
-                  const whyExplanation =
-                    readinessStatus === 'GREEN'
-                      ? `Readiness is optimal (${readinessScore}/100, GREEN) because HRV (${hrvVal} ms) and resting heart rate (${m.heartRate} bpm) match baseline with zero cardiovascular compensation.`
-                      : readinessStatus === 'YELLOW'
-                      ? `Readiness is moderated (${readinessScore}/100, YELLOW) driven by ${rhrDiff > 0 ? `elevated heart rate (+${rhrDiff} bpm)` : 'depressed autonomic HRV recovery'}.`
-                      : `Readiness is critical (${readinessScore}/100, RED) due to acute cardiorespiratory excursion.`;
 
                   return (
                     <div key={`mob-${m.id}`} className="rounded-xl bg-[#0B1224] border border-slate-800 p-3 space-y-2.5 text-xs font-mono overflow-hidden">
@@ -969,27 +973,29 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
                   <tbody className="divide-y divide-slate-800/60 text-slate-300 bg-[#101B30]/50">
                     {ledgerRows.map((m) => {
                       const hrvVal = m.hrv || baseHrv;
-                      const hrvRatio = Math.min(hrvVal / baseHrv, 1.15);
-                      const hrvScore = Math.min((hrvRatio / 1.0) * 100, 100);
-
-                      const rhrDiff = m.heartRate - baseRhr;
-                      const rhrScore = Math.max(0, Math.min(100, 100 - rhrDiff * 4));
-
-                      const sleepScore = Math.min(sleepHoursDisplay / 7.5, 1.0) * sleepEffDisplay;
-                      const tempDiff = Math.abs(m.bodyTemperature - baseTemp);
-                      const tempScore = Math.max(0, 100 - tempDiff * 60);
-
-                      const total = hrvScore * 0.35 + rhrScore * 0.25 + sleepScore * 0.25 + tempScore * 0.15;
-                      const readinessScore = Math.round(total * 10) / 10;
-                      const readinessStatus = readinessScore >= 80 ? 'GREEN' : readinessScore >= 60 ? 'YELLOW' : 'RED';
+                      const evalResult = calculateEdgeReadinessScore({
+                        heartRate: m.heartRate,
+                        hrv: hrvVal,
+                        sleepHours: sleepHoursDisplay,
+                        sleepEfficiency: sleepEffDisplay,
+                        skinTempC: m.bodyTemperature,
+                        baselineHrv: baseHrv,
+                        baselineRhr: baseRhr,
+                        baselineTempC: baseTemp,
+                      });
+                      const {
+                        readinessScore,
+                        status: readinessStatus,
+                        hrvRatio,
+                        hrvScore,
+                        rhrDiff,
+                        rhrScore,
+                        sleepScore,
+                        tempDiff,
+                        tempScore,
+                        whyExplanation,
+                      } = evalResult;
                       const isExpanded = activeRowFactorsId === m.id;
-
-                      const whyExplanation =
-                        readinessStatus === 'GREEN'
-                          ? `Readiness is optimal (${readinessScore}/100, GREEN) because HRV (${hrvVal} ms) and resting heart rate (${m.heartRate} bpm) match baseline with zero cardiovascular compensation.`
-                          : readinessStatus === 'YELLOW'
-                          ? `Readiness is moderated (${readinessScore}/100, YELLOW) driven by ${rhrDiff > 0 ? `elevated heart rate (+${rhrDiff} bpm)` : 'depressed autonomic HRV recovery'}.`
-                          : `Readiness is critical (${readinessScore}/100, RED) due to acute cardiorespiratory excursion.`;
 
                       return (
                         <React.Fragment key={m.id}>

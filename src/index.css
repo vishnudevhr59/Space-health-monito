@@ -16,8 +16,8 @@
 @layer base {
   html, body {
     width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
+    max-width: 100%;
+    overflow-x: clip;
     margin: 0;
     padding: 0;
     background-color: #050816;
@@ -26,15 +26,23 @@
   }
   #root {
     width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    min-height: 100vh;
+    max-width: 100%;
+    overflow-x: clip;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
   }
   code, kbd, samp, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Aerospace Glassmorphism & Atmospheric Lighting */

@@ -430,9 +430,11 @@ export const SystemHealthPage: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-slate-400 font-mono pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono pt-2">
           <span>Showing {filteredTests.length} of {testsList.length} automated tests</span>
-          <span className="text-emerald-400 font-bold">All 103 Automated Tests Verified Passing</span>
+          <span className="text-emerald-400 font-bold">
+            {testsList.filter((t) => t.passed).length} / {testsList.length} Automated Tests Verified Passing
+          </span>
         </div>
       </div>
 

@@ -306,7 +306,7 @@ export default function App() {
   const isConsoleView = currentTab !== 'landing' && currentTab !== 'auth';
 
   return (
-    <div className="min-h-screen bg-[#050816] text-slate-100 flex flex-col font-sans selection:bg-[#00E5FF]/20 selection:text-[#00E5FF]">
+    <div className="min-h-[100dvh] bg-[#050816] text-slate-100 flex flex-col font-sans selection:bg-[#00E5FF]/20 selection:text-[#00E5FF]">
       
       {/* CINEMATIC STARTUP SPLASH SCREEN WITH SMOOTH TRANSITION TO LANDING PAGE */}
       {showSplash && (
@@ -360,7 +360,7 @@ export default function App() {
       )}
 
       {/* ROW 5: MAIN VIEWPORT STAGE */}
-      <div className="flex-1 flex relative w-full overflow-x-hidden pb-24 sm:pb-28">
+      <div className="flex-1 flex relative w-full overflow-x-clip pb-24 sm:pb-28">
         <main className="w-full flex-1 min-w-0 transition-all duration-300">
           <ErrorBoundary
             key={currentTab}

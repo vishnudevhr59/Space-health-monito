@@ -103,20 +103,21 @@ export const Navbar: React.FC<NavbarProps> = ({
   // When collapsed, render ultra-sleek immersive micro-bar
   if (isHeaderCollapsed) {
     return (
-      <header className="sticky top-0 z-[60] w-full bg-[#050816]/95 backdrop-blur-xl border-b border-[#00E5FF]/20 shadow-[0_2px_15px_rgba(0,0,0,0.6)] select-none">
-        <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-2 text-xs">
+      <header className="sticky top-0 z-[70] w-full border-b border-[#00E5FF]/20 shadow-[0_2px_15px_rgba(0,0,0,0.6)] select-none">
+        <div className="absolute inset-0 bg-[#050816]/95 backdrop-blur-xl -z-10 pointer-events-none" />
+        <div className="w-full max-w-screen-2xl mx-auto px-2.5 sm:px-6 h-11 flex items-center justify-between gap-2 text-xs">
           {/* Left mini brand + tap to reveal */}
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => setIsHeaderCollapsed(false)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-mono text-[11px] font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-mono text-[11px] font-bold transition-all cursor-pointer shadow-sm active:scale-95 shrink-0"
               title="Tap to reveal full navigation header"
             >
               <ChevronDown className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />
               <span className="hidden sm:inline">TAP TO REVEAL HEADER</span>
               <span className="sm:hidden">NAV</span>
             </button>
-            <div className="flex items-center gap-1.5 text-slate-300 font-mono text-[11px] truncate">
+            <div className="flex items-center gap-1.5 text-slate-300 font-mono text-[11px] min-w-0 truncate">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
               <span className="text-white font-bold truncate">{selectedStation.split(' ')[0]}</span>
               <span className="text-slate-500 hidden sm:inline">· 1Hz DSN LOCK</span>
@@ -124,10 +125,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Right: Unclipped Astronaut Profile Badge + Expand Button */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={onOpenAuthModal}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#00E5FF]/50 bg-[#0c182c] hover:bg-[#142646] text-xs font-mono text-cyan-200 shadow-sm transition-all cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full border border-[#00E5FF]/50 bg-[#0c182c] hover:bg-[#142646] text-xs font-mono text-cyan-200 shadow-sm transition-all cursor-pointer"
               title="Astronaut Profile & Role"
             >
               <UserCheck className="w-3.5 h-3.5 text-[#00E5FF] shrink-0" />
@@ -152,10 +153,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   }
 
   return (
-    <header className="sticky top-0 z-[60] w-full bg-[#050816]/98 backdrop-blur-2xl border-b border-[#00E5FF]/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)] select-none transition-all duration-300">
+    <header className="sticky top-0 z-[70] w-full border-b border-[#00E5FF]/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)] select-none transition-all duration-300">
+      <div className="absolute inset-0 bg-[#050816]/98 backdrop-blur-2xl -z-10 pointer-events-none" />
       {(isStationMenuOpen || isQuickActionOpen) && (
         <div
-          className="fixed inset-0 z-[65] bg-black/30 backdrop-blur-[1px]"
+          className="fixed inset-0 z-[75] bg-black/40 backdrop-blur-[1px]"
           onClick={() => {
             setIsStationMenuOpen(false);
             setIsQuickActionOpen(false);
@@ -165,7 +167,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       )}
       
       {/* 1. TOP FLIPKART-STYLE MISSION LOCATION & HABITAT SELECTOR BAR */}
-      <div className="w-full bg-[#030612] border-b border-slate-800/80 px-3 sm:px-6 py-1 flex items-center justify-between text-[11px] font-mono">
+      <div className="w-full bg-[#030612] border-b border-slate-800/80 px-2.5 sm:px-6 py-1 flex items-center justify-between gap-2 text-[11px] font-mono">
         <div className="relative flex items-center gap-1.5 text-slate-300 min-w-0">
           <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
           <span className="text-slate-400 hidden sm:inline">Station:</span>
@@ -174,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               setIsQuickActionOpen(false);
               setIsStationMenuOpen(!isStationMenuOpen);
             }}
-            className="flex items-center gap-1 text-cyan-300 hover:text-cyan-100 font-bold truncate max-w-[180px] sm:max-w-none cursor-pointer"
+            className="flex items-center gap-1 text-cyan-300 hover:text-cyan-100 font-bold truncate max-w-[175px] sm:max-w-none cursor-pointer"
             title="Change active mission station"
           >
             <span className="truncate">{selectedStation}</span>
@@ -183,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Station dropdown */}
           {isStationMenuOpen && (
-            <div className="absolute top-6 left-0 w-72 max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-130px)] overflow-y-auto rounded-xl bg-[#091122] border border-cyan-500/40 shadow-2xl p-2 z-[70] text-xs font-mono space-y-1">
+            <div className="fixed top-[34px] left-2 sm:absolute sm:top-6 sm:left-0 w-[min(18rem,calc(100vw-1rem))] max-h-[calc(100dvh-140px)] overflow-y-auto rounded-xl bg-[#091122] border border-cyan-500/40 shadow-2xl p-2 z-[80] text-xs font-mono space-y-1">
               <div className="text-[10px] uppercase font-bold text-slate-400 px-2 py-1 border-b border-slate-800">
                 Select Telemetry Station
               </div>
@@ -226,16 +228,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* 2. MAIN HEADER BAR */}
-      <div className="w-full max-w-screen-2xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
         
-        {/* Left: Brand Wordmark (Single Line) */}
+        {/* Left: Brand Wordmark (Single Line, shrinks safely on 320px-360px screens) */}
         <button
           onClick={() => {
             setIsQuickActionOpen(false);
             setIsStationMenuOpen(false);
             onSelectTab('dashboard');
           }}
-          className="flex items-center text-left transition-opacity hover:opacity-95 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] rounded-xl min-w-0"
+          className="flex items-center text-left transition-opacity hover:opacity-95 min-w-0 shrink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] rounded-xl"
           title="Return to Mission Dashboard"
         >
           <Logo size="sm" />
@@ -251,7 +253,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="text-emerald-400 font-bold">1Hz TELEMETRY LOCK</span>
         </div>
 
-        {/* Right: Controls + NASA Uplink + Astronaut Profile (100% visible on all devices) */}
+        {/* Right: Controls + NASA Uplink + Astronaut Profile + Quick Actions (100% visible on all devices) */}
         <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
           
           {/* DSN Connection Status Badge */}
@@ -266,7 +268,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               setIsStationMenuOpen(false);
               onSelectTab('ground-uplink');
             }}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-950 to-teal-950 hover:bg-emerald-900 border border-emerald-500/50 text-[10px] sm:text-xs font-mono text-emerald-300 transition-all cursor-pointer shadow-sm hover:border-emerald-400 active:scale-95 min-h-[34px] sm:min-h-[38px] shrink-0"
+            className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-950 to-teal-950 hover:bg-emerald-900 border border-emerald-500/50 text-[9px] sm:text-xs font-mono text-emerald-300 transition-all cursor-pointer shadow-sm hover:border-emerald-400 active:scale-95 min-h-[34px] sm:min-h-[38px] shrink-0"
             title="Send Real-Time Health Reports to NASA Flight Surgeon Team (Houston, USA)"
           >
             <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 animate-pulse shrink-0" />
@@ -286,38 +288,39 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* User Profile and Astronaut Role Pill (Guaranteed 100% visible on all devices) */}
           <button
             onClick={onOpenAuthModal}
-            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-[#00E5FF]/40 bg-[#0F1B30] hover:bg-[#152542] text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] min-h-[34px] sm:min-h-[38px]"
+            className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 rounded-xl border border-[#00E5FF]/40 bg-[#0F1B30] hover:bg-[#152542] text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] min-h-[34px] sm:min-h-[38px]"
             title="Inspect Astronaut Profile & Role-Based Access"
             aria-label="Astronaut Profile"
           >
-            <div className="w-6 h-6 rounded-full bg-cyan-950 border border-cyan-400 flex items-center justify-center shrink-0">
-              <UserCheck className="w-3.5 h-3.5 text-[#00E5FF]" />
+            <div className="hidden min-[375px]:flex w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-cyan-950 border border-cyan-400 items-center justify-center shrink-0">
+              <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00E5FF]" />
             </div>
             <div className="flex flex-col text-left leading-none">
-              <span className="font-bold font-mono text-[11px] sm:text-xs text-white">CDR</span>
-              <span className="text-[9px] font-mono text-cyan-300">
+              <span className="font-bold font-mono text-[10px] sm:text-xs text-white">CDR</span>
+              <span className="text-[8px] sm:text-[9px] font-mono text-cyan-300">
                 {currentUser.role === 'Mission Health Specialist' ? 'Surgeon' : currentUser.role.split(' ')[0]}
               </span>
             </div>
           </button>
 
           {/* QUICK ACTION DROPDOWN MENU */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => {
                 setIsStationMenuOpen(false);
                 setIsQuickActionOpen(!isQuickActionOpen);
               }}
-              className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-950/20 hover:bg-amber-900/30 text-xs font-medium text-amber-300 transition-all cursor-pointer shadow-sm hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 min-h-[34px] sm:min-h-[38px] active:scale-95 shrink-0"
+              className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-950/20 hover:bg-amber-900/30 text-xs font-medium text-amber-300 transition-all cursor-pointer shadow-sm hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 min-h-[34px] sm:min-h-[38px] active:scale-95 shrink-0"
               title="Quick Mission Actions"
               aria-label="Quick Mission Actions"
+              aria-expanded={isQuickActionOpen}
             >
               <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <ChevronDown className={`w-3.5 h-3.5 text-amber-400 transition-transform ${isQuickActionOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-amber-400 shrink-0 transition-transform ${isQuickActionOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isQuickActionOpen && (
-              <div className="absolute right-0 mt-2 w-64 sm:w-72 max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-135px)] overflow-y-auto rounded-2xl bg-[#0B1224] border border-amber-500/40 shadow-2xl p-2 z-[70] text-xs font-mono space-y-1.5 animate-fadeIn">
+              <div className="fixed top-[88px] right-2 sm:absolute sm:top-full sm:mt-2 sm:right-0 w-[min(18.5rem,calc(100vw-1rem))] max-h-[calc(100dvh-168px)] overflow-y-auto rounded-2xl bg-[#0B1224] border border-amber-500/40 shadow-2xl p-2 z-[80] text-xs font-mono space-y-1.5 animate-fadeIn">
                 <button
                   onClick={() => {
                     onSelectTab('ground-uplink');

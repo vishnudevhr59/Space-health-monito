@@ -458,7 +458,7 @@ export const MissionSimulationBar: React.FC<MissionSimulationBarProps> = ({ onNa
             </div>
 
             {simState?.currentStepData?.telemetry && (
-              <div className="flex items-center gap-3 bg-slate-950/80 px-3 py-1.5 rounded border border-slate-800 shrink-0 font-mono text-[11px]">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-2.5 sm:px-3 py-1.5 rounded border border-slate-800 shrink-0 font-mono text-[11px]">
                 <div>
                   <span className="text-slate-500 mr-1">HR:</span>
                   <span className="text-cyan-300 font-semibold">{simState.currentStepData.telemetry.heartRate} BPM</span>

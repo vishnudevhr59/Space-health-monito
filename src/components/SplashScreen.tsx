@@ -112,10 +112,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         />
 
         {/* Ambient Orbit Tracks */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-25">
-          <div className="w-[340px] h-[340px] sm:w-[500px] sm:h-[500px] rounded-full border border-cyan-400/35 animate-[spin_24s_linear_infinite]" />
-          <div className="absolute w-[240px] h-[240px] sm:w-[350px] sm:h-[350px] rounded-full border border-dashed border-blue-400/40 animate-[spin_16s_linear_infinite_reverse]" />
-          <div className="absolute w-[150px] h-[150px] sm:w-[210px] sm:h-[210px] rounded-full border border-teal-300/35 animate-pulse" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-25 pointer-events-none">
+          <div className="w-[min(85vw,340px)] h-[min(85vw,340px)] sm:w-[500px] sm:h-[500px] rounded-full border border-cyan-400/35 animate-[spin_24s_linear_infinite]" />
+          <div className="absolute w-[min(62vw,240px)] h-[min(62vw,240px)] sm:w-[350px] sm:h-[350px] rounded-full border border-dashed border-blue-400/40 animate-[spin_16s_linear_infinite_reverse]" />
+          <div className="absolute w-[min(40vw,150px)] h-[min(40vw,150px)] sm:w-[210px] sm:h-[210px] rounded-full border border-teal-300/35 animate-pulse" />
         </div>
 
         {/* Interactive Click Ripples */}
@@ -134,19 +134,21 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       </div>
 
       {/* TOP TACTICAL FLIGHT STATUS (CLEAN, NO SECOND NUMBERS) */}
-      <div className="w-full max-w-5xl flex items-center justify-between text-xs font-mono relative z-10 px-2 shrink-0">
-        <div className="flex items-center gap-2 text-cyan-300">
-          <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span className="font-bold tracking-widest text-[11px] sm:text-xs">
+      <div className="w-full max-w-5xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono relative z-10 px-1 sm:px-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-cyan-300 min-w-0">
+          <Radio className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 animate-pulse shrink-0" />
+          <span className="font-bold tracking-wider sm:tracking-widest text-[10px] sm:text-xs truncate">
             NASA ORBITAL GATEWAY FLIGHT TELEMETRY
           </span>
         </div>
 
         {/* 3-Second Fluid Progress Bar (Visual time representation, strictly zero numerical second text) */}
-        <div className="flex items-center gap-2.5 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-[10px] text-slate-300 font-semibold tracking-wider">SYSTEM SYNCHRONIZING</span>
-          <div className="w-16 sm:w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-2.5 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] self-start sm:self-auto">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+            <span className="text-[9px] sm:text-[10px] text-slate-300 font-semibold tracking-wider whitespace-nowrap">SYSTEM SYNCHRONIZING</span>
+          </div>
+          <div className="w-16 sm:w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden shrink-0">
             <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 rounded-full animate-[progress_3s_ease-out_forwards]" />
           </div>
         </div>
@@ -209,12 +211,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         </div>
 
         {/* Energetic Typography Wordmark - Guaranteed Single Line */}
-        <div className="mt-6 space-y-2 w-full max-w-3xl px-2 text-center">
-          <h1 className="inline-flex items-center justify-center whitespace-nowrap flex-nowrap text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-none select-none mx-auto">
+        <div className="mt-5 sm:mt-6 space-y-2 w-full max-w-3xl px-1 sm:px-2 text-center">
+          <h1 className="inline-flex items-center justify-center whitespace-nowrap flex-nowrap text-[17px] min-[375px]:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-none select-none mx-auto">
             <span className="text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.4)] whitespace-nowrap">
               SPACE HEALTH
             </span>
-            <span className="ml-2 sm:ml-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] whitespace-nowrap">
+            <span className="ml-1.5 sm:ml-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] whitespace-nowrap">
               MONITO
             </span>
           </h1>
@@ -245,15 +247,15 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       </div>
 
       {/* BOTTOM ACTION BAR */}
-      <div className="relative z-10 w-full max-w-5xl flex items-center justify-between text-xs font-mono px-2 shrink-0 pt-2 pb-1">
-        <div className="text-[11px] text-slate-400 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400" />
+      <div className="relative z-10 w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs font-mono px-1 sm:px-2 shrink-0 pt-2 pb-1">
+        <div className="text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-2 text-center">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
           <span>Operational Ready · NASA Space Apps 2026</span>
         </div>
 
         <button
           onClick={handleSkip}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 hover:brightness-110 text-white font-extrabold transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] cursor-pointer text-xs active:scale-95 min-h-[44px]"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 hover:brightness-110 text-white font-extrabold transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] cursor-pointer text-xs active:scale-95 min-h-[44px]"
         >
           <span>Enter Mission Control</span>
           <ChevronRight className="w-4 h-4 text-white" />

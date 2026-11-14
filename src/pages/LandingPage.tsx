@@ -72,7 +72,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
   ];
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden text-slate-100 space-stars-bg">
+    <div className="min-h-[100dvh] w-full overflow-x-clip text-slate-100 space-stars-bg">
       
       {/* FULL-SCREEN CINEMATIC HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-36 border-b border-[#00E5FF]/20 bg-gradient-to-b from-[#050816] via-[#0B1224] to-[#050816]">
@@ -131,18 +131,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
               </div>
 
               {/* Quick Telemetry Footprint */}
-              <div className="pt-6 border-t border-slate-800/80 grid grid-cols-3 gap-4 max-w-lg font-mono text-xs">
+              <div className="pt-6 border-t border-slate-800/80 grid grid-cols-3 gap-2 sm:gap-4 max-w-lg font-mono text-xs">
                 <div>
-                  <div className="text-2xl font-bold text-white tabular-nums">12+</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Biosensors Tracked</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">12+</div>
+                  <div className="text-slate-400 text-[10px] sm:text-[11px] mt-0.5">Biosensors Tracked</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#00E5FF] tabular-nums">98.4%</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Normoxic SpO2 Target</div>
+                  <div className="text-xl sm:text-2xl font-bold text-[#00E5FF] tabular-nums">98.4%</div>
+                  <div className="text-slate-400 text-[10px] sm:text-[11px] mt-0.5">Normoxic SpO2 Target</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#21D4A5] tabular-nums">100%</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">NASA HRP Sourced</div>
+                  <div className="text-xl sm:text-2xl font-bold text-[#21D4A5] tabular-nums">100%</div>
+                  <div className="text-slate-400 text-[10px] sm:text-[11px] mt-0.5">NASA HRP Sourced</div>
                 </div>
               </div>
 
@@ -321,7 +321,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
                   SPACE HEALTH MONITO does not invent findings. Every threshold, risk assessment, and decision-support recommendation is anchored in peer-reviewed aerospace evidence from NASA HRP, OSDR, and the NASA Twins Study.
                 </p>
 
-                <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
                   <div className="flex items-center gap-2 text-slate-300">
                     <CheckCircle2 className="w-4 h-4 text-[#00E5FF] shrink-0" />
                     <span>NASA OSDR Studies (OSD-137)</span>
@@ -340,16 +340,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
                   </div>
                 </div>
 
-                <div className="mt-8 flex items-center gap-4">
+                <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
                   <button
                     onClick={() => onNavigate('overview')}
-                    className="px-5 py-3 bg-[#00E5FF] hover:bg-cyan-400 text-[#050816] font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md shadow-cyan-950 cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-3 bg-[#00E5FF] hover:bg-cyan-400 text-[#050816] font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md shadow-cyan-950 cursor-pointer"
                   >
                     Open Astronaut Dashboard
                   </button>
                   <button
                     onClick={() => onNavigate('research')}
-                    className="px-5 py-3 bg-[#0B1224] hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-3 bg-[#0B1224] hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
                   >
                     Explore Research Library
                   </button>
@@ -357,25 +357,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onOpenAuth
               </div>
 
               {/* Research Matrix Card */}
-              <div className="p-6 rounded-2xl bg-[#050816] border border-slate-800 space-y-3 font-mono text-xs">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-2 text-slate-400">
-                  <span>SCIENTIFIC EVIDENCE ENGINE</span>
-                  <span className="text-[#00E5FF]">HRP-V2026</span>
+              <div className="p-4 sm:p-6 rounded-2xl bg-[#050816] border border-slate-800 space-y-3 font-mono text-xs">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-2 text-slate-400 gap-2">
+                  <span className="truncate">SCIENTIFIC EVIDENCE ENGINE</span>
+                  <span className="text-[#00E5FF] shrink-0">HRP-V2026</span>
                 </div>
                 <div className="space-y-2 text-slate-300">
-                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex justify-between items-center">
+                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex flex-wrap justify-between items-center gap-1.5">
                     <span>Bone Density Target:</span>
                     <span className="text-[#21D4A5]">&lt; 1.0% loss/mo with ARED</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex justify-between items-center">
+                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex flex-wrap justify-between items-center gap-1.5">
                     <span>Artemis Permissible Radiation:</span>
                     <span className="text-[#FFB547]">250 mSv Mission Limit</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex justify-between items-center">
+                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex flex-wrap justify-between items-center gap-1.5">
                     <span>Circadian Lighting Protocol:</span>
                     <span className="text-[#00E5FF]">460nm Blue Enriched Light</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex justify-between items-center">
+                  <div className="p-2.5 rounded-lg bg-[#101B30]/50 border border-slate-800 flex flex-wrap justify-between items-center gap-1.5">
                     <span>Sleep Quality Target (PSQI):</span>
                     <span className="text-white">&ge; 85% Efficiency</span>
                   </div>

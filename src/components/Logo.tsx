@@ -8,13 +8,13 @@ interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showText = true }) => {
   const iconDimensions = {
-    sm: 'w-7 h-7',
+    sm: 'w-6 h-6 sm:w-7 sm:h-7',
     md: 'w-9 h-9',
     lg: 'w-12 h-12',
   }[size];
 
   return (
-    <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
+    <div className={`flex items-center gap-1.5 sm:gap-2.5 min-w-0 ${className}`}>
       <div className={`relative flex items-center justify-center ${iconDimensions} shrink-0`}>
         {/* Background glow & subtle disc */}
         <div className="absolute inset-0 rounded-full bg-cyan-500/10 border border-cyan-500/30" />
@@ -94,10 +94,10 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
       {showText && (
         <div className="flex flex-col select-none min-w-0">
           <div className="flex items-center flex-nowrap whitespace-nowrap gap-1 sm:gap-1.5 leading-none">
-            <span className="font-extrabold tracking-wide sm:tracking-wider text-white text-[11px] sm:text-base md:text-lg whitespace-nowrap">
+            <span className="font-extrabold tracking-tight sm:tracking-wider text-white text-[10px] min-[375px]:text-[11px] sm:text-base md:text-lg whitespace-nowrap">
               SPACE HEALTH
             </span>
-            <span className="font-bold tracking-wide sm:tracking-wider text-cyan-400 text-[11px] sm:text-base md:text-lg whitespace-nowrap">
+            <span className="font-bold tracking-tight sm:tracking-wider text-cyan-400 text-[10px] min-[375px]:text-[11px] sm:text-base md:text-lg whitespace-nowrap">
               MONITO
             </span>
           </div>

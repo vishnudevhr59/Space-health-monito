@@ -7,8 +7,22 @@
  * NASA Space Apps Challenge 2026
  */
 
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import WebSocket from 'ws';
+import { calculateEdgeReadinessScore, buildDtnTelemetryPacket } from '../src/utils/readinessScore';
+import { offlineSyncService } from '../src/services/offlineSyncService';
+import { mqttTopicMatches } from '../src/services/mqttClientService';
+import { telemetryStreamEngine } from '../src/services/telemetryStreamEngine';
+import { HealthMonitoringPage } from '../src/pages/HealthMonitoringPage';
+import { DashboardPage } from '../src/pages/DashboardPage';
+import { Navbar } from '../src/components/Navbar';
+import { MissionSimulationBar } from '../src/components/MissionSimulationBar';
+import { NOMINAL_HEALTH_STATE } from '../src/components/SimulationAnomalyPanel';
+
 const BASE_URL = 'http://127.0.0.1:3000';
 const ML_URL = 'http://127.0.0.1:5050';
+const WS_URL = 'ws://127.0.0.1:3000/ws/telemetry';
 
 interface TestResult {
   suite: string;
@@ -862,6 +876,248 @@ async function runTests() {
   }
 
   // -----------------------------------------------------------------
+  // SUITE 20: UNIT — EDGE MISSION READINESS & DTN SERIALIZATION
+  // -----------------------------------------------------------------
+  console.log('Running Suite 20: Unit Edge Readiness & DTN Serialization...');
+  try {
+    const greenEval = calculateEdgeReadinessScore({
+      heartRate: 58,
+      hrv: 68,
+      sleepHours: 7.5,
+      sleepEfficiency: 92,
+      skinTempC: 36.6,
+      baselineHrv: 65,
+      baselineRhr: 58,
+      baselineTempC: 36.6,
+    });
+    assert(greenEval.status === 'GREEN' && greenEval.readinessScore >= 90, 'Edge Readiness Unit', 'Optimal baseline evaluates to GREEN (90-100)');
+
+    const yellowEval = calculateEdgeReadinessScore({
+      heartRate: 72,
+      hrv: 52,
+      sleepHours: 6.2,
+      sleepEfficiency: 80,
+      skinTempC: 36.8,
+    });
+    assert(yellowEval.status === 'YELLOW' && yellowEval.readinessScore >= 60 && yellowEval.readinessScore < 80, 'Edge Readiness Unit', 'Moderate fatigue evaluates to YELLOW (60-79.9)');
+
+    const redEval = calculateEdgeReadinessScore({
+      heartRate: 118,
+      hrv: 20,
+      sleepHours: 4.0,
+      sleepEfficiency: 60,
+      skinTempC: 38.6,
+    });
+    assert(redEval.status === 'RED' && redEval.readinessScore < 60 && redEval.rhrScore === 0, 'Edge Readiness Unit', 'Critical excursion evaluates to RED with clamped lower bounds');
+
+    const dtnPacket = buildDtnTelemetryPacket({
+      astronautId: 'astro-1',
+      crewName: 'Sarah Chen',
+      mission: 'Artemis Gateway Expedition 04',
+      missionDay: 142,
+      locationModule: 'GATEWAY_HALO_01',
+      syncStatus: 'PENDING_DOWNLINK',
+      heartRate: 58,
+      hrv: 68,
+      spo2: 98.4,
+      respirationRpm: 14,
+      skinTempC: 36.6,
+      bloodGlucoseMgDl: 94,
+      sleepHours: 7.5,
+      sleepEfficiency: 92,
+      cabinCo2Ppm: 2100,
+      evaluation: greenEval,
+    });
+    assert(dtnPacket.sync_status === 'PENDING_DOWNLINK' && dtnPacket.edge_ai_output.readiness_factors.hrv.weight === '35%', 'DTN Serialization Unit', 'DTN packet serializes sync flag and weighted Readiness Factors');
+  } catch (err: any) {
+    assert(false, 'Edge Readiness Unit', 'Unit readiness test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 21: UNIT — DTN CRYPTO LEDGER & MQTT IOT PUB/SUB
+  // -----------------------------------------------------------------
+  console.log('Running Suite 21: Unit DTN Ledger & MQTT Topic Routing...');
+  try {
+    const d0 = offlineSyncService.calculateBackoffDelay(0);
+    const d2 = offlineSyncService.calculateBackoffDelay(2);
+    assert(d0 >= 1000 && d0 < 1500 && d2 >= 4000 && d2 < 4500, 'DTN Backoff Unit', 'Exponential backoff with jitter stays within calibrated bounds');
+
+    const sha = await offlineSyncService.computeSha256('dtn_bundle_integrity_check');
+    assert(sha.length === 64 && /^[0-9a-f]{64}$/.test(sha), 'DTN Crypto Unit', 'SHA-256 checksum outputs valid 64-character hex digest');
+
+    const b1 = await offlineSyncService.createLedgerBlock('TELEMETRY_BATCH', [{ hr: 64 }], 'Suite 21 Block');
+    const integrity = await offlineSyncService.verifyLedgerIntegrity();
+    assert(Boolean(b1.blockHash) && integrity.isValid === true, 'DTN Crypto Unit', 'Cryptographic ledger links block hashes and passes integrity audit');
+
+    assert(mqttTopicMatches('space/crew/+/vitals', 'space/crew/astro-1/vitals') && mqttTopicMatches('space/#', 'space/habitat/eclss/air'), 'MQTT Broker Unit', 'MQTT + and # wildcard topic filters match space habitat topics');
+    const mqttReceived: string[] = [];
+    const unsub = telemetryStreamEngine.subscribeTopic('space/crew/+/vitals', (m) => mqttReceived.push(m.topic));
+    telemetryStreamEngine.setActiveCrewId('astro-2');
+    unsub();
+    telemetryStreamEngine.setActiveCrewId('astro-1');
+    assert(mqttReceived.includes('space/crew/astro-2/vitals'), 'MQTT Broker Unit', 'Crew switch emits live MQTT vitals packet to topic subscribers');
+  } catch (err: any) {
+    assert(false, 'MQTT Broker Unit', 'DTN & MQTT unit test failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 22: COMPONENT — RESPONSIVE UI & LAYERING CONTRACTS
+  // -----------------------------------------------------------------
+  console.log('Running Suite 22: Component Responsive Layout & Layering...');
+  try {
+    const sampleAstro = {
+      id: 'astro-1',
+      userId: 'usr-1',
+      name: 'Sarah Chen',
+      callsign: 'Nova',
+      mission: 'Artemis Gateway Expedition 04',
+      destination: 'Lunar Orbital Gateway',
+      missionDay: 142,
+      totalDaysInSpace: 326,
+      bloodType: 'O-Positive',
+      age: 38,
+      heightCm: 172,
+      weightKg: 64.5,
+      baselineVitals: { restingHeartRate: 58, systolicBP: 114, diastolicBP: 72, spo2: 98.4, bodyTempC: 36.6, hrvMs: 65 },
+      radiationCumulativeMSv: 78.4,
+      radiationMissionLimitMSv: 250.0,
+      boneDensityLossRatePercentPerMonth: 0.85,
+      currentStatus: 'Nominal' as const,
+    };
+    const sampleMeas = [{
+      id: 'm-ssr-1',
+      astronautId: 'astro-1',
+      timestamp: new Date().toISOString(),
+      heartRate: 64,
+      spo2: 98.4,
+      bodyTemperature: 36.6,
+      bloodPressure: { systolic: 114, diastolic: 72 },
+      hrv: 64,
+      respiratoryRate: 14,
+      perfusionIndex: 3.8,
+      isSimulated: false,
+      dataQuality: 'High' as const,
+    }];
+    const monHtml = renderToString(React.createElement(HealthMonitoringPage, { astronaut: sampleAstro, telemetry: sampleMeas, sleepRecords: [], activityRecords: [] }));
+    assert(monHtml.includes('overflow-x-hidden') && monHtml.includes('Cabin Air Quality Node'), 'Responsive UI Component', 'HealthMonitoringPage renders overflow-x-hidden mobile stack and IoT hardware grid');
+
+    const dashHtml = renderToString(React.createElement(DashboardPage, {
+      astronaut: sampleAstro,
+      telemetry: sampleMeas,
+      sleepRecords: [],
+      activityRecords: [],
+      radiation: [],
+      alerts: [],
+      onRefreshTelemetry: () => {},
+      onLogMeasurement: () => {},
+      onNavigate: () => {},
+      anomalyState: NOMINAL_HEALTH_STATE,
+      onInjectAnomaly: () => {},
+      onResetNominal: () => {},
+      onSelectAstronaut: () => {},
+    }));
+    assert(dashHtml.includes('grid-cols-1 sm:grid-cols-2 lg:grid-cols-4') && dashHtml.includes('MQTT Topic Stream'), 'Responsive UI Component', 'Dashboard scales 1->2->4 metric grid and mounts MQTT subscriber panel');
+
+    const navHtml = renderToString(React.createElement(Navbar, {
+      currentTab: 'dashboard',
+      onSelectTab: () => {},
+      currentUser: { id: 'usr-1', email: 'sarah.chen@spacehealth.nasa.gov', fullName: 'CDR Sarah Chen', role: 'Astronaut', badgeNumber: 'EXP-72-CDR', assignedCrewId: 'astro-1' },
+      onOpenAuthModal: () => {},
+      onOpenProvenanceModal: () => {},
+      onOpenLogVitals: () => {},
+      onOpenEmergencyBeacon: () => {},
+      onSyncOffline: () => {},
+      activeAlertCount: 0,
+    }));
+    const simHtml = renderToString(React.createElement(MissionSimulationBar, { onNavigateTab: () => {} }));
+    assert(navHtml.includes('z-[70]') && navHtml.includes('min-w-0 shrink') && !simHtml.includes('sticky top-0') && simHtml.includes('relative z-20'), 'Responsive UI Component', 'Header z-[70] with shrink-safe layout and SimulationBar relative z-20 prevent dropdown slicing');
+  } catch (err: any) {
+    assert(false, 'Responsive UI Component', 'Component verification failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
+  // SUITE 23: INTEGRATION — LIVE WEBSOCKET /ws/telemetry STREAM
+  // -----------------------------------------------------------------
+  console.log('Running Suite 23: Integration Live WebSocket /ws/telemetry...');
+  try {
+    const wsResult = await new Promise<{ connected: boolean; gotFrame: boolean; updatedTarget: boolean }>((resolve) => {
+      const ws = new WebSocket(WS_URL);
+      let connected = false;
+      let gotFrame = false;
+      let updatedTarget = false;
+      const timer = setTimeout(() => {
+        try { ws.close(); } catch {}
+        resolve({ connected, gotFrame, updatedTarget });
+      }, 4000);
+
+      ws.on('open', () => {
+        connected = true;
+        ws.send(JSON.stringify({
+          type: 'telemetry:setTarget',
+          payload: {
+            heartRate: 108,
+            spo2: 95.5,
+            bodyTemperature: 37.2,
+            bloodPressure: { systolic: 132, diastolic: 84 },
+            hrv: 40,
+            respiratoryRate: 20,
+            cabinPressurePsi: 14.7,
+            cabinCo2MmHg: 2.5,
+            vestibularConflictScore: 3.0,
+            severity: 'WARNING',
+            anomalyName: 'WS Integration Probe',
+          },
+        }));
+      });
+
+      ws.on('message', (raw) => {
+        try {
+          const msg = JSON.parse(raw.toString());
+          if (msg?.type === 'telemetry:frame' && msg.frame) {
+            gotFrame = true;
+            if (msg.frame.anomalyName === 'WS Integration Probe') {
+              updatedTarget = true;
+              // Restore nominal state cleanly
+              ws.send(JSON.stringify({
+                type: 'telemetry:setTarget',
+                payload: {
+                  heartRate: 64,
+                  spo2: 98.4,
+                  bodyTemperature: 36.6,
+                  bloodPressure: { systolic: 114, diastolic: 72 },
+                  hrv: 64,
+                  respiratoryRate: 14,
+                  cabinPressurePsi: 14.7,
+                  cabinCo2MmHg: 2.2,
+                  vestibularConflictScore: 1.4,
+                  severity: 'NOMINAL',
+                  anomalyName: 'Nominal Operations',
+                },
+              }));
+              clearTimeout(timer);
+              setTimeout(() => {
+                try { ws.close(); } catch {}
+                resolve({ connected, gotFrame, updatedTarget });
+              }, 100);
+            }
+          }
+        } catch {}
+      });
+
+      ws.on('error', () => {
+        clearTimeout(timer);
+        resolve({ connected, gotFrame, updatedTarget });
+      });
+    });
+
+    assert(wsResult.connected, 'WebSocket Stream', 'Connects cleanly to ws://127.0.0.1:3000/ws/telemetry');
+    assert(wsResult.gotFrame, 'WebSocket Stream', 'Receives 1Hz server-authoritative telemetry:frame broadcast');
+    assert(wsResult.updatedTarget, 'WebSocket Stream', 'Propagates telemetry:setTarget anomaly injection and restores baseline');
+  } catch (err: any) {
+    assert(false, 'WebSocket Stream', 'WebSocket integration failure', err.message);
+  }
+
+  // -----------------------------------------------------------------
   // SUMMARY REPORT
   // -----------------------------------------------------------------
   console.log('\n===============================================================');
@@ -870,9 +1126,11 @@ async function runTests() {
   console.log(`TOTAL TESTS: ${results.length} | PASSED: ${passedCount} | FAILED: ${failedCount}`);
   console.log('===============================================================\n');
 
+  telemetryStreamEngine.stopStreaming();
   if (failedCount > 0) {
     process.exit(1);
   }
+  process.exit(0);
 }
 
 runTests();

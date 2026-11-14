@@ -124,10 +124,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onNavigate, current
   };
 
   return (
-    <div className="min-h-screen bg-[#05070d] text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#05070d] text-slate-100 flex flex-col justify-center py-10 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
       
       {/* Background radial glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[min(24rem,90vw)] h-[min(24rem,90vw)] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center mb-6">

@@ -74,7 +74,8 @@ const BACKOFF_CONFIG = {
 
 class OfflineSyncService {
   private listeners: ((state: OfflineSyncState) => void)[] = [];
-  private isOnline: boolean = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  private isOnline: boolean =
+    typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean' ? navigator.onLine : true;
   private currentStatus: SyncStatus = 'LIVE';
   private lastSyncTime: string | null = null;
   private consecutiveFailures: number = 0;
@@ -131,7 +132,7 @@ class OfflineSyncService {
     const queue = this.getQueue();
     const pendingItems = queue.filter((i) => i.status === 'PENDING' || i.status === 'SYNCING');
     const failedItems = queue.filter((i) => i.status === 'FAILED');
-    const isActuallyOnline = this.isOnline && !this.isOccultationSimulated;
+    const isActuallyOnline = Boolean(this.isOnline) && !this.isOccultationSimulated;
 
     let derivedStatus: SyncStatus = this.currentStatus;
 
