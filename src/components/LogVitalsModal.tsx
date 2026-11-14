@@ -84,8 +84,8 @@ export const LogVitalsModal: React.FC<LogVitalsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-[#0B1224] border border-[#00E5FF]/40 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,229,255,0.15)]">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="bg-[#0B1224] border border-[#00E5FF]/40 rounded-2xl w-full max-w-md max-h-[90dvh] overflow-y-auto shadow-[0_0_50px_rgba(0,229,255,0.15)]">
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-[#050816]">
           <div className="flex items-center gap-2">

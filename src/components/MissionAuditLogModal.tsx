@@ -45,7 +45,7 @@ export const MissionAuditLogModal: React.FC<MissionAuditLogModalProps> = ({
     : auditLog.filter((item) => item.severity === filterSeverity);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
       <div className="bg-[#070D1F] border-2 border-cyan-500/50 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-[0_0_60px_rgba(0,229,255,0.25)] overflow-hidden">
         
         {/* Header */}

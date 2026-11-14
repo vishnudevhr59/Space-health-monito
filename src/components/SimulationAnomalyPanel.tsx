@@ -180,7 +180,7 @@ export const SimulationAnomalyPanel: React.FC<SimulationAnomalyPanelProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-fadeIn">
       <div className="bg-[#070D1F] border-2 border-cyan-500/60 rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-[0_0_50px_rgba(0,229,255,0.25)] overflow-hidden">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-cyan-900/50 flex items-center justify-between bg-cyan-950/40 shrink-0">

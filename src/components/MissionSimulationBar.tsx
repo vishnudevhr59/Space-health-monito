@@ -252,7 +252,7 @@ export const MissionSimulationBar: React.FC<MissionSimulationBarProps> = ({ onNa
   const currentTourStage = GUIDED_TOUR_STAGES[currentTourStageIndex];
 
   return (
-    <div className="w-full bg-[#030718]/95 border-b border-cyan-900/50 text-slate-100 text-xs backdrop-blur-md sticky top-0 z-40 transition-all">
+    <div className="relative z-20 w-full bg-[#030718]/95 border-b border-cyan-900/50 text-slate-100 text-xs backdrop-blur-md transition-all overflow-x-hidden">
       {/* GUIDED TOUR ACTIVE STRIP */}
       {isGuidedTourActive && (
         <div className="bg-gradient-to-r from-cyan-950/90 via-[#0B1A36] to-cyan-950/90 border-b border-cyan-500/50 px-4 py-2">
@@ -346,11 +346,11 @@ export const MissionSimulationBar: React.FC<MissionSimulationBarProps> = ({ onNa
             </button>
           )}
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto max-w-full min-w-0">
             <select
               value={activeScenario}
               onChange={(e) => handleStart(e.target.value)}
-              className="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1 pr-7 appearance-none focus:outline-none focus:border-cyan-500 font-medium cursor-pointer"
+              className="w-full sm:w-auto max-w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1.5 pr-7 appearance-none focus:outline-none focus:border-cyan-500 font-medium cursor-pointer truncate"
             >
               <option value="SCENARIO_B">Scenario B: Gradual Health Deviation (Recommended)</option>
               <option value="SCENARIO_A">Scenario A: Normal Operations Baseline</option>

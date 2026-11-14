@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AstronautProfile,
   HealthMeasurement,
@@ -65,6 +65,8 @@ import { SolarStormShieldingEngine } from '../components/SolarStormShieldingEngi
 import { CrewBiometricMuxMatrix } from '../components/CrewBiometricMuxMatrix';
 import { HardwareDiagnosticSuite } from '../components/HardwareDiagnosticSuite';
 import { EdgeMissionReadinessCard } from '../components/EdgeMissionReadinessCard';
+import { MqttTopicSubscriberPanel } from '../components/MqttTopicSubscriberPanel';
+import { telemetryStreamEngine } from '../services/telemetryStreamEngine';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const cardFadeUp: Variants = {
@@ -133,6 +135,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [newTemp, setNewTemp] = useState(36.7);
   const [newSys, setNewSys] = useState(118);
   const [newDia, setNewDia] = useState(76);
+
+  useEffect(() => {
+    if (astronaut?.id) {
+      telemetryStreamEngine.setActiveCrewId(astronaut.id);
+    }
+  }, [astronaut?.id]);
 
   const latestVital = telemetry[telemetry.length - 1] || {
     heartRate: 64,
@@ -432,7 +440,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
         >
           
           {/* 1. Heart Rate - Dynamic Danger/Warning or Health Green */}
@@ -580,6 +588,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </motion.div>
 
         </motion.div>
+      </motion.div>
+
+      {/* REAL-TIME MQTT HABITAT & BIOMETRIC TOPIC SUBSCRIPTIONS */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.22 }}
+      >
+        <MqttTopicSubscriberPanel astronautId={astronaut.id} />
       </motion.div>
 
       {/* MISSION CONTROL WORKFLOW MODULE TABS */}
@@ -1039,8 +1056,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
       {/* LOG TELEMETRY MODAL */}
       {showLogModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div className="bg-[#101B30] border border-[#00E5FF]/40 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-[0_0_40px_rgba(0,229,255,0.25)]">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="bg-[#101B30] border border-[#00E5FF]/40 rounded-3xl p-6 sm:p-8 w-full max-w-md max-h-[90dvh] overflow-y-auto shadow-[0_0_40px_rgba(0,229,255,0.25)]">
             <h3 className="text-lg font-bold text-white mb-1">Log Astronaut Measurement</h3>
             <p className="text-xs text-slate-400 mb-5">
               Simulate real-time biosensor ingest to evaluate automated anomaly scoring and dashed baseline triggers.

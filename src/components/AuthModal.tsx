@@ -80,8 +80,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg bg-[#0b101f] border border-slate-700/80 rounded-2xl p-6 shadow-2xl text-slate-100">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-[#0b101f] border border-slate-700/80 rounded-2xl p-6 shadow-2xl text-slate-100">
         
         {/* Close Button */}
         <button

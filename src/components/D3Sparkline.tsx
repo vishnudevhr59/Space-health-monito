@@ -121,7 +121,8 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
 
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-auto overflow-hidden block"
+        preserveAspectRatio="xMidYMid meet"
+        className="w-full max-w-full h-auto overflow-hidden block"
         style={{ maxHeight: height }}
       >
         <defs>

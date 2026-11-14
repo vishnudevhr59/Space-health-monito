@@ -7,6 +7,7 @@
 import { AnomalyInjectionState, NOMINAL_HEALTH_STATE } from '../components/SimulationAnomalyPanel';
 import { voiceAlertService } from './voiceAlertService';
 import { missionAuditTrailService } from './missionAuditTrailService';
+import { mqttClientService, MqttBrokerStats, MqttMessage, MqttTopicCallback } from './mqttClientService';
 
 export interface TelemetryFrame {
   timestamp: string;
@@ -40,6 +41,7 @@ class TelemetryStreamEngine {
   private subscribers: Set<FrameSubscriber> = new Set();
   private tickCount: number = 0;
   private lastAlertSeverity: string = 'NOMINAL';
+  private activeCrewId: string = 'astro-1';
 
   constructor() {
     this.targetState = { ...NOMINAL_HEALTH_STATE };
@@ -61,8 +63,89 @@ class TelemetryStreamEngine {
       anomalyName: 'Nominal Operations',
     };
 
+    mqttClientService.connect();
+    this.publishMqttTopics(this.currentFrame);
     this.startStreaming();
     this.connectWebSocket();
+  }
+
+  public setActiveCrewId(crewId: string) {
+    if (crewId && crewId !== this.activeCrewId) {
+      this.activeCrewId = crewId;
+      this.publishMqttTopics(this.currentFrame);
+    }
+  }
+
+  public subscribeTopic<T = Record<string, unknown>>(
+    topicFilter: string,
+    callback: MqttTopicCallback<T>
+  ): () => void {
+    return mqttClientService.subscribe<T>(topicFilter, callback);
+  }
+
+  public getMqttBrokerStats(): MqttBrokerStats {
+    return mqttClientService.getStats();
+  }
+
+  public subscribeMqttStats(listener: (stats: MqttBrokerStats) => void): () => void {
+    return mqttClientService.subscribeStats(listener);
+  }
+
+  public getRecentMqttMessages(topicFilter?: string, limit: number = 12): MqttMessage<any>[] {
+    return mqttClientService.getRecentPackets(topicFilter, limit);
+  }
+
+  private publishMqttTopics(frame: TelemetryFrame) {
+    const crewId = this.activeCrewId || 'astro-1';
+    const co2Ppm = Math.round((frame.cabinCo2MmHg / 760) * 1_000_000);
+    const cgmGlucoseMgDl = Math.round(96 + Math.sin(this.tickCount * 0.15) * 3.5 + (frame.heartRate > 95 ? 8 : 0));
+    const doseRateMicroSvHr = +(0.34 + (frame.severity === 'CRITICAL' ? 0.65 : frame.severity === 'WARNING' ? 0.22 : 0.09)).toFixed(2);
+
+    mqttClientService.publish(
+      `space/crew/${crewId}/vitals`,
+      {
+        heartRate: frame.heartRate,
+        spo2: frame.spo2,
+        bp: `${frame.systolicBP}/${frame.diastolicBP}`,
+        coreTempC: frame.bodyTemperature,
+        hrvMs: frame.hrv,
+        respRate: frame.respiratoryRate,
+      },
+      { qos: 1, retain: true }
+    );
+
+    mqttClientService.publish(
+      `space/crew/${crewId}/metabolic`,
+      {
+        glucoseMgDl: cgmGlucoseMgDl,
+        trend: frame.heartRate > 95 ? 'RISING' : 'STEADY',
+        sensorSource: 'Suite-Ride-CGM',
+      },
+      { qos: 1, retain: true }
+    );
+
+    mqttClientService.publish(
+      'space/habitat/eclss/air',
+      {
+        pressurePsi: frame.cabinPressurePsi,
+        co2MmHg: frame.cabinCo2MmHg,
+        co2Ppm,
+        o2Percent: frame.eclssOgaPercent,
+        vocPpb: 68,
+      },
+      { qos: 1, retain: true }
+    );
+
+    mqttClientService.publish(
+      'space/habitat/cpds/radiation',
+      {
+        doseMicroSvHr: doseRateMicroSvHr,
+        trishRecovery: frame.trishRecoveryScore,
+        vestibularScore: frame.vestibularConflictScore,
+        severity: frame.severity,
+      },
+      { qos: 1, retain: true }
+    );
   }
 
   public getTransportMode(): TelemetryTransportMode {
@@ -88,6 +171,7 @@ class TelemetryStreamEngine {
           const msg = JSON.parse(event.data);
           if (msg?.type === 'telemetry:frame' && msg.frame) {
             this.currentFrame = msg.frame;
+            this.publishMqttTopics(this.currentFrame);
             this.subscribers.forEach((sub) => sub({ ...this.currentFrame }));
           }
         } catch {
@@ -279,6 +363,8 @@ class TelemetryStreamEngine {
       );
     }
     this.lastAlertSeverity = liveSeverity;
+
+    this.publishMqttTopics(this.currentFrame);
 
     // Notify all subscribers (Gauges, HUDs, Tickers)
     this.subscribers.forEach((sub) => sub({ ...this.currentFrame }));

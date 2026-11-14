@@ -68,6 +68,17 @@ export const Navbar: React.FC<NavbarProps> = ({
     return voiceAlertService.subscribe((enabled) => setVoiceEnabled(enabled));
   }, []);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsQuickActionOpen(false);
+        setIsStationMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const STATIONS = [
     { id: 'gateway', name: 'NASA Gateway (NRHO)', orbit: 'Near-Rectilinear Halo Orbit · 384,400 km', status: 'Optimal' },
     { id: 'artemis3', name: 'Artemis III Basecamp', orbit: 'Lunar South Pole · Shackleton Crater', status: 'Nominal' },
@@ -92,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   // When collapsed, render ultra-sleek immersive micro-bar
   if (isHeaderCollapsed) {
     return (
-      <header className="sticky top-0 z-40 w-full bg-[#050816]/95 backdrop-blur-xl border-b border-[#00E5FF]/20 shadow-[0_2px_15px_rgba(0,0,0,0.6)] select-none">
+      <header className="sticky top-0 z-[60] w-full bg-[#050816]/95 backdrop-blur-xl border-b border-[#00E5FF]/20 shadow-[0_2px_15px_rgba(0,0,0,0.6)] select-none">
         <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-2 text-xs">
           {/* Left mini brand + tap to reveal */}
           <div className="flex items-center gap-2 min-w-0">
@@ -141,7 +152,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#050816]/98 backdrop-blur-2xl border-b border-[#00E5FF]/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)] select-none transition-all duration-300">
+    <header className="sticky top-0 z-[60] w-full bg-[#050816]/98 backdrop-blur-2xl border-b border-[#00E5FF]/20 shadow-[0_4px_30px_rgba(0,0,0,0.7)] select-none transition-all duration-300">
+      {(isStationMenuOpen || isQuickActionOpen) && (
+        <div
+          className="fixed inset-0 z-[65] bg-black/30 backdrop-blur-[1px]"
+          onClick={() => {
+            setIsStationMenuOpen(false);
+            setIsQuickActionOpen(false);
+          }}
+          aria-hidden="true"
+        />
+      )}
       
       {/* 1. TOP FLIPKART-STYLE MISSION LOCATION & HABITAT SELECTOR BAR */}
       <div className="w-full bg-[#030612] border-b border-slate-800/80 px-3 sm:px-6 py-1 flex items-center justify-between text-[11px] font-mono">
@@ -149,7 +170,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
           <span className="text-slate-400 hidden sm:inline">Station:</span>
           <button
-            onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
+            onClick={() => {
+              setIsQuickActionOpen(false);
+              setIsStationMenuOpen(!isStationMenuOpen);
+            }}
             className="flex items-center gap-1 text-cyan-300 hover:text-cyan-100 font-bold truncate max-w-[180px] sm:max-w-none cursor-pointer"
             title="Change active mission station"
           >
@@ -159,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Station dropdown */}
           {isStationMenuOpen && (
-            <div className="absolute top-6 left-0 w-72 rounded-xl bg-[#091122] border border-cyan-500/40 shadow-2xl p-2 z-50 text-xs font-mono space-y-1">
+            <div className="absolute top-6 left-0 w-72 max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-130px)] overflow-y-auto rounded-xl bg-[#091122] border border-cyan-500/40 shadow-2xl p-2 z-[70] text-xs font-mono space-y-1">
               <div className="text-[10px] uppercase font-bold text-slate-400 px-2 py-1 border-b border-slate-800">
                 Select Telemetry Station
               </div>
@@ -206,7 +230,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* Left: Brand Wordmark (Single Line) */}
         <button
-          onClick={() => onSelectTab('dashboard')}
+          onClick={() => {
+            setIsQuickActionOpen(false);
+            setIsStationMenuOpen(false);
+            onSelectTab('dashboard');
+          }}
           className="flex items-center text-left transition-opacity hover:opacity-95 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] rounded-xl min-w-0"
           title="Return to Mission Dashboard"
         >
@@ -224,7 +252,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right: Controls + NASA Uplink + Astronaut Profile (100% visible on all devices) */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
           
           {/* DSN Connection Status Badge */}
           <div className="hidden sm:block">
@@ -233,8 +261,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* NASA Ground Uplink Button */}
           <button
-            onClick={() => onSelectTab('ground-uplink')}
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-950 to-teal-950 hover:bg-emerald-900 border border-emerald-500/50 text-[10px] sm:text-xs font-mono text-emerald-300 transition-all cursor-pointer shadow-sm hover:border-emerald-400 active:scale-95 min-h-[34px] sm:min-h-[38px] shrink-0"
+            onClick={() => {
+              setIsQuickActionOpen(false);
+              setIsStationMenuOpen(false);
+              onSelectTab('ground-uplink');
+            }}
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-950 to-teal-950 hover:bg-emerald-900 border border-emerald-500/50 text-[10px] sm:text-xs font-mono text-emerald-300 transition-all cursor-pointer shadow-sm hover:border-emerald-400 active:scale-95 min-h-[34px] sm:min-h-[38px] shrink-0"
             title="Send Real-Time Health Reports to NASA Flight Surgeon Team (Houston, USA)"
           >
             <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 animate-pulse shrink-0" />
@@ -254,7 +286,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* User Profile and Astronaut Role Pill (Guaranteed 100% visible on all devices) */}
           <button
             onClick={onOpenAuthModal}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#00E5FF]/40 bg-[#0F1B30] hover:bg-[#152542] text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] min-h-[34px] sm:min-h-[38px]"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-[#00E5FF]/40 bg-[#0F1B30] hover:bg-[#152542] text-xs font-medium text-slate-200 transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-sm hover:border-[#00E5FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] min-h-[34px] sm:min-h-[38px]"
             title="Inspect Astronaut Profile & Role-Based Access"
             aria-label="Astronaut Profile"
           >
@@ -272,7 +304,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* QUICK ACTION DROPDOWN MENU */}
           <div className="relative">
             <button
-              onClick={() => setIsQuickActionOpen(!isQuickActionOpen)}
+              onClick={() => {
+                setIsStationMenuOpen(false);
+                setIsQuickActionOpen(!isQuickActionOpen);
+              }}
               className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-950/20 hover:bg-amber-900/30 text-xs font-medium text-amber-300 transition-all cursor-pointer shadow-sm hover:border-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 min-h-[34px] sm:min-h-[38px] active:scale-95 shrink-0"
               title="Quick Mission Actions"
               aria-label="Quick Mission Actions"
@@ -282,7 +317,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {isQuickActionOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#0B1224] border border-amber-500/40 shadow-2xl p-2 z-50 text-xs font-mono space-y-1.5 animate-fadeIn">
+              <div className="absolute right-0 mt-2 w-64 sm:w-72 max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-135px)] overflow-y-auto rounded-2xl bg-[#0B1224] border border-amber-500/40 shadow-2xl p-2 z-[70] text-xs font-mono space-y-1.5 animate-fadeIn">
                 <button
                   onClick={() => {
                     onSelectTab('ground-uplink');
@@ -426,7 +461,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             return (
               <button
                 key={cat.id}
-                onClick={() => onSelectTab(cat.id)}
+                onClick={() => {
+                  setIsQuickActionOpen(false);
+                  setIsStationMenuOpen(false);
+                  onSelectTab(cat.id);
+                }}
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-950 to-blue-950 text-cyan-300 border border-cyan-400 shadow-[0_0_10px_rgba(0,229,255,0.2)] font-bold'

@@ -22,6 +22,7 @@ import {
   Radio,
 } from 'lucide-react';
 import { AstronautDigitalTwin } from '../components/AstronautDigitalTwin';
+import { IotEdgeHardwareGrid } from '../components/IotEdgeHardwareGrid';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -251,7 +252,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
   };
 
   return (
-    <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6 overflow-x-hidden">
+    <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6 overflow-x-hidden box-border">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5 min-w-0">
         <div className="min-w-0">
@@ -269,38 +270,38 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
 
         {/* View Mode & Date Selector */}
         <div className="flex flex-wrap items-center gap-2 text-xs font-mono w-full md:w-auto min-w-0">
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 bg-[#050816] p-1 rounded-xl border border-cyan-500/30 w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:inline-flex items-center gap-1 bg-[#050816] p-1 rounded-xl border border-cyan-500/30 w-full sm:w-auto min-w-0">
             <button
               onClick={() => setViewMode('telemetry')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[38px] min-w-0 ${
                 viewMode === 'telemetry'
                   ? 'bg-cyan-600 text-white font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Activity className="w-3.5 h-3.5 shrink-0" />
-              <span>Sensors &amp; Trends</span>
+              <span className="truncate">Sensors &amp; Trends</span>
             </button>
             <button
               onClick={() => setViewMode('digital-twin')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[36px] whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer min-h-[38px] min-w-0 ${
                 viewMode === 'digital-twin'
                   ? 'bg-cyan-600 text-white font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-              <span>Digital Twin Model</span>
+              <span className="truncate">Digital Twin</span>
             </button>
           </div>
 
           {viewMode === 'telemetry' && (
-            <div className="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="grid grid-cols-4 sm:inline-flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 w-full sm:w-auto min-w-0">
               {(['24h', '7d', '14d', '30d'] as const).map((rng) => (
                 <button
                   key={rng}
                   onClick={() => setSelectedRange(rng)}
-                  className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg uppercase transition-colors cursor-pointer min-h-[36px] whitespace-nowrap ${
+                  className={`px-2 sm:px-3 py-1.5 rounded-lg uppercase transition-colors cursor-pointer min-h-[38px] text-center truncate ${
                     selectedRange === rng
                       ? 'bg-cyan-600 text-white font-bold'
                       : 'text-slate-400 hover:text-white'
@@ -369,7 +370,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
                 <button
                   key={ch.id}
                   onClick={() => setActiveFilter(ch.id as 'all' | 'cardiac' | 'respiratory' | 'thermal')}
-                  className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-medium whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                  className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-medium max-w-full truncate transition-all cursor-pointer ${
                     activeFilter === ch.id
                       ? 'bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF]/50 shadow-[0_0_12px_rgba(0,229,255,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
@@ -438,22 +439,22 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
               </span>
             </div>
 
-            <div className="w-full h-[250px] sm:h-[320px] min-w-0 overflow-hidden">
+            <div className="w-full max-w-full h-[240px] sm:h-[320px] min-w-0 overflow-hidden">
               <ResponsiveContainer
                 width="100%"
                 height="100%"
                 minWidth={0}
                 minHeight={220}
-                initialDimension={{ width: 320, height: 250 }}
+                initialDimension={{ width: 240, height: 240 }}
               >
-                <ComposedChart data={chartSeries} margin={{ top: 12, right: 4, left: -4, bottom: 5 }}>
+                <ComposedChart data={chartSeries} margin={{ top: 10, right: 2, left: -10, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" opacity={0.6} />
                   <XAxis dataKey="date" stroke="#64748B" fontSize={10} minTickGap={22} />
 
                   {/* Left Axis: Heart Rate & BP */}
                   <YAxis
                     yAxisId="left"
-                    width={34}
+                    width={32}
                     domain={[30, 145]}
                     stroke="#00E5FF"
                     fontSize={10}
@@ -481,7 +482,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
                       color: '#FFFFFF',
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', maxWidth: '100%' }} />
 
                   {(activeFilter === 'all' || activeFilter === 'cardiac') && (
                     <Line
@@ -828,6 +829,14 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
               </div>
             </div>
           </div>
+
+          {/* SPACE IOT MESH, PROTOCOL PACKET INSPECTOR (MQTT/WS vs DTN) & HARDWARE DIAGNOSTICS */}
+          <IotEdgeHardwareGrid
+            astronautId={astronaut?.id || 'astro-1'}
+            latestFrame={latestFrame}
+            transportMode={transportMode}
+            orbitalSnapshot={orbitalSnapshot}
+          />
 
           {/* COLLAPSIBLE RAW BIOSENSOR INGEST PACKET AUDIT */}
           {showRawTable && (

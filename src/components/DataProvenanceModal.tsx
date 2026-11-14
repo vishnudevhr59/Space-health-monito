@@ -64,7 +64,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({ isOpen
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#0B1224] border border-[#00E5FF]/40 rounded-3xl shadow-[0_0_50px_rgba(0,229,255,0.2)] overflow-hidden flex flex-col">
         
         {/* HEADER */}

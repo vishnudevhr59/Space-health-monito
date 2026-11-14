@@ -14,7 +14,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
   }[size];
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
       <div className={`relative flex items-center justify-center ${iconDimensions} shrink-0`}>
         {/* Background glow & subtle disc */}
         <div className="absolute inset-0 rounded-full bg-cyan-500/10 border border-cyan-500/30" />
@@ -93,11 +93,11 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showTex
 
       {showText && (
         <div className="flex flex-col select-none min-w-0">
-          <div className="flex items-center flex-nowrap whitespace-nowrap gap-1.5 leading-none">
-            <span className="font-extrabold tracking-wider text-white text-xs sm:text-base md:text-lg whitespace-nowrap">
+          <div className="flex items-center flex-nowrap whitespace-nowrap gap-1 sm:gap-1.5 leading-none">
+            <span className="font-extrabold tracking-wide sm:tracking-wider text-white text-[11px] sm:text-base md:text-lg whitespace-nowrap">
               SPACE HEALTH
             </span>
-            <span className="font-bold tracking-wider text-cyan-400 text-xs sm:text-base md:text-lg whitespace-nowrap">
+            <span className="font-bold tracking-wide sm:tracking-wider text-cyan-400 text-[11px] sm:text-base md:text-lg whitespace-nowrap">
               MONITO
             </span>
           </div>

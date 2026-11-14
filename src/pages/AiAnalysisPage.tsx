@@ -874,8 +874,8 @@ export const AiAnalysisPage: React.FC<AiAnalysisPageProps> = ({
         </div>
       </div>
       {selectedRawObservation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-xl p-6 rounded-2xl bg-[#0B1224] border border-[#00E5FF]/40 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-xl max-h-[90dvh] overflow-y-auto p-6 rounded-2xl bg-[#0B1224] border border-[#00E5FF]/40 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <h4 className="text-sm font-bold font-mono text-white flex items-center gap-2">
                 <Database className="w-4 h-4 text-[#00E5FF]" />

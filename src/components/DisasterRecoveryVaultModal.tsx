@@ -83,7 +83,7 @@ export const DisasterRecoveryVaultModal: React.FC<DisasterRecoveryVaultModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#0B1221] border border-[#00E5FF]/30 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden text-slate-100 font-mono">
         
         {/* MODAL HEADER */}

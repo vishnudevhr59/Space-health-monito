@@ -87,7 +87,7 @@ export const EmergencyBeaconModal: React.FC<EmergencyBeaconModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
       <div className="bg-[#0B1224] border-2 border-rose-500/80 rounded-2xl w-full max-w-xl overflow-hidden shadow-[0_0_60px_rgba(255,83,104,0.35)] flex flex-col max-h-[92vh]">
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-rose-900/60 flex items-center justify-between bg-rose-950/50 shrink-0">

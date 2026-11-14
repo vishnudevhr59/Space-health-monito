@@ -774,7 +774,7 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
           
           {/* FLOATING AUTOCOMPLETE DROPDOWN (appears when user focuses or types in search input) */}
           {isInputFocused && (
-            <div className="absolute bottom-full left-4 right-4 mb-2 bg-[#0B1224] border border-slate-700 rounded-3xl shadow-[0_-10px_35px_rgba(0,0,0,0.8)] overflow-hidden z-50 text-xs font-sans max-h-80 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-150">
+            <div className="absolute bottom-full left-2 right-2 sm:left-4 sm:right-4 mb-2 bg-[#0B1224] border border-slate-700 rounded-3xl shadow-[0_-10px_35px_rgba(0,0,0,0.8)] overflow-hidden z-[55] text-xs font-sans max-h-72 sm:max-h-80 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-150">
               
               {/* RECENT SEARCHES (with Clock icon 🕒 and delete button ✕) */}
               {searchHistory.length > 0 && (
@@ -905,7 +905,7 @@ Commander **${astronaut.name}**, your query (*"${query}"*) has been evaluated ag
             </button>
           </form>
 
-          <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-slate-500">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-slate-500">
             <span>Powered by Gemini 3.8 Flash &bull; Real-Time Search & Autocomplete</span>
             <span className="text-[#00E5FF]">NASA HRP Evidence Grounded</span>
           </div>

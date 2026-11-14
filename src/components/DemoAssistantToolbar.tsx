@@ -298,20 +298,20 @@ export const DemoAssistantToolbar: React.FC<DemoAssistantToolbarProps> = ({
   ];
 
   return (
-    <div className="fixed bottom-20 right-3 sm:right-6 z-40 select-none font-sans">
+    <div className={`fixed bottom-[72px] sm:bottom-20 right-2.5 sm:right-6 select-none font-sans ${isExpanded ? 'z-[75]' : 'z-30'}`}>
       {/* FLOATING COLLAPSED BADGE / TOGGLE TRIGGER */}
       {!isExpanded ? (
         <button
           onClick={() => setIsExpanded(true)}
-          className="flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 rounded-2xl bg-[#09152B]/95 hover:bg-[#0E2042] border-2 border-[#00E5FF] text-white shadow-[0_0_25px_rgba(0,229,255,0.4)] backdrop-blur-xl transition-all cursor-pointer hover:scale-105 active:scale-95 group focus-visible:ring-2 focus-visible:ring-[#00E5FF] focus-visible:outline-none min-h-[44px]"
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-[#09152B]/95 hover:bg-[#0E2042] border-2 border-[#00E5FF] text-white shadow-[0_0_25px_rgba(0,229,255,0.4)] backdrop-blur-xl transition-all cursor-pointer hover:scale-105 active:scale-95 group focus-visible:ring-2 focus-visible:ring-[#00E5FF] focus-visible:outline-none min-h-[40px] sm:min-h-[44px]"
           title="Open Hackathon Demo Assistant Suite"
         >
-          <span className="relative flex h-3 w-3">
+          <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00E5FF]" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-[#00E5FF]" />
           </span>
           <div className="flex flex-col text-left">
-            <span className="text-xs font-black tracking-wider text-[#00E5FF] uppercase font-mono leading-none">
+            <span className="text-[11px] sm:text-xs font-black tracking-wider text-[#00E5FF] uppercase font-mono leading-none">
               DEMO ASSISTANT
             </span>
             <span className="text-[10px] text-slate-300 font-mono hidden sm:inline leading-tight mt-0.5">
@@ -322,7 +322,7 @@ export const DemoAssistantToolbar: React.FC<DemoAssistantToolbarProps> = ({
         </button>
       ) : (
         /* EXPANDED HIGH-CONTRAST MISSION DEMO CONTROL CONSOLE */
-        <div className="w-[92vw] sm:w-[420px] rounded-3xl bg-[#050B1B]/98 border-2 border-[#00E5FF] shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_30px_rgba(0,229,255,0.25)] backdrop-blur-2xl p-4 sm:p-5 text-slate-100 flex flex-col gap-3.5 transition-all animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="w-[calc(100vw-1.25rem)] sm:w-[420px] max-h-[calc(100dvh-110px)] overflow-y-auto rounded-3xl bg-[#050B1B]/98 border-2 border-[#00E5FF] shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_30px_rgba(0,229,255,0.25)] backdrop-blur-2xl p-4 sm:p-5 text-slate-100 flex flex-col gap-3.5 transition-all animate-in fade-in slide-in-from-bottom-4 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
             <div className="flex items-center gap-2">
