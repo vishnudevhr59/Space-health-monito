@@ -509,12 +509,14 @@ export default function App() {
         </main>
       </div>
 
-      {/* PERMANENT TOP-TIER PRODUCTION 5-CORE BOTTOM NAVIGATION BAR */}
-      <BottomNavBar
-        currentTab={currentTab}
-        onSelectTab={setCurrentTab}
-        activeAlertCount={activeAlertCount}
-      />
+      {/* PERMANENT TOP-TIER PRODUCTION 5-CORE BOTTOM NAVIGATION BAR (HIDDEN DURING SPLASH) */}
+      {!showSplash && (
+        <BottomNavBar
+          currentTab={currentTab}
+          onSelectTab={setCurrentTab}
+          activeAlertCount={activeAlertCount}
+        />
+      )}
 
       {/* RBAC AUTHENTICATION & QUICK DEMO ROLE SWITCHER MODAL */}
       <AuthModal
@@ -567,17 +569,19 @@ export default function App() {
         onClose={() => setIsVaultModalOpen(false)}
       />
 
-      {/* HACKATHON DEMO ASSISTANT & QUICK-CHECK SCRIPT SUITE */}
-      <DemoAssistantToolbar
-        currentTab={currentTab}
-        onNavigateTab={(tab) => setCurrentTab(tab)}
-        astronaut={astronaut}
-        telemetry={telemetry}
-        sleepRecords={sleepRecords}
-        activityRecords={activityRecords}
-        radiation={radiation}
-        alerts={alerts}
-      />
+      {/* HACKATHON DEMO ASSISTANT & QUICK-CHECK SCRIPT SUITE (HIDDEN DURING SPLASH) */}
+      {!showSplash && (
+        <DemoAssistantToolbar
+          currentTab={currentTab}
+          onNavigateTab={(tab) => setCurrentTab(tab)}
+          astronaut={astronaut}
+          telemetry={telemetry}
+          sleepRecords={sleepRecords}
+          activityRecords={activityRecords}
+          radiation={radiation}
+          alerts={alerts}
+        />
+      )}
 
     </div>
   );

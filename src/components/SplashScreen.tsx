@@ -57,7 +57,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   return (
     <div
       onClick={handleInteractiveClick}
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-between p-4 sm:p-8 bg-[#020617] overflow-hidden select-none transition-all duration-500 ease-out h-[100dvh] w-full cursor-pointer ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-between p-4 sm:p-8 bg-[#020617] overflow-hidden select-none transition-all duration-500 ease-out h-[100dvh] w-full cursor-pointer ${
         animationStage === 'exit' ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
       aria-label="Space Health Monito Launch Screen"
