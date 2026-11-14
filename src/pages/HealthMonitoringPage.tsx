@@ -22,6 +22,10 @@ import {
   TrendingUp,
   BarChart2,
   ShieldCheck,
+  Sliders,
+  Info,
+  X,
+  Cpu,
 } from 'lucide-react';
 import { AstronautDigitalTwin } from '../components/AstronautDigitalTwin';
 import {
@@ -55,6 +59,7 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
   const [activeFilter, setActiveFilter] = useState<'all' | 'cardiac' | 'respiratory' | 'thermal' | 'activity'>('all');
   const [searchDate, setSearchDate] = useState('');
   const [showRawTable, setShowRawTable] = useState(false);
+  const [activeRowFactorsId, setActiveRowFactorsId] = useState<string | null>(null);
 
   // 1Hz Real-Time Streaming Buffer (Rolling 50 frames)
   const [liveStreamFrames, setLiveStreamFrames] = useState<TelemetryFrame[]>(() => [
@@ -700,24 +705,147 @@ export const HealthMonitoringPage: React.FC<HealthMonitoringPageProps> = ({
                   <th className="py-3 px-4">Core Temp</th>
                   <th className="py-3 px-4">HRV (RMSSD)</th>
                   <th className="py-3 px-4">Data Quality</th>
+                  <th className="py-3 px-4 text-right">Edge AI Readiness</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-slate-300 bg-[#101B30]/50">
-                {filteredTelemetry.slice(-10).reverse().map((m) => (
-                  <tr key={m.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3 px-4 font-semibold text-white">
-                      {new Date(m.timestamp).toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4 font-bold text-[#00E5FF] tabular-nums">{m.heartRate} BPM</td>
-                    <td className="py-3 px-4 text-sky-400 tabular-nums">{m.spo2}%</td>
-                    <td className="py-3 px-4 tabular-nums">{m.bloodPressure.systolic}/{m.bloodPressure.diastolic} mmHg</td>
-                    <td className="py-3 px-4 tabular-nums">{m.bodyTemperature} °C</td>
-                    <td className="py-3 px-4 tabular-nums">{m.hrv} ms</td>
-                    <td className="py-3 px-4">
-                      <span className="text-[#21D4A5] font-bold">{m.dataQuality}</span>
-                    </td>
-                  </tr>
-                ))}
+                {filteredTelemetry.slice(-10).reverse().map((m) => {
+                  const baselineHrv = astronaut.baselineVitals?.hrvMs || 65;
+                  const baselineRhr = astronaut.baselineVitals?.restingHeartRate || 58;
+                  const baselineTemp = astronaut.baselineVitals?.bodyTempC || 36.6;
+
+                  const hrvRatio = Math.min((m.hrv || 64) / baselineHrv, 1.15);
+                  const hrvScore = Math.min((hrvRatio / 1.0) * 100, 100);
+
+                  const rhrDiff = (m.heartRate || 60) - baselineRhr;
+                  const rhrScore = Math.max(0, Math.min(100, 100 - rhrDiff * 4));
+
+                  const sleepScore = Math.min(7.2 / 7.5, 1.0) * 88;
+                  const tempDiff = Math.abs((m.bodyTemperature || 36.6) - baselineTemp);
+                  const tempScore = Math.max(0, 100 - tempDiff * 60);
+
+                  const total = hrvScore * 0.35 + rhrScore * 0.25 + sleepScore * 0.25 + tempScore * 0.15;
+                  const readinessScore = Math.round(total * 10) / 10;
+                  const readinessStatus = readinessScore >= 80 ? 'GREEN' : readinessScore >= 60 ? 'YELLOW' : 'RED';
+                  const isExpanded = activeRowFactorsId === m.id;
+
+                  const whyExplanation =
+                    readinessStatus === 'GREEN'
+                      ? `Readiness is optimal (${readinessScore}/100, GREEN) because HRV (${m.hrv} ms) and resting heart rate (${m.heartRate} bpm) match baseline with zero cardiovascular compensation.`
+                      : readinessStatus === 'YELLOW'
+                      ? `Readiness is moderated (${readinessScore}/100, YELLOW) driven by ${rhrDiff > 0 ? `elevated heart rate (+${rhrDiff} bpm)` : 'depressed autonomic HRV recovery'}.`
+                      : `Readiness is critical (${readinessScore}/100, RED) due to acute cardiorespiratory excursion.`;
+
+                  return (
+                    <React.Fragment key={m.id}>
+                      <tr className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-white">
+                          {new Date(m.timestamp).toLocaleString()}
+                        </td>
+                        <td className="py-3 px-4 font-bold text-[#00E5FF] tabular-nums">{m.heartRate} BPM</td>
+                        <td className="py-3 px-4 text-sky-400 tabular-nums">{m.spo2}%</td>
+                        <td className="py-3 px-4 tabular-nums">{m.bloodPressure.systolic}/{m.bloodPressure.diastolic} mmHg</td>
+                        <td className="py-3 px-4 tabular-nums">{m.bodyTemperature} °C</td>
+                        <td className="py-3 px-4 tabular-nums">{m.hrv} ms</td>
+                        <td className="py-3 px-4">
+                          <span className="text-[#21D4A5] font-bold">{m.dataQuality}</span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            onClick={() => setActiveRowFactorsId(isExpanded ? null : m.id)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer shadow-sm ${
+                              readinessStatus === 'GREEN'
+                                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/80'
+                                : readinessStatus === 'YELLOW'
+                                ? 'bg-amber-950/60 text-amber-300 border-amber-500/40 hover:bg-amber-900/80'
+                                : 'bg-rose-950/60 text-rose-300 border-rose-500/40 hover:bg-rose-900/80'
+                            }`}
+                            title="Click to view weighted Readiness Factors breakdown"
+                          >
+                            <Sliders className="w-3 h-3" />
+                            <span>{readinessScore}</span>
+                            <span className="text-[9px] uppercase">({readinessStatus})</span>
+                            <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Expandable Readiness Factors Breakdown Row */}
+                      {isExpanded && (
+                        <tr className="bg-[#050C1B] border-b border-cyan-500/30">
+                          <td colSpan={8} className="p-4">
+                            <div className="rounded-xl bg-[#091325] border border-cyan-500/40 p-4 space-y-3">
+                              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <div className="flex items-center gap-2">
+                                  <Cpu className="w-4 h-4 text-cyan-400" />
+                                  <span className="font-bold text-white text-xs">
+                                    edge_ai_output: Readiness Factors Breakdown ({new Date(m.timestamp).toLocaleTimeString()} UTC)
+                                  </span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold border ${
+                                    readinessStatus === 'GREEN' ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-amber-950 text-amber-300 border-amber-500/40'
+                                  }`}>
+                                    Score: {readinessScore} / 100
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => setActiveRowFactorsId(null)}
+                                  className="text-slate-400 hover:text-white cursor-pointer"
+                                  title="Close breakdown"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+
+                              {/* Why Score is in current state */}
+                              <div className="p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-slate-200 text-xs font-sans flex items-start gap-2">
+                                <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                                <div>
+                                  <strong className="text-cyan-300 font-mono text-[10px] uppercase block">Why is the score in its current state?</strong>
+                                  <span>{whyExplanation}</span>
+                                </div>
+                              </div>
+
+                              {/* 4 Factor Contribution Badges */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-[11px] font-mono">
+                                <div className="p-2.5 rounded-lg bg-[#060D1A] border border-cyan-500/20">
+                                  <div className="flex justify-between font-bold text-cyan-300">
+                                    <span>HRV (35%)</span>
+                                    <span>{(hrvScore * 0.35).toFixed(1)} / 35.0 pts</span>
+                                  </div>
+                                  <div className="text-slate-400 text-[10px] mt-1">{m.hrv} ms (ratio: {hrvRatio.toFixed(2)}x)</div>
+                                </div>
+
+                                <div className="p-2.5 rounded-lg bg-[#060D1A] border border-emerald-500/20">
+                                  <div className="flex justify-between font-bold text-emerald-300">
+                                    <span>Resting HR (25%)</span>
+                                    <span>{(rhrScore * 0.25).toFixed(1)} / 25.0 pts</span>
+                                  </div>
+                                  <div className="text-slate-400 text-[10px] mt-1">{m.heartRate} bpm ({rhrDiff > 0 ? `+${rhrDiff}` : rhrDiff} bpm)</div>
+                                </div>
+
+                                <div className="p-2.5 rounded-lg bg-[#060D1A] border border-purple-500/20">
+                                  <div className="flex justify-between font-bold text-purple-300">
+                                    <span>Sleep (25%)</span>
+                                    <span>{(sleepScore * 0.25).toFixed(1)} / 25.0 pts</span>
+                                  </div>
+                                  <div className="text-slate-400 text-[10px] mt-1">7.2h logged · 88% efficiency</div>
+                                </div>
+
+                                <div className="p-2.5 rounded-lg bg-[#060D1A] border border-amber-500/20">
+                                  <div className="flex justify-between font-bold text-amber-300">
+                                    <span>Temp Stability (15%)</span>
+                                    <span>{(tempScore * 0.15).toFixed(1)} / 15.0 pts</span>
+                                  </div>
+                                  <div className="text-slate-400 text-[10px] mt-1">{m.bodyTemperature}°C (±{tempDiff.toFixed(2)}°C)</div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

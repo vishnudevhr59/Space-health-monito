@@ -1425,6 +1425,35 @@
         }
       },
       "status": "Pre-Launch"
+    },
+    {
+      "id": "msn-mte-01",
+      "name": "Mars Transit Expedition 01",
+      "code": "MTE-01",
+      "orbitTarget": "Heliocentric Transfer",
+      "launchDate": "2026-11-12T15:52:43.237Z",
+      "projectedReturnDate": "2027-05-11T15:52:43.237Z",
+      "currentDay": 1,
+      "crewIds": [],
+      "primaryFlightSurgeonId": "usr-2",
+      "environmentalTarget": {
+        "cabinTempC": {
+          "min": 21,
+          "max": 24
+        },
+        "humidityPercent": {
+          "min": 40,
+          "max": 60
+        },
+        "co2MmHg": {
+          "max": 3
+        },
+        "o2Percent": {
+          "min": 20.8,
+          "max": 21.5
+        }
+      },
+      "status": "Pre-Launch"
     }
   ],
   "telemetry": [
@@ -10567,6 +10596,225 @@
         "hrv": "ms"
       },
       "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498762923-792",
+      "idempotencyKey": "5b2dd4dd9082e7c0fa0cd1b3ae28f22d681d77a69afd6bc5fd46407e92806cb5",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:42.916Z",
+      "ingestedAt": "2026-11-12T15:52:42.923Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 64,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 65,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763018-431",
+      "idempotencyKey": "test_idempotency_key_1794498763008",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.018Z",
+      "ingestedAt": "2026-11-12T15:52:43.018Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 60,
+      "spo2": 98.5,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763260-179",
+      "idempotencyKey": "9ef5ea3492af04d5a49aa16c946ebcae46d51a2093ab2a8fcd30c8a5ef7fdf5c",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.252Z",
+      "ingestedAt": "2026-11-12T15:52:43.261Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 64,
+      "spo2": 98.4,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763270-969",
+      "idempotencyKey": "3023e29d0464fcc90a4ae6f71b4f9305f2e6f72a3d4837b86cea4756865973db",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.270Z",
+      "ingestedAt": "2026-11-12T15:52:43.270Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 115,
+      "spo2": 94,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763303-195",
+      "idempotencyKey": "6083056decc1689afe72a2572c3dd0b75917f9e8b8a51f4c68f4b0e7336092a3",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.303Z",
+      "ingestedAt": "2026-11-12T15:52:43.303Z",
+      "dataSource": "BioHarness-V4 [SIMULATED]",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 64,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "heartRateVariability": 65,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763326-307",
+      "idempotencyKey": "bcf07c6adea84db019c2d38a47292ae66115916d8f64025ea534ea2c401801b0",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.326Z",
+      "ingestedAt": "2026-11-12T15:52:43.326Z",
+      "dataSource": "BioHarness-V4 [SIMULATED]",
+      "dataQuality": "VERIFIED",
+      "provenance": "SIMULATED_TELEMETRY",
+      "heartRate": 72,
+      "spo2": 98.2,
+      "bodyTemperature": 36.8,
+      "heartRateVariability": 54,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.6,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763363-73",
+      "idempotencyKey": "b281148d7168d7f9255ff097cec97b5e94f77e0d454ff5262873314ec769cf84",
+      "astronautId": "astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.357Z",
+      "ingestedAt": "2026-11-12T15:52:43.363Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 65,
+      "spo2": 98.4,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
+    },
+    {
+      "id": "tel-1794498763374-758",
+      "idempotencyKey": "a3c49bfbec9988f8725e96659f998eb6cf3efbee660ce3bc9d6cb84722d0ff72",
+      "astronautId": "astro-2",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.374Z",
+      "ingestedAt": "2026-11-12T15:52:43.374Z",
+      "dataSource": "Telemetry-Ingest-Stream",
+      "dataQuality": "ESTIMATED",
+      "provenance": "USER_ENTERED",
+      "heartRate": 68,
+      "spo2": 98.6,
+      "bodyTemperature": 36.6,
+      "bloodPressure": {
+        "systolic": 114,
+        "diastolic": 72
+      },
+      "perfusionIndex": 3.8,
+      "respiratoryRate": 14,
+      "units": {
+        "heartRate": "BPM",
+        "spo2": "%",
+        "bodyTemperature": "°C",
+        "hrv": "ms"
+      },
+      "sensorQualityScore": 98
     }
   ],
   "environmental": [
@@ -10751,6 +10999,22 @@
   "mlAnalyses": [],
   "alerts": [
     {
+      "id": "alt-1794498763270",
+      "astronautId": "astro-1",
+      "astronautName": "Astronaut astro-1",
+      "missionId": "artemis-gateway-04",
+      "timestamp": "2026-11-12T15:52:43.270Z",
+      "indicator": "Arterial Oxygenation (SpO2)",
+      "severity": "Warning",
+      "observedValue": "94%",
+      "configuredThreshold": "SpO2 >= 95.0%",
+      "title": "Hypoxic Telemetry Event",
+      "reason": "Automated telemetry validation triggered threshold envelope excursion.",
+      "suggestedAction": "Notify Flight Surgeon on console; initiate 5-minute seated ECG trace.",
+      "status": "Active",
+      "relatedMeasurementId": "tel-1794498763270-969"
+    },
+    {
       "id": "alt-1794492444669",
       "astronautId": "astro-1",
       "astronautName": "Astronaut astro-1",
@@ -10763,8 +11027,11 @@
       "title": "Hypoxic Telemetry Event",
       "reason": "Automated telemetry validation triggered threshold envelope excursion.",
       "suggestedAction": "Notify Flight Surgeon on console; initiate 5-minute seated ECG trace.",
-      "status": "Active",
-      "relatedMeasurementId": "tel-1794492444669-647"
+      "status": "Resolved",
+      "relatedMeasurementId": "tel-1794492444669-647",
+      "acknowledgedBy": "sarah.chen@spacehealth.nasa.gov",
+      "dismissalReason": "Verified transient post-ARED recovery lag; seated trace nominal.",
+      "resolvedAt": "2026-11-12T15:52:43.203Z"
     },
     {
       "id": "alt-1794492103078",
@@ -11553,6 +11820,190 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "aud-1794498763374-586",
+      "timestamp": "2026-11-12T15:52:43.374Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763374-758",
+      "status": "SUCCESS",
+      "details": "HR: 68 BPM, SpO2: 98.6% for astronaut astro-2"
+    },
+    {
+      "id": "aud-1794498763363-768",
+      "timestamp": "2026-11-12T15:52:43.363Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763363-73",
+      "status": "SUCCESS",
+      "details": "HR: 65 BPM, SpO2: 98.4% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498763344-375",
+      "timestamp": "2026-11-12T15:52:43.344Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "CROSS_ASTRONAUT_ACCESS_DENIED",
+      "resourceType": "/api/telemetry/astro-2",
+      "status": "DENIED",
+      "details": "Astronaut astro-1 attempted unauthorized access to telemetry for astro-2"
+    },
+    {
+      "id": "aud-1794498763331-629",
+      "timestamp": "2026-11-12T15:52:43.331Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763326-307",
+      "status": "SUCCESS",
+      "details": "HR: 72 BPM, SpO2: 98.2% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498763310-193",
+      "timestamp": "2026-11-12T15:52:43.310Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763303-195",
+      "status": "SUCCESS",
+      "details": "HR: 64 BPM, SpO2: 98.6% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498763270-763",
+      "timestamp": "2026-11-12T15:52:43.270Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763270-969",
+      "status": "SUCCESS",
+      "details": "HR: 115 BPM, SpO2: 94% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498763261-93",
+      "timestamp": "2026-11-12T15:52:43.261Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763260-179",
+      "status": "SUCCESS",
+      "details": "HR: 64 BPM, SpO2: 98.4% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498763223-900",
+      "timestamp": "2026-11-12T15:52:43.223Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ACCESS_DENIED",
+      "resourceType": "/api/missions",
+      "status": "DENIED",
+      "details": "Role Astronaut lacks permission for POST /api/missions"
+    },
+    {
+      "id": "aud-1794498763203-380",
+      "timestamp": "2026-11-12T15:52:43.203Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ALERT_RESOLVED",
+      "resourceType": "HealthAlert",
+      "resourceId": "alt-1794492444669",
+      "status": "SUCCESS",
+      "details": "Alert alt-1794492444669 status changed to Resolved"
+    },
+    {
+      "id": "aud-1794498763190-313",
+      "timestamp": "2026-11-12T15:52:43.190Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ALERT_DISMISSED",
+      "resourceType": "HealthAlert",
+      "resourceId": "alt-1794492444669",
+      "status": "SUCCESS",
+      "details": "Alert alt-1794492444669 status changed to Dismissed"
+    },
+    {
+      "id": "aud-1794498763174-888",
+      "timestamp": "2026-11-12T15:52:43.174Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "ALERT_UNDER REVIEW",
+      "resourceType": "HealthAlert",
+      "resourceId": "alt-1794492444669",
+      "status": "SUCCESS",
+      "details": "Alert alt-1794492444669 status changed to Under Review"
+    },
+    {
+      "id": "aud-1794498763144-743",
+      "timestamp": "2026-11-12T15:52:43.144Z",
+      "userId": "usr-1",
+      "userRole": "Astronaut",
+      "action": "BRIEFING_ACKNOWLEDGE",
+      "resourceType": "BriefingItem",
+      "resourceId": "obs-01",
+      "status": "SUCCESS",
+      "details": "Briefing item obs-01 acknowledged by sarah.chen@spacehealth.nasa.gov"
+    },
+    {
+      "id": "aud-1794498763018-424",
+      "timestamp": "2026-11-12T15:52:43.018Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498763018-431",
+      "status": "SUCCESS",
+      "details": "HR: 60 BPM, SpO2: 98.5% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794498762923-910",
+      "timestamp": "2026-11-12T15:52:42.923Z",
+      "userId": "system-ingest",
+      "userRole": "Mission Administrator",
+      "action": "INGEST_TELEMETRY",
+      "resourceType": "PhysiologicalTelemetry",
+      "resourceId": "tel-1794498762923-792",
+      "status": "SUCCESS",
+      "details": "HR: 64 BPM, SpO2: 98.6% for astronaut astro-1"
+    },
+    {
+      "id": "aud-1794492446366-995",
+      "timestamp": "2026-11-12T14:07:26.366Z",
+      "userId": "astronaut-1",
+      "userRole": "Astronaut",
+      "action": "NASA_GROUND_DISPATCH",
+      "resourceType": "/api/nasa-ground-dispatch",
+      "status": "SUCCESS",
+      "details": "Medical telemetry packet DSN-MCC-MWDMGXB1-5046 successfully transmitted via DSN to NASA Houston MCC-H for Sarah Chen."
+    },
+    {
+      "id": "aud-1794492444837-335",
+      "timestamp": "2026-11-12T14:07:24.837Z",
+      "userId": "usr-flight-surgeon",
+      "userRole": "Flight Medical Officer",
+      "action": "SHIFT_HANDOVER_EXECUTED",
+      "resourceType": "ShiftHandover",
+      "resourceId": "HND-MWDMGW4L",
+      "status": "SUCCESS",
+      "details": "Shift handover executed between Dr. Marcus Vance (Flight Surgeon, MCC-Houston) and Dr. Elena Rostova, M.D. (Gateway Flight Med) for CDR Sarah Chen."
+    },
+    {
+      "id": "aud-1794492444823-485",
+      "timestamp": "2026-11-12T14:07:24.823Z",
+      "userId": "astro-1",
+      "userRole": "Astronaut",
+      "action": "SIMULATED_BEACON_TRANSMITTED",
+      "resourceType": "EmergencyBeacon",
+      "resourceId": "DEMO-PKT-MWDMGW47",
+      "status": "SUCCESS",
+      "details": "Simulated medical beacon generated for CDR Sarah Chen (MAYDAY-MED-01-DEMO). Stored locally."
+    },
     {
       "id": "aud-1794492444759-703",
       "timestamp": "2026-11-12T14:07:24.759Z",
@@ -26750,9 +27201,273 @@
       ],
       "ingestedRecordId": "tel-1794492444759-700",
       "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762916-733",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:42.916Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 64,
+        "spo2": 98.6,
+        "bodyTemperature": 36.6,
+        "hrv": 65,
+        "bloodPressure": {
+          "systolic": 114,
+          "diastolic": 72
+        },
+        "provenance": "USER_ENTERED"
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498762923-792",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762936-772",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:42.936Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 340,
+        "spo2": 98
+      },
+      "classification": "POTENTIAL_SENSOR_ARTIFACT",
+      "rejectionReason": "Heart rate of 340 BPM is physiologically impossible (28 - 240 BPM). Sensor artifact suspected.",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762947-837",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:42.947Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 15,
+        "spo2": 98
+      },
+      "classification": "POTENTIAL_SENSOR_ARTIFACT",
+      "rejectionReason": "Heart rate of 15 BPM is physiologically impossible (28 - 240 BPM). Sensor artifact suspected.",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762961-82",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:42.961Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 72,
+        "spo2": 115
+      },
+      "classification": "IMPOSSIBLE_OR_MALFORMED",
+      "rejectionReason": "SpO2 of 115% is invalid. Values must be between 70% and 100%.",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762986-334",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:42.986Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 70,
+        "spo2": 98,
+        "timestamp": "2026-11-12T16:52:42.962Z"
+      },
+      "classification": "IMPOSSIBLE_OR_MALFORMED",
+      "rejectionReason": "Measurement timestamp is in the future (2026-11-12T16:52:42.962Z) beyond acceptable 5-minute clock drift.",
+      "warnings": [],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498762996-292",
+      "astronautId": "unassigned",
+      "receivedAt": "2026-11-12T15:52:42.996Z",
+      "rawPayload": {
+        "heartRate": 70,
+        "spo2": 98
+      },
+      "classification": "STRUCTURALLY_INVALID",
+      "rejectionReason": "Missing required field 'astronautId'",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763007-843",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.007Z",
+      "rawPayload": {
+        "astronautId": "astro-1"
+      },
+      "classification": "MISSING_MEASUREMENT",
+      "rejectionReason": "Required metric 'heartRate' is missing or non-numeric; Required metric 'spo2' is missing or non-numeric",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763018-727",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.018Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 60,
+        "spo2": 98.5
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498763018-431",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763032-829",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.032Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 60,
+        "spo2": 98.5
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498763018-431",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763252-879",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.252Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 64,
+        "spo2": 98.4,
+        "bodyTemperature": 36.6
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498763260-179",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763270-301",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.270Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 115,
+        "spo2": 94
+      },
+      "classification": "UNUSUAL_OBSERVATION",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp",
+        "Heart rate 115 BPM exceeds normal clinical resting envelope.",
+        "SpO2 94% indicates potential hypoxic event (< 95.0%)."
+      ],
+      "ingestedRecordId": "tel-1794498763270-969",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763281-678",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.281Z",
+      "rawPayload": {
+        "astronautId": "astro-1",
+        "heartRate": 310,
+        "spo2": 98
+      },
+      "classification": "POTENTIAL_SENSOR_ARTIFACT",
+      "rejectionReason": "Heart rate of 310 BPM is physiologically impossible (28 - 240 BPM). Sensor artifact suspected.",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763357-814",
+      "astronautId": "astro-1",
+      "receivedAt": "2026-11-12T15:52:43.357Z",
+      "rawPayload": {
+        "heartRate": 65,
+        "spo2": 98.4,
+        "astronautId": "astro-1"
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498763363-73",
+      "dataSource": "Telemetry-Ingest-Stream"
+    },
+    {
+      "id": "raw-1794498763374-264",
+      "astronautId": "astro-2",
+      "receivedAt": "2026-11-12T15:52:43.374Z",
+      "rawPayload": {
+        "heartRate": 68,
+        "spo2": 98.6,
+        "astronautId": "astro-2"
+      },
+      "classification": "NOMINAL",
+      "warnings": [
+        "Timestamp was not provided; assigned current UTC timestamp"
+      ],
+      "ingestedRecordId": "tel-1794498763374-758",
+      "dataSource": "Telemetry-Ingest-Stream"
     }
   ],
   "shiftHandovers": [
+    {
+      "id": "HND-MWDMGW4L",
+      "shiftDate": "2026-11-12",
+      "shiftPeriod": "Bravo (08:00-16:00 UTC)",
+      "outgoingSurgeon": "Dr. Marcus Vance (Flight Surgeon, MCC-Houston)",
+      "incomingSurgeon": "Dr. Elena Rostova, M.D. (Gateway Flight Med)",
+      "astronautId": "astro-1",
+      "astronautName": "CDR Sarah Chen",
+      "vitalsSummary24h": {
+        "meanHeartRate": 64,
+        "heartRateRange": [
+          56,
+          88
+        ],
+        "meanSpo2": 98.2,
+        "meanHrv": 58,
+        "meanCoreTemp": 36.8,
+        "sleepDurationHours": 6.8
+      },
+      "openAlertsCount": 1,
+      "unresolvedIssues": [
+        "Autonomic Fatigue under surveillance"
+      ],
+      "clinicalDirectives": [
+        "Hydration +750mL oral rehydration salts"
+      ],
+      "countermeasuresScheduled": [
+        "ARED Heavy Resistive Squat Protocol (14:00 UTC)"
+      ],
+      "outgoingSignature": "M. Vance, MD / MCC-SURGEON-04",
+      "incomingSignature": "E. Rostova, MD / GATEWAY-MED-02",
+      "status": "SIGNED",
+      "timestamp": "2026-11-12T14:07:24.837Z"
+    },
     {
       "id": "HND-MWDM9KJU",
       "shiftDate": "2026-11-12",
@@ -27639,6 +28354,27 @@
     }
   ],
   "simulatedBeacons": [
+    {
+      "packetId": "DEMO-PKT-MWDMGW47",
+      "utcTimestamp": "2026-11-12T14:07:24.823Z",
+      "missionId": "artemis-gateway-04",
+      "habitatModule": "Lunar Gateway HALO Module (Node 2)",
+      "astronautId": "astro-1",
+      "astronautName": "CDR Sarah Chen",
+      "emergencyCode": "MAYDAY-MED-01-DEMO",
+      "biometrics": {
+        "heartRateBpm": 142,
+        "spo2Percent": 91.2,
+        "coreTempC": 38.5,
+        "bloodPressure": "158/96 mmHg",
+        "hrvMs": 24
+      },
+      "telemetrySource": "BioHarness-V4 [SIMULATED DEMONSTRATION STREAM]",
+      "isSimulatedDemo": true,
+      "dsnChannel": "DSN-SIM-MED-CHANNEL-DEMO-01",
+      "packetChecksumSha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "disclosure": "LOCAL SOFTWARE SIMULATION DEMO: No RF transmitter engaged. No transmission to NASA Deep Space Network or emergency services."
+    },
     {
       "packetId": "DEMO-PKT-MWDM9KJF",
       "utcTimestamp": "2026-11-12T14:01:43.227Z",

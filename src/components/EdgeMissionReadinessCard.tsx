@@ -10,6 +10,8 @@ import {
   Copy,
   Check,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Sparkles,
   Zap,
   Info,
@@ -19,6 +21,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
+  Layers,
+  FileCode,
+  HelpCircle,
 } from 'lucide-react';
 import { AstronautProfile, HealthMeasurement } from '../types';
 
@@ -37,6 +42,8 @@ export const EdgeMissionReadinessCard: React.FC<EdgeMissionReadinessCardProps> =
   const [selectedCrewPreset, setSelectedCrewPreset] = useState<'SHUKLA' | 'WILLIAMS' | 'CURRENT'>('CURRENT');
   const [copied, setCopied] = useState(false);
   const [isSimulatedOverride, setIsSimulatedOverride] = useState(false);
+  const [isReadinessDropdownOpen, setIsReadinessDropdownOpen] = useState(true);
+  const [activeSchemaView, setActiveSchemaView] = useState<'INTERACTIVE' | 'JSON'>('INTERACTIVE');
 
   // Custom adjustable parameters to demo the algorithm
   const [currentHrv, setCurrentHrv] = useState(latestVital?.hrv || 64);
@@ -173,6 +180,79 @@ export const EdgeMissionReadinessCard: React.FC<EdgeMissionReadinessCardProps> =
       readiness_score: readinessScore,
       alert_level: status,
       recommended_action: recommendedAction,
+      readiness_factors: {
+        hrv: {
+          name: 'Heart Rate Variability (HRV RMSSD)',
+          weight: '35%',
+          current_value: `${Math.round(currentHrv)} ms`,
+          baseline_value: `${baselineHrv} ms`,
+          ratio: `${hrvRatio.toFixed(2)}x`,
+          factor_score: `${Math.round(hrvScore)}/100`,
+          weighted_points: Number((hrvScore * 0.35).toFixed(1)),
+          max_points: 35.0,
+          status: hrvRatio >= 1.0 ? 'Optimal' : hrvRatio >= 0.85 ? 'Acceptable' : 'Depressed',
+          explanation:
+            hrvRatio >= 1.0
+              ? 'Autonomic parasympathetic tone matches or exceeds orbital baseline, indicating full neurological recovery.'
+              : `HRV dropped ${Math.round((1 - hrvRatio) * 100)}% below baseline, reflecting cumulative fatigue or sympathetic stress.`,
+        },
+        rhr: {
+          name: 'Resting Heart Rate (RHR)',
+          weight: '25%',
+          current_value: `${Math.round(currentRhr)} bpm`,
+          baseline_value: `${baselineRhr} bpm`,
+          delta: `${rhrDiff > 0 ? `+${rhrDiff}` : rhrDiff} bpm`,
+          factor_score: `${Math.round(rhrScore)}/100`,
+          weighted_points: Number((rhrScore * 0.25).toFixed(1)),
+          max_points: 25.0,
+          status: rhrDiff <= 0 ? 'Optimal' : rhrDiff <= 4 ? 'Mild Elevation' : 'Strained',
+          explanation:
+            rhrDiff <= 0
+              ? 'Resting heart rate remains at or below baseline, showing zero cardiovascular over-compensation.'
+              : `RHR is elevated +${rhrDiff} bpm above baseline, applying a -${rhrDiff * 4} pt penalty due to cephalad fluid volume shift.`,
+        },
+        sleep: {
+          name: 'Sleep Duration & Efficiency',
+          weight: '25%',
+          current_value: `${currentSleepHours}h duration · ${currentSleepEfficiency}% efficiency`,
+          target_value: '7.5h duration · ≥85% efficiency',
+          factor_score: `${Math.round(sleepScore)}/100`,
+          weighted_points: Number((sleepScore * 0.25).toFixed(1)),
+          max_points: 25.0,
+          status: currentSleepHours >= 7.0 && currentSleepEfficiency >= 85 ? 'Optimal' : 'Sleep Debt',
+          explanation:
+            currentSleepHours >= 7.0 && currentSleepEfficiency >= 85
+              ? 'Adequate slow-wave sleep and high sleep efficiency counter 16 orbital sunrises/day circadian disruption.'
+              : `Sleep duration (${currentSleepHours}h / 7.5h) or efficiency (${currentSleepEfficiency}%) falls short, reducing neurological alertness.`,
+        },
+        temp: {
+          name: 'Skin Temperature Stability',
+          weight: '15%',
+          current_value: `${currentSkinTemp}°C`,
+          baseline_value: `${baselineTemp}°C`,
+          delta: `±${tempDiff.toFixed(2)}°C`,
+          factor_score: `${Math.round(tempScore)}/100`,
+          weighted_points: Number((tempScore * 0.15).toFixed(1)),
+          max_points: 15.0,
+          status: tempDiff <= 0.3 ? 'Optimal' : 'Thermal Drift',
+          explanation:
+            tempDiff <= 0.3
+              ? 'Peripheral skin temperature is thermally stable within normal diurnal limits.'
+              : `Thermal deviation of ±${tempDiff.toFixed(2)}°C indicates possible thermoregulatory drift or early immune activation.`,
+        },
+      },
+      why_score_in_current_state:
+        status === 'GREEN'
+          ? `Score is ${readinessScore}/100 (GREEN) because autonomic recovery (HRV ${Math.round(currentHrv)} ms, ${(hrvScore * 0.35).toFixed(1)}/35 pts) and resting heart rate (${Math.round(currentRhr)} bpm, ${(rhrScore * 0.25).toFixed(1)}/25 pts) closely align with pre-flight baseline with strong sleep efficiency (${currentSleepEfficiency}%).`
+          : status === 'YELLOW'
+          ? `Score is ${readinessScore}/100 (YELLOW) due to moderate physiological debt, primarily driven by ${
+              hrvRatio < 0.9
+                ? `diminished autonomic HRV recovery (${Math.round(currentHrv)} ms vs ${baselineHrv} ms baseline)`
+                : rhrDiff > 0
+                ? `resting heart rate elevation (+${rhrDiff} bpm over baseline)`
+                : `sleep deficit (${currentSleepHours}h vs 7.5h target)`
+            }, indicating standard orbital maintenance capacity while deferring high-intensity EVA.`
+          : `Score is ${readinessScore}/100 (RED) due to concurrent cardiorespiratory and autonomic strain exceeding safety margins. Immediate rest and Private Medical Conference recommended.`,
     },
   };
 
@@ -506,27 +586,284 @@ export const EdgeMissionReadinessCard: React.FC<EdgeMissionReadinessCardProps> =
         </div>
       )}
 
-      {/* TAB 2: DELAY-TOLERANT (DTN) JSON TELEMETRY PACKET */}
+      {/* TAB 2: DELAY-TOLERANT (DTN) JSON TELEMETRY PACKET & EDGE AI OUTPUT */}
       {activeTab === 'SCHEMA' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+          {/* Header Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono border-b border-slate-800 pb-3">
             <div className="text-slate-300">
-              <span className="text-cyan-400 font-bold">Delay-Tolerant Networking (DTN)</span> schema buffering sensor wearables & cabin environmental metrics locally during signal occultation.
+              <span className="text-cyan-400 font-bold">Delay-Tolerant Networking (DTN) Telemetry Packet</span>
+              <span className="text-slate-500 mx-2">·</span>
+              <span className="text-slate-400">Buffered locally during orbital blackout</span>
             </div>
-            <button
-              onClick={copyJson}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-bold transition-all cursor-pointer shrink-0"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'COPIED TO CLIPBOARD' : 'COPY JSON SCHEMA'}</span>
-            </button>
+
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-[#050C1B] p-1 rounded-xl border border-slate-800 text-[11px]">
+                <button
+                  onClick={() => setActiveSchemaView('INTERACTIVE')}
+                  className={`px-2.5 py-1 rounded-lg transition-all font-bold cursor-pointer flex items-center gap-1.5 ${
+                    activeSchemaView === 'INTERACTIVE'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Telemetry Inspector</span>
+                </button>
+                <button
+                  onClick={() => setActiveSchemaView('JSON')}
+                  className={`px-2.5 py-1 rounded-lg transition-all font-bold cursor-pointer flex items-center gap-1.5 ${
+                    activeSchemaView === 'JSON'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Raw DTN JSON</span>
+                </button>
+              </div>
+
+              <button
+                onClick={copyJson}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-bold transition-all cursor-pointer shrink-0"
+                title="Copy formatted JSON packet to clipboard"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'COPIED' : 'COPY'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Code Viewer */}
-          <div className="rounded-2xl bg-[#030610] border border-slate-800 p-4 font-mono text-xs overflow-x-auto text-emerald-400 relative">
-            <pre className="leading-relaxed">{JSON.stringify(telemetryPacket, null, 2)}</pre>
-          </div>
+          {/* VIEW MODE 1: INTERACTIVE TELEMETRY VIEW WITH EDGE_AI_OUTPUT READINESS FACTORS DROPDOWN */}
+          {activeSchemaView === 'INTERACTIVE' ? (
+            <div className="space-y-4">
+              
+              {/* Packet Metadata Strip */}
+              <div className="p-3.5 rounded-2xl bg-[#050B17] border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">PACKET_ID:</span>
+                  <code className="text-cyan-300 font-bold">{telemetryPacket.packet_id}</code>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1.5 text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-500/40 font-bold text-[10px]">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span>{telemetryPacket.sync_status}</span>
+                  </span>
+                  <span className="text-slate-400 text-[11px]">
+                    Module: <strong className="text-white">{telemetryPacket.crew_member.location_module}</strong>
+                  </span>
+                </div>
+              </div>
 
+              {/* HIGHLIGHTED SECTION: edge_ai_output WITH READINESS FACTORS TOOLTIP & DROPDOWN */}
+              <div className="rounded-2xl bg-gradient-to-b from-[#09152A] to-[#060D1E] border-2 border-cyan-500/50 p-5 shadow-[0_0_30px_rgba(0,229,255,0.15)] space-y-4 relative">
+                
+                {/* edge_ai_output Header Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyan-500/30 pb-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                      <Cpu className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-cyan-300 uppercase tracking-wider">
+                          telemetryPacket.edge_ai_output
+                        </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold">
+                          Local Edge Inference
+                        </span>
+                      </div>
+                      <div className="text-sm font-extrabold text-white mt-0.5 flex items-center gap-2">
+                        <span>Readiness Score:</span>
+                        <span className={`text-base font-black px-2.5 py-0.5 rounded-lg border ${statusColor}`}>
+                          {telemetryPacket.edge_ai_output.readiness_score} / 100 ({telemetryPacket.edge_ai_output.alert_level})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* READINESS FACTORS DROPDOWN / TOOLTIP TOGGLE BUTTON */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsReadinessDropdownOpen(!isReadinessDropdownOpen)}
+                      className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer shadow-md active:scale-95 ${
+                        isReadinessDropdownOpen
+                          ? 'bg-cyan-950 text-cyan-200 border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.3)]'
+                          : 'bg-[#0B1528] text-cyan-300 hover:text-white border-cyan-500/40 hover:border-cyan-400'
+                      }`}
+                      title="Inspect weighted breakdown of the score (HRV, RHR, Sleep, Temp) for this measurement"
+                    >
+                      <Sliders className="w-4 h-4 text-cyan-400" />
+                      <span>Readiness Factors</span>
+                      {isReadinessDropdownOpen ? (
+                        <ChevronUp className="w-3.5 h-3.5 text-cyan-400 transition-transform" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5 text-cyan-400 transition-transform" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recommended Clinical Action */}
+                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono flex items-start gap-2.5 text-slate-200">
+                  <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block mb-0.5">recommended_action:</span>
+                    <span className="text-cyan-200">{telemetryPacket.edge_ai_output.recommended_action}</span>
+                  </div>
+                </div>
+
+                {/* READINESS FACTORS DROPDOWN / TOOLTIP ACCORDION EXPANSION */}
+                {isReadinessDropdownOpen && (
+                  <div className="rounded-2xl bg-[#040814] border border-cyan-500/30 p-4 sm:p-5 space-y-4 animate-fadeIn">
+                    
+                    {/* "Why is the score in its current state?" Root-Cause Diagnostic Box */}
+                    <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 space-y-1.5">
+                      <div className="flex items-center gap-2 text-cyan-300 font-mono text-xs font-bold uppercase tracking-wider">
+                        <Info className="w-4 h-4 text-cyan-400 shrink-0" />
+                        <span>Why is the score in its current state? (Clinical Justification)</span>
+                      </div>
+                      <p className="text-xs sm:text-sm font-sans text-white leading-relaxed">
+                        {telemetryPacket.edge_ai_output.why_score_in_current_state}
+                      </p>
+                    </div>
+
+                    {/* 4 Weighted Factors Detailed Breakdown Grid */}
+                    <div className="space-y-2">
+                      <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                        <span>Readiness Factors Contribution Matrix (Weight Normalized):</span>
+                        <span className="text-cyan-400 font-bold">Sum: {telemetryPacket.edge_ai_output.readiness_score} / 100</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-xs">
+                        
+                        {/* 1. HRV Factor (35%) */}
+                        <div className="p-3.5 rounded-xl bg-[#070E1E] border border-cyan-500/30 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 font-bold text-cyan-300">
+                              <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                              <span>HRV RMSSD (35% Weight)</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 font-bold text-[10px] border border-cyan-500/40">
+                              {telemetryPacket.edge_ai_output.readiness_factors.hrv.weighted_points} / 35.0 pts
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Value: <strong className="text-white">{telemetryPacket.edge_ai_output.readiness_factors.hrv.current_value}</strong></span>
+                            <span>Baseline: {telemetryPacket.edge_ai_output.readiness_factors.hrv.baseline_value} ({telemetryPacket.edge_ai_output.readiness_factors.hrv.ratio})</span>
+                          </div>
+
+                          <p className="text-[11px] font-sans text-slate-300 leading-snug">
+                            {telemetryPacket.edge_ai_output.readiness_factors.hrv.explanation}
+                          </p>
+                        </div>
+
+                        {/* 2. Resting Heart Rate Factor (25%) */}
+                        <div className="p-3.5 rounded-xl bg-[#070E1E] border border-emerald-500/30 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 font-bold text-emerald-300">
+                              <Heart className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Resting HR (25% Weight)</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
+                              {telemetryPacket.edge_ai_output.readiness_factors.rhr.weighted_points} / 25.0 pts
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Value: <strong className="text-white">{telemetryPacket.edge_ai_output.readiness_factors.rhr.current_value}</strong></span>
+                            <span>Baseline: {telemetryPacket.edge_ai_output.readiness_factors.rhr.baseline_value} ({telemetryPacket.edge_ai_output.readiness_factors.rhr.delta})</span>
+                          </div>
+
+                          <p className="text-[11px] font-sans text-slate-300 leading-snug">
+                            {telemetryPacket.edge_ai_output.readiness_factors.rhr.explanation}
+                          </p>
+                        </div>
+
+                        {/* 3. Sleep Duration & Efficiency Factor (25%) */}
+                        <div className="p-3.5 rounded-xl bg-[#070E1E] border border-purple-500/30 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 font-bold text-purple-300">
+                              <Moon className="w-3.5 h-3.5 text-purple-400" />
+                              <span>Sleep & Circadian (25% Weight)</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-purple-950 text-purple-300 font-bold text-[10px] border border-purple-500/40">
+                              {telemetryPacket.edge_ai_output.readiness_factors.sleep.weighted_points} / 25.0 pts
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Logged: <strong className="text-white">{telemetryPacket.edge_ai_output.readiness_factors.sleep.current_value}</strong></span>
+                            <span>Target: 7.5h (≥85%)</span>
+                          </div>
+
+                          <p className="text-[11px] font-sans text-slate-300 leading-snug">
+                            {telemetryPacket.edge_ai_output.readiness_factors.sleep.explanation}
+                          </p>
+                        </div>
+
+                        {/* 4. Skin Temperature Factor (15%) */}
+                        <div className="p-3.5 rounded-xl bg-[#070E1E] border border-amber-500/30 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                              <Thermometer className="w-3.5 h-3.5 text-amber-400" />
+                              <span>Skin Temp Stability (15% Weight)</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 font-bold text-[10px] border border-amber-500/40">
+                              {telemetryPacket.edge_ai_output.readiness_factors.temp.weighted_points} / 15.0 pts
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Value: <strong className="text-white">{telemetryPacket.edge_ai_output.readiness_factors.temp.current_value}</strong></span>
+                            <span>Baseline: {telemetryPacket.edge_ai_output.readiness_factors.temp.baseline_value} ({telemetryPacket.edge_ai_output.readiness_factors.temp.delta})</span>
+                          </div>
+
+                          <p className="text-[11px] font-sans text-slate-300 leading-snug">
+                            {telemetryPacket.edge_ai_output.readiness_factors.temp.explanation}
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Other Packet Subsections Overview (Biometrics, Circadian, Cabin Context) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+                <div className="p-3.5 rounded-xl bg-[#050B17] border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold block">biometrics:</span>
+                  <div className="text-slate-300">HR: <strong className="text-white">{telemetryPacket.biometrics.heart_rate_bpm} BPM</strong></div>
+                  <div className="text-slate-300">SpO2: <strong className="text-white">{telemetryPacket.biometrics.spo2_pct}%</strong></div>
+                  <div className="text-slate-300">Blood Glucose: <strong className="text-emerald-400">{telemetryPacket.biometrics.blood_glucose_mg_dl} mg/dL (CGM)</strong></div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#050B17] border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold block">circadian_and_sleep:</span>
+                  <div className="text-slate-300">Duration: <strong className="text-white">{telemetryPacket.circadian_and_sleep.sleep_duration_hours}h</strong></div>
+                  <div className="text-slate-300">Efficiency: <strong className="text-white">{telemetryPacket.circadian_and_sleep.sleep_efficiency_pct}%</strong></div>
+                  <div className="text-slate-300">Actiwatch Lux: <strong className="text-cyan-400">{telemetryPacket.circadian_and_sleep.ambient_lux_exposure} lx</strong></div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#050B17] border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px] uppercase font-bold block">cabin_context:</span>
+                  <div className="text-slate-300">Cabin CO2: <strong className="text-amber-400">{telemetryPacket.cabin_context.co2_level_ppm} ppm</strong></div>
+                  <div className="text-slate-300">Radiation: <strong className="text-white">{telemetryPacket.cabin_context.radiation_dose_msv} mSv</strong></div>
+                  <div className="text-slate-300">Pressure: <strong className="text-white">{telemetryPacket.cabin_context.cabin_pressure_kpa} kPa</strong></div>
+                </div>
+              </div>
+
+            </div>
+          ) : (
+            /* VIEW MODE 2: RAW DTN JSON PRE BLOCK */
+            <div className="rounded-2xl bg-[#030610] border border-slate-800 p-4 font-mono text-xs overflow-x-auto text-emerald-400 relative">
+              <pre className="leading-relaxed">{JSON.stringify(telemetryPacket, null, 2)}</pre>
+            </div>
+          )}
+
+          {/* Footnote Disclosures */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
             <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-300">
               <span className="text-cyan-400 font-bold block mb-1">● Buffer First, Sync Later:</span>
