@@ -313,47 +313,51 @@ export default function App() {
         <SplashScreen onComplete={() => setShowSplash(false)} />
       )}
 
-      {/* ROW 1 & ROW 2: BRAND HEADER & SECONDARY NAVIGATION STRIP */}
-      <Navbar
-        currentTab={currentTab}
-        onSelectTab={setCurrentTab}
-        currentUser={currentUser}
-        onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onOpenProvenanceModal={() => setIsProvenanceModalOpen(true)}
-        onOpenLogVitals={() => setIsLogVitalsModalOpen(true)}
-        onOpenEmergencyBeacon={() => setIsEmergencyBeaconOpen(true)}
-        onOpenShiftHandover={() => setIsShiftHandoverOpen(true)}
-        onOpenAuditModal={() => setIsAuditModalOpen(true)}
-        onOpenVault={() => setIsVaultModalOpen(true)}
-        onSyncOffline={() => {
-          offlineSyncService.startBackgroundSync();
-          loadInitialData();
-        }}
-        activeAlertCount={activeAlertCount}
-      />
+      {currentTab !== 'settings' && (
+        <>
+          {/* ROW 1 & ROW 2: BRAND HEADER & SECONDARY NAVIGATION STRIP */}
+          <Navbar
+            currentTab={currentTab}
+            onSelectTab={setCurrentTab}
+            currentUser={currentUser}
+            onOpenAuthModal={() => setIsAuthModalOpen(true)}
+            onOpenProvenanceModal={() => setIsProvenanceModalOpen(true)}
+            onOpenLogVitals={() => setIsLogVitalsModalOpen(true)}
+            onOpenEmergencyBeacon={() => setIsEmergencyBeaconOpen(true)}
+            onOpenShiftHandover={() => setIsShiftHandoverOpen(true)}
+            onOpenAuditModal={() => setIsAuditModalOpen(true)}
+            onOpenVault={() => setIsVaultModalOpen(true)}
+            onSyncOffline={() => {
+              offlineSyncService.startBackgroundSync();
+              loadInitialData();
+            }}
+            activeAlertCount={activeAlertCount}
+          />
 
-      {/* ROW 3: MISSION CONTROL LIVE TICKER (MET, TDRS Ka-BAND LATENCY, NASA MCC-H / DSN GOLDSTONE GROUND LOCK, ECLSS, STATUS TOGGLE) */}
-      <MissionControlTicker
-        missionDay={astronaut.missionDay}
-        habitatPressurePsi={anomalyState.cabinPressurePsi}
-        cabinCo2MmHg={anomalyState.cabinCo2MmHg}
-        emergencyStatus={anomalyState.severity}
-        onStatusChange={(newStatus) =>
-          setAnomalyState((prev) => ({
-            ...prev,
-            severity: newStatus,
-            isAnomalyActive: newStatus !== 'NOMINAL',
-            anomalyName: newStatus === 'NOMINAL' ? 'Nominal Operations' : `Manual Emergency State: ${newStatus}`,
-          }))
-        }
-        onOpenAuditModal={() => setIsAuditModalOpen(true)}
-      />
+          {/* ROW 3: MISSION CONTROL LIVE TICKER (MET, TDRS Ka-BAND LATENCY, NASA MCC-H / DSN GOLDSTONE GROUND LOCK, ECLSS, STATUS TOGGLE) */}
+          <MissionControlTicker
+            missionDay={astronaut.missionDay}
+            habitatPressurePsi={anomalyState.cabinPressurePsi}
+            cabinCo2MmHg={anomalyState.cabinCo2MmHg}
+            emergencyStatus={anomalyState.severity}
+            onStatusChange={(newStatus) =>
+              setAnomalyState((prev) => ({
+                ...prev,
+                severity: newStatus,
+                isAnomalyActive: newStatus !== 'NOMINAL',
+                anomalyName: newStatus === 'NOMINAL' ? 'Nominal Operations' : `Manual Emergency State: ${newStatus}`,
+              }))
+            }
+            onOpenAuditModal={() => setIsAuditModalOpen(true)}
+          />
 
-      {/* ROW 4: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
-      <MissionSimulationBar onNavigateTab={(tab) => setCurrentTab(tab)} />
+          {/* ROW 4: PERSISTENT MISSION CONTROL SIMULATION BAR (SCENARIOS A-D) */}
+          <MissionSimulationBar onNavigateTab={(tab) => setCurrentTab(tab)} />
 
-      {/* AUTONOMOUS ANOMALY SELF-HEALING & FAIL-SAFE MITIGATION PROTOCOL ENGINE */}
-      <AutonomousSelfHealingBanner />
+          {/* AUTONOMOUS ANOMALY SELF-HEALING & FAIL-SAFE MITIGATION PROTOCOL ENGINE */}
+          <AutonomousSelfHealingBanner />
+        </>
+      )}
 
       {/* ROW 5: MAIN VIEWPORT STAGE */}
       <div className="flex-1 flex relative w-full overflow-x-hidden pb-24 sm:pb-28">
