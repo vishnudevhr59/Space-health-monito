@@ -50,10 +50,15 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
 }) => {
   const [selectedSystem, setSelectedSystem] = useState<PhysiologicalSystemKey>('cardiovascular');
 
-  const hr = latestTelemetry?.heartRate || astronaut.baselineVitals.restingHeartRate || 64;
-  const spo2 = latestTelemetry?.spo2 || astronaut.baselineVitals.spo2 || 98.4;
-  const hrv = latestTelemetry?.hrv || astronaut.baselineVitals.hrvMs || 58;
-  const temp = latestTelemetry?.bodyTemperature || astronaut.baselineVitals.bodyTempC || 37.1;
+  const baseHr = astronaut?.baselineVitals?.restingHeartRate ?? 58;
+  const baseSpo2 = astronaut?.baselineVitals?.spo2 ?? 98.4;
+  const baseHrv = astronaut?.baselineVitals?.hrvMs ?? 65;
+  const baseTemp = astronaut?.baselineVitals?.bodyTempC ?? 36.6;
+
+  const hr = latestTelemetry?.heartRate || baseHr || 64;
+  const spo2 = latestTelemetry?.spo2 || baseSpo2 || 98.4;
+  const hrv = latestTelemetry?.hrv || (latestTelemetry as any)?.heartRateVariability || baseHrv || 58;
+  const temp = latestTelemetry?.bodyTemperature || baseTemp || 37.1;
 
   const systemsData: Record<PhysiologicalSystemKey, SystemDetail> = {
     cardiovascular: {
@@ -64,8 +69,8 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
       statusColor: hr > 80 ? 'text-amber-400' : 'text-emerald-400',
       keyMetric: 'Resting Heart Rate & Baroreceptor Tone',
       metricValue: `${hr} BPM`,
-      baselineValue: `${astronaut.baselineVitals.restingHeartRate} BPM (Pre-Flight)`,
-      zScore: `+${((hr - astronaut.baselineVitals.restingHeartRate) / 4.2).toFixed(1)}σ`,
+      baselineValue: `${baseHr} BPM (Pre-Flight)`,
+      zScore: `+${((hr - baseHr) / 4.2).toFixed(1)}σ`,
       mechanism:
         'Cephalad fluid shift eliminates hydrostatic gradient in microgravity, inducing baroreceptor down-regulation and adaptive resting rate elevation.',
       nasaEvidence: 'NASA OSDR Cardiovascular Longitudinal Data & Twins Study (2019)',
@@ -84,8 +89,8 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
       statusColor: hrv < 40 ? 'text-amber-400' : 'text-emerald-400',
       keyMetric: 'Heart Rate Variability (rMSSD)',
       metricValue: `${hrv} ms`,
-      baselineValue: `${astronaut.baselineVitals.hrvMs} ms (Pre-Flight)`,
-      zScore: `${((hrv - astronaut.baselineVitals.hrvMs) / 8.5).toFixed(1)}σ`,
+      baselineValue: `${baseHrv} ms (Pre-Flight)`,
+      zScore: `${((hrv - baseHrv) / 8.5).toFixed(1)}σ`,
       mechanism:
         'Vagal tone suppression from operational stress, ambient acoustic noise (>62 dBA), and microgravity autonomic remodeling.',
       nasaEvidence: 'NASA Human Research Program (HRP) Autonomic Regulation Omnibus',
@@ -103,7 +108,7 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
       status: 'Adaptive Shift',
       statusColor: 'text-cyan-400',
       keyMetric: 'Bone Mineral Resorption Rate',
-      metricValue: `-${astronaut.boneDensityLossRatePercentPerMonth}% / mo`,
+      metricValue: `-${astronaut?.boneDensityLossRatePercentPerMonth ?? 0.85}% / mo`,
       baselineValue: '0.0% / mo (Terrestrial)',
       zScore: '+1.4σ resorption marker',
       mechanism:
@@ -124,8 +129,8 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
       statusColor: 'text-amber-400',
       keyMetric: 'Resting Core Body Temperature',
       metricValue: `${temp}°C`,
-      baselineValue: `${astronaut.baselineVitals.bodyTempC}°C (Terrestrial)`,
-      zScore: `+${((temp - astronaut.baselineVitals.bodyTempC) / 0.25).toFixed(1)}σ`,
+      baselineValue: `${baseTemp}°C (Terrestrial)`,
+      zScore: `+${((temp - baseTemp) / 0.25).toFixed(1)}σ`,
       mechanism:
         'Persistent +0.5°C core temperature elevation due to reduced convective heat dissipation in microgravity and pro-inflammatory cytokine secretion.',
       nasaEvidence: 'ESA/NASA ThermoLab Core Body Temperature Study (Stahn et al., 2017)',
@@ -181,16 +186,16 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
   const currentSystem = systemsData[selectedSystem];
 
   return (
-    <div className="bg-[#0B1224] rounded-2xl border border-cyan-900/40 p-4 sm:p-6 space-y-5 shadow-xl">
+    <div className="bg-[#0B1224] rounded-2xl border border-cyan-900/40 p-3.5 sm:p-6 space-y-5 shadow-xl overflow-hidden min-w-0 max-w-full">
       {/* Header and Disclaimers */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-cyan-950/60 rounded-lg border border-cyan-500/40">
+            <div className="p-2 bg-cyan-950/60 rounded-lg border border-cyan-500/40 shrink-0">
               <Zap className="w-5 h-5 text-[#00E5FF] animate-pulse" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h3 className="text-base font-bold text-white flex flex-wrap items-center gap-2">
                 <span>ASTRONAUT DIGITAL TWIN</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
                   PHYSIOLOGICAL STATE MODEL
@@ -213,7 +218,7 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
       {/* Main Grid: Anatomical Interactive Representation & System Details */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column: Anatomical Node Map (5 cols) */}
-        <div className="lg:col-span-5 bg-[#050816] rounded-xl border border-slate-800 p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[380px]">
+        <div className="lg:col-span-5 bg-[#050816] rounded-xl border border-slate-800 p-3.5 sm:p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[340px] sm:min-h-[380px] min-w-0">
           <div className="text-[11px] font-mono text-slate-400 w-full flex justify-between border-b border-slate-800/80 pb-2">
             <span>PHYSIOLOGICAL NODES</span>
             <span className="text-cyan-400">SELECT TO INSPECT</span>
@@ -316,7 +321,7 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
           </div>
 
           {/* Quick System Selector Buttons */}
-          <div className="w-full grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-800 text-[10px] font-mono">
+          <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-2 border-t border-slate-800 text-[10px] font-mono">
             {Object.keys(systemsData).map((key) => {
               const sys = systemsData[key as PhysiologicalSystemKey];
               const isSelected = selectedSystem === key;
@@ -338,10 +343,10 @@ export const AstronautDigitalTwin: React.FC<AstronautDigitalTwinProps> = ({
         </div>
 
         {/* Right Column: Deep Clinical Detail & Countermeasures (7 cols) */}
-        <div className="lg:col-span-7 bg-[#050816] rounded-xl border border-slate-800 p-4 sm:p-5 flex flex-col justify-between space-y-4">
-          <div>
+        <div className="lg:col-span-7 bg-[#050816] rounded-xl border border-slate-800 p-3.5 sm:p-5 flex flex-col justify-between space-y-4 min-w-0 overflow-hidden">
+          <div className="min-w-0">
             {/* System Title and Status Pill */}
-            <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
               <div>
                 <h4 className="text-base font-bold text-white flex items-center gap-2">
                   <span>{currentSystem.name}</span>

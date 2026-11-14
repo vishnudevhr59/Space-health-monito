@@ -63,52 +63,59 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       aria-label="Space Health Monito Launch Screen"
       role="banner"
     >
-      {/* CINEMATIC HOTSTAR-STYLE AURORA STREAMS & PARTICLES */}
+      {/* CINEMATIC HOTSTAR-STYLE AURORA STREAMS & ASTRONAUT MOONWALK BACKDROP */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* ASTRONAUT WALKING ON MOON WITH USA FLAG - BACKGROUND CINEMATIC LAYER */}
+        {/* ASTRONAUT WALKING ON PLANETARY/LUNAR SURFACE HOISTING USA FLAG */}
         <div className="absolute inset-0 overflow-hidden">
+          {/* Desktop / Tablet Widescreen (16:9) */}
+          <img
+            src="/assets/images/astronaut_planet_flag_wide.jpg"
+            alt="Astronaut walking on lunar surface hoisting American flag with Earth rising"
+            className="hidden md:block w-full h-full object-cover object-center opacity-70 scale-105 filter brightness-105 contrast-110 transition-transform duration-1000"
+          />
+          {/* Mobile Portrait (9:16) */}
           <img
             src="/assets/images/astronaut_moon_flag.jpg"
             alt="Astronaut walking on moon surface with American flag"
-            className="w-full h-full object-cover object-center opacity-35 mix-blend-screen scale-105 filter brightness-110 contrast-125 transition-transform duration-1000"
+            className="md:hidden w-full h-full object-cover object-center opacity-70 scale-105 filter brightness-105 contrast-110 transition-transform duration-1000"
           />
-          {/* Deep space cosmic vignettes to keep central emblem & title high-contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-[#020617]/90" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#020617_80%)]" />
+          {/* Balanced contrast scrim preserving astronaut & flag visibility while keeping central UI legible */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/85 via-[#020617]/30 to-[#020617]/75" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(2,6,23,0.45)_0%,rgba(2,6,23,0.18)_55%,rgba(2,6,23,0.72)_100%)]" />
         </div>
 
         {/* Animated Radial Energy Cones */}
         <div
           className={`absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[110px] transition-all duration-1000 ${
             activeMode === 'aurora'
-              ? 'bg-emerald-500/30'
+              ? 'bg-emerald-500/25'
               : activeMode === 'deepSpace'
-              ? 'bg-purple-600/30'
-              : 'bg-blue-600/35'
+              ? 'bg-purple-600/25'
+              : 'bg-blue-600/25'
           }`}
         />
         <div
           className={`absolute -bottom-32 -right-32 w-[30rem] h-[30rem] rounded-full blur-[130px] transition-all duration-1000 ${
             activeMode === 'aurora'
-              ? 'bg-teal-400/25'
+              ? 'bg-teal-400/20'
               : activeMode === 'deepSpace'
-              ? 'bg-rose-500/25'
-              : 'bg-cyan-400/30'
+              ? 'bg-rose-500/20'
+              : 'bg-cyan-400/25'
           }`}
         />
 
-        {/* Dynamic Light Rays like JioHotstar Intro */}
+        {/* Subtle Light Rays like JioHotstar Intro */}
         <div
-          className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.18)_0%,rgba(15,23,42,0.85)_60%,#020617_100%)] transition-opacity duration-700 ${
+          className={`absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.16)_0%,transparent_55%)] transition-opacity duration-700 ${
             animationStage === 'burst' ? 'opacity-100 scale-110' : 'opacity-60 scale-100'
           }`}
         />
 
         {/* Ambient Orbit Tracks */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-30">
-          <div className="w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] rounded-full border border-cyan-400/30 animate-[spin_24s_linear_infinite]" />
-          <div className="absolute w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] rounded-full border border-dashed border-blue-400/40 animate-[spin_16s_linear_infinite_reverse]" />
-          <div className="absolute w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] rounded-full border border-teal-300/30 animate-pulse" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-25">
+          <div className="w-[340px] h-[340px] sm:w-[500px] sm:h-[500px] rounded-full border border-cyan-400/35 animate-[spin_24s_linear_infinite]" />
+          <div className="absolute w-[240px] h-[240px] sm:w-[350px] sm:h-[350px] rounded-full border border-dashed border-blue-400/40 animate-[spin_16s_linear_infinite_reverse]" />
+          <div className="absolute w-[150px] h-[150px] sm:w-[210px] sm:h-[210px] rounded-full border border-teal-300/35 animate-pulse" />
         </div>
 
         {/* Interactive Click Ripples */}

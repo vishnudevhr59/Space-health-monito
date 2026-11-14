@@ -77,7 +77,7 @@ export const MissionControlTicker: React.FC<MissionControlTickerProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#020512] border-b border-cyan-500/20 px-2 sm:px-4 lg:px-6 py-1.5 flex items-center justify-between text-[10px] sm:text-[11px] font-mono tracking-wider text-slate-300 overflow-x-auto scrollbar-none whitespace-nowrap gap-2 sm:gap-4 shadow-inner select-none">
+    <div className="w-full bg-[#020512] border-b border-cyan-500/20 px-2 sm:px-4 lg:px-6 py-1.5 flex flex-wrap items-center justify-between text-[10px] sm:text-[11px] font-mono tracking-wider text-slate-300 overflow-hidden gap-x-3 gap-y-1.5 shadow-inner select-none">
       {/* Left: Real-time MET Clock */}
       <div className="flex items-center gap-2 shrink-0">
         <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shrink-0 shadow-[0_0_8px_#00E5FF]" />
@@ -88,10 +88,10 @@ export const MissionControlTicker: React.FC<MissionControlTickerProps> = ({
       </div>
 
       {/* Ground Station Lock Status (NASA MCC-H / NASA DSN GOLDSTONE) */}
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="flex items-center gap-1.5 min-w-0 max-w-full">
         <Compass className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-        <span className="text-slate-400 hidden sm:inline">GROUND LOCK:</span>
-        <span className="text-emerald-300 font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/30">
+        <span className="text-slate-400 hidden sm:inline shrink-0">GROUND LOCK:</span>
+        <span className="text-emerald-300 font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/30 truncate">
           [{groundStationName} ACTIVE] (EL: 52° / AZ: 188° / SNR: 38 dB)
         </span>
       </div>

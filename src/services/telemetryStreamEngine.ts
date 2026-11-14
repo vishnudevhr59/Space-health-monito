@@ -28,8 +28,13 @@ export interface TelemetryFrame {
 
 type FrameSubscriber = (frame: TelemetryFrame) => void;
 
+export type TelemetryTransportMode = 'WEBSOCKET_LIVE' | 'LOCAL_EDGE_STREAM';
+
 class TelemetryStreamEngine {
   private timerId: any = null;
+  private ws: WebSocket | null = null;
+  private reconnectTimer: any = null;
+  private transportMode: TelemetryTransportMode = 'LOCAL_EDGE_STREAM';
   private currentFrame: TelemetryFrame;
   private targetState: AnomalyInjectionState;
   private subscribers: Set<FrameSubscriber> = new Set();
@@ -57,6 +62,58 @@ class TelemetryStreamEngine {
     };
 
     this.startStreaming();
+    this.connectWebSocket();
+  }
+
+  public getTransportMode(): TelemetryTransportMode {
+    return this.transportMode;
+  }
+
+  private connectWebSocket() {
+    if (typeof window === 'undefined' || typeof WebSocket === 'undefined') return;
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) return;
+
+    try {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${proto}//${window.location.host}/ws/telemetry`;
+      const socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        this.transportMode = 'WEBSOCKET_LIVE';
+        socket.send(JSON.stringify({ type: 'telemetry:setTarget', payload: this.targetState }));
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg?.type === 'telemetry:frame' && msg.frame) {
+            this.currentFrame = msg.frame;
+            this.subscribers.forEach((sub) => sub({ ...this.currentFrame }));
+          }
+        } catch {
+          // Ignore malformed frame
+        }
+      };
+
+      socket.onerror = () => {
+        this.transportMode = 'LOCAL_EDGE_STREAM';
+      };
+
+      socket.onclose = () => {
+        this.transportMode = 'LOCAL_EDGE_STREAM';
+        this.ws = null;
+        if (!this.reconnectTimer) {
+          this.reconnectTimer = setTimeout(() => {
+            this.reconnectTimer = null;
+            this.connectWebSocket();
+          }, 8000);
+        }
+      };
+
+      this.ws = socket;
+    } catch {
+      this.transportMode = 'LOCAL_EDGE_STREAM';
+    }
   }
 
   public setTargetState(newState: AnomalyInjectionState) {
@@ -64,6 +121,13 @@ class TelemetryStreamEngine {
     const isNewWarning = newState.severity === 'WARNING' && this.targetState.anomalyName !== newState.anomalyName;
 
     this.targetState = { ...newState };
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      try {
+        this.ws.send(JSON.stringify({ type: 'telemetry:setTarget', payload: newState }));
+      } catch {
+        // Non-fatal
+      }
+    }
 
     // Log judge-injected anomaly into mission audit trail
     if (newState.isAnomalyActive) {
@@ -126,6 +190,10 @@ class TelemetryStreamEngine {
     if (this.timerId) return;
 
     this.timerId = setInterval(() => {
+      // Skip local synthetic step while server-authoritative WebSocket stream is actively feeding frames
+      if (this.transportMode === 'WEBSOCKET_LIVE' && this.ws?.readyState === WebSocket.OPEN) {
+        return;
+      }
       this.tick();
     }, 1000);
   }
@@ -134,6 +202,14 @@ class TelemetryStreamEngine {
     if (this.timerId) {
       clearInterval(this.timerId);
       this.timerId = null;
+    }
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
     }
   }
 

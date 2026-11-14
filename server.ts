@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
 import { spawn, exec } from 'child_process';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
@@ -2815,7 +2816,89 @@ app.post('/api/system/run-tests', (req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
-// VITE DEV SERVER INTEGRATION
+// LIVE ISS ORBITAL & NOAA SPACE WEATHER PROXY
+// ----------------------------------------------------
+let cachedOrbitalSnapshot: any = null;
+let cachedOrbitalAt = 0;
+
+app.get('/api/orbital/iss', async (req: Request, res: Response) => {
+  const now = Date.now();
+  if (cachedOrbitalSnapshot && now - cachedOrbitalAt < 5000) {
+    return res.json(cachedOrbitalSnapshot);
+  }
+
+  let lat: number | null = null;
+  let lon: number | null = null;
+  let alt = 418.4;
+  let vel = 27582;
+  let vis = 'daylight';
+  let source: 'BACKEND_RELAY' | 'ORBITAL_PROPAGATOR' = 'BACKEND_RELAY';
+
+  try {
+    const issRes = await fetch('https://api.wheretheiss.at/v1/satellites/25544', {
+      signal: AbortSignal.timeout(2200),
+    });
+    if (issRes.ok) {
+      const issJson: any = await issRes.json();
+      if (typeof issJson?.latitude === 'number' && typeof issJson?.longitude === 'number') {
+        lat = +issJson.latitude.toFixed(2);
+        lon = +issJson.longitude.toFixed(2);
+        alt = +Number(issJson.altitude || 418.4).toFixed(1);
+        vel = +Number(issJson.velocity || 27582).toFixed(0);
+        vis = issJson.visibility || 'daylight';
+      }
+    }
+  } catch {
+    // Fallback to deterministic Keplerian propagation
+  }
+
+  if (lat === null || lon === null) {
+    const t = now / 1000;
+    const phase = (t % 5574) / 5574;
+    const angle = phase * Math.PI * 2;
+    lat = +(Math.sin(angle) * 51.6).toFixed(2);
+    lon = +((((phase * 360) - 180 + 360) % 360) - 180).toFixed(2);
+    alt = +(418.4 + Math.cos(angle) * 2.1).toFixed(1);
+    vel = +(27582 + Math.sin(angle) * 28).toFixed(0);
+    vis = lat > 0 ? 'daylight' : 'eclipsed';
+    source = 'ORBITAL_PROPAGATOR';
+  }
+
+  let kpIndex = 2.3;
+  try {
+    const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json', {
+      signal: AbortSignal.timeout(1800),
+    });
+    if (kpRes.ok) {
+      const rows: any = await kpRes.json();
+      if (Array.isArray(rows) && rows.length > 1) {
+        const lastRow = rows[rows.length - 1];
+        const parsedKp = Number(Array.isArray(lastRow) ? lastRow[1] : undefined);
+        if (Number.isFinite(parsedKp)) kpIndex = +parsedKp.toFixed(1);
+      }
+    }
+  } catch {
+    // Use nominal quiet Kp baseline
+  }
+
+  cachedOrbitalSnapshot = {
+    name: 'ISS (ZARYA)',
+    latitude: lat,
+    longitude: lon,
+    altitudeKm: alt,
+    velocityKmh: vel,
+    visibility: vis,
+    kpIndex,
+    solarFluxStatus: kpIndex >= 5 ? 'STORM' : kpIndex >= 4 ? 'MODERATE' : 'QUIET',
+    source,
+    timestamp: new Date().toISOString(),
+  };
+  cachedOrbitalAt = now;
+  res.json(cachedOrbitalSnapshot);
+});
+
+// ----------------------------------------------------
+// VITE DEV SERVER INTEGRATION + WEBSOCKET TELEMETRY
 // ----------------------------------------------------
 async function startServer() {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -2833,8 +2916,112 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, () => {
-    console.log(`[SPACE HEALTH MONITO] Mission Control Server operational on port ${PORT}`);
+  const httpServer = http.createServer(app);
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws/telemetry' });
+
+  let wsTick = 0;
+  let wsTarget = {
+    heartRate: 64,
+    spo2: 98.4,
+    bodyTemperature: 36.6,
+    bloodPressure: { systolic: 114, diastolic: 72 },
+    hrv: 64,
+    respiratoryRate: 14,
+    cabinPressurePsi: 14.7,
+    cabinCo2MmHg: 2.2,
+    vestibularConflictScore: 1.4,
+    severity: 'NOMINAL' as 'NOMINAL' | 'WARNING' | 'CRITICAL',
+    anomalyName: 'Nominal Operations',
+  };
+  let wsFrame = {
+    timestamp: new Date().toISOString(),
+    heartRate: 64,
+    spo2: 98.4,
+    bodyTemperature: 36.6,
+    systolicBP: 114,
+    diastolicBP: 72,
+    hrv: 64,
+    respiratoryRate: 14,
+    cabinPressurePsi: 14.7,
+    cabinCo2MmHg: 2.2,
+    vestibularConflictScore: 1.4,
+    eclssOgaPercent: 21.0,
+    trishRecoveryScore: 86,
+    severity: 'NOMINAL' as 'NOMINAL' | 'WARNING' | 'CRITICAL',
+    anomalyName: 'Nominal Operations',
+  };
+
+  wss.on('connection', (socket) => {
+    socket.send(JSON.stringify({ type: 'telemetry:frame', frame: wsFrame }));
+
+    socket.on('message', (raw) => {
+      try {
+        const msg = JSON.parse(raw.toString());
+        if (msg?.type === 'telemetry:setTarget' && msg.payload) {
+          wsTarget = {
+            ...wsTarget,
+            ...msg.payload,
+            bloodPressure: msg.payload.bloodPressure || wsTarget.bloodPressure,
+          };
+        }
+      } catch {
+        // Ignore invalid message
+      }
+    });
+  });
+
+  setInterval(() => {
+    if (wss.clients.size === 0) return;
+    wsTick++;
+    const drift = (cur: number, tgt: number, rate: number) =>
+      Math.abs(tgt - cur) < 0.1 ? tgt : cur + (tgt - cur) * rate;
+
+    const hr = Math.round(drift(wsFrame.heartRate, wsTarget.heartRate, 0.35) + Math.sin(wsTick * 0.4) * 0.8);
+    const spo2 = +drift(wsFrame.spo2, wsTarget.spo2, 0.3).toFixed(1);
+    const temp = +(drift(wsFrame.bodyTemperature, wsTarget.bodyTemperature, 0.25) + Math.sin(wsTick * 0.1) * 0.02).toFixed(2);
+    const sys = Math.round(drift(wsFrame.systolicBP, wsTarget.bloodPressure.systolic, 0.35));
+    const dia = Math.round(drift(wsFrame.diastolicBP, wsTarget.bloodPressure.diastolic, 0.35));
+    const resp = Math.round(drift(wsFrame.respiratoryRate, wsTarget.respiratoryRate, 0.3) + Math.cos(wsTick * 0.3) * 0.3);
+    const press = +drift(wsFrame.cabinPressurePsi, wsTarget.cabinPressurePsi, 0.25).toFixed(1);
+    const co2 = +drift(wsFrame.cabinCo2MmHg, wsTarget.cabinCo2MmHg, 0.25).toFixed(1);
+    const vest = +drift(wsFrame.vestibularConflictScore, wsTarget.vestibularConflictScore, 0.3).toFixed(1);
+    const hrv = Math.round(drift(wsFrame.hrv, wsTarget.hrv, 0.3));
+
+    let severity: 'NOMINAL' | 'WARNING' | 'CRITICAL' = 'NOMINAL';
+    if (hr > 120 || spo2 < 90 || press < 12.0 || vest > 7.0 || wsTarget.severity === 'CRITICAL') {
+      severity = 'CRITICAL';
+    } else if (hr > 95 || spo2 < 95 || co2 > 3.5 || vest > 4.0 || wsTarget.severity === 'WARNING') {
+      severity = 'WARNING';
+    }
+
+    wsFrame = {
+      timestamp: new Date().toISOString(),
+      heartRate: hr,
+      spo2,
+      bodyTemperature: temp,
+      systolicBP: sys,
+      diastolicBP: dia,
+      hrv,
+      respiratoryRate: resp,
+      cabinPressurePsi: press,
+      cabinCo2MmHg: co2,
+      vestibularConflictScore: vest,
+      eclssOgaPercent: 21.0,
+      trishRecoveryScore: severity === 'NOMINAL' ? 86 : 58,
+      severity,
+      anomalyName: wsTarget.anomalyName,
+    };
+
+    const payload = JSON.stringify({ type: 'telemetry:frame', frame: wsFrame });
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(payload);
+      }
+    });
+  }, 1000);
+
+  httpServer.listen(PORT, () => {
+    console.log(`[SPACE HEALTH MONITO] Mission Control Server + WebSocket (/ws/telemetry) operational on port ${PORT}`);
   });
 }
 

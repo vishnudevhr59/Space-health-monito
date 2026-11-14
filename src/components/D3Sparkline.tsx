@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useId } from 'react';
+import React, { useMemo, useId } from 'react';
 import * as d3 from 'd3';
 
 export interface SparklinePoint {
@@ -39,20 +39,15 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
   thresholdCritical,
   className = '',
 }) => {
-  const svgRef = useRef<SVGSVGElement | null>(null);
-  const pathRef = useRef<SVGPathElement | null>(null);
-  const areaRef = useRef<SVGPathElement | null>(null);
-  const dotRef = useRef<SVGCircleElement | null>(null);
-  const pulseRef = useRef<SVGCircleElement | null>(null);
-
   const uniqueId = useId().replace(/:/g, '');
   const gradientId = `spark-grad-${uniqueId}`;
   const areaGradId = `spark-area-${uniqueId}`;
 
   // Extract raw numerical values safely, filtering out NaN or undefined
-  const values: number[] = data
+  const safeData = Array.isArray(data) ? data : [];
+  const values: number[] = safeData
     .map((d) => (typeof d === 'number' ? d : d?.value))
-    .filter((v): v is number => typeof v === 'number' && !isNaN(v));
+    .filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
   const latestValue = values.length > 0 ? values[values.length - 1] : 0;
 
   // Determine dynamic color based on thresholds if provided
@@ -67,18 +62,20 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
   const innerWidth = Math.max(width - margin.left - margin.right, 40);
   const innerHeight = Math.max(height - margin.top - margin.bottom, 20);
 
-  useEffect(() => {
-    if (!svgRef.current || values.length === 0) return;
+  const { linePath, areaPath, lastX, lastY } = useMemo(() => {
+    if (values.length === 0) {
+      return { linePath: '', areaPath: '', lastX: margin.left, lastY: margin.top + innerHeight / 2 };
+    }
 
-    // Compute scales
-    const extent = d3.extent(values) as [number, number];
+    const plotValues = values.length === 1 ? [values[0], values[0]] : values;
+    const extent = d3.extent(plotValues) as [number, number];
     const dataMin = minDomain !== undefined ? minDomain : (extent[0] ?? 0);
     const dataMax = maxDomain !== undefined ? maxDomain : (extent[1] ?? 100);
     const domainPadding = (dataMax - dataMin) * 0.1 || 1;
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, Math.max(values.length - 1, 1)])
+      .domain([0, Math.max(plotValues.length - 1, 1)])
       .range([margin.left, margin.left + innerWidth]);
 
     const yScale = d3
@@ -86,7 +83,6 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
       .domain([dataMin - domainPadding, dataMax + domainPadding])
       .range([margin.top + innerHeight, margin.top]);
 
-    // Generator for curve
     const lineGenerator = d3
       .line<number>()
       .x((_, i) => xScale(i))
@@ -100,57 +96,19 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
       .y1((d) => yScale(d))
       .curve(d3.curveMonotoneX);
 
-    const linePath = lineGenerator(values) || '';
-    const areaPath = areaGenerator(values) || '';
-
-    // Update path attributes smoothly
-    if (pathRef.current) {
-      d3.select(pathRef.current)
-        .transition()
-        .duration(350)
-        .ease(d3.easeCubicOut)
-        .attr('d', linePath)
-        .attr('stroke', strokeColor);
-    }
-
-    if (areaRef.current && showArea) {
-      d3.select(areaRef.current)
-        .transition()
-        .duration(350)
-        .ease(d3.easeCubicOut)
-        .attr('d', areaPath);
-    }
-
-    // Position latest glowing point
-    const lastIdx = values.length - 1;
-    const lastX = xScale(lastIdx);
-    const lastY = yScale(values[lastIdx]);
-
-    if (dotRef.current && showLatestPoint) {
-      d3.select(dotRef.current)
-        .transition()
-        .duration(350)
-        .ease(d3.easeCubicOut)
-        .attr('cx', lastX)
-        .attr('cy', lastY)
-        .attr('fill', strokeColor);
-    }
-
-    if (pulseRef.current && showLatestPoint) {
-      d3.select(pulseRef.current)
-        .transition()
-        .duration(350)
-        .ease(d3.easeCubicOut)
-        .attr('cx', lastX)
-        .attr('cy', lastY)
-        .attr('stroke', strokeColor);
-    }
-  }, [values, width, height, strokeColor, minDomain, maxDomain, showArea, showLatestPoint]);
+    const lastIdx = plotValues.length - 1;
+    return {
+      linePath: lineGenerator(plotValues) || '',
+      areaPath: areaGenerator(plotValues) || '',
+      lastX: xScale(lastIdx),
+      lastY: yScale(plotValues[lastIdx]),
+    };
+  }, [values, innerWidth, innerHeight, margin.left, margin.top, minDomain, maxDomain]);
 
   return (
-    <div className={`relative flex flex-col select-none overflow-hidden ${className}`}>
+    <div className={`relative flex flex-col select-none overflow-hidden w-full min-w-0 ${className}`}>
       {label && (
-        <div className="flex items-center justify-between text-[11px] font-mono mb-1">
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-mono mb-1">
           <span className="text-slate-400 font-bold uppercase tracking-wider">{label}</span>
           <span className="font-extrabold tabular-nums" style={{ color: strokeColor }}>
             {typeof latestValue === 'number' && Number.isInteger(latestValue)
@@ -162,20 +120,17 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
       )}
 
       <svg
-        ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-auto overflow-visible transform-gpu will-change-transform"
+        className="w-full h-auto overflow-hidden block"
         style={{ maxHeight: height }}
       >
         <defs>
-          {/* Linear gradient along line stroke */}
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={strokeColor} stopOpacity={0.4} />
             <stop offset="70%" stopColor={strokeColor} stopOpacity={0.85} />
             <stop offset="100%" stopColor={strokeColor} stopOpacity={1} />
           </linearGradient>
 
-          {/* Area gradient fill below curve */}
           <linearGradient id={areaGradId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor={strokeColor} stopOpacity={0.25} />
             <stop offset="85%" stopColor={strokeColor} stopOpacity={0.03} />
@@ -183,7 +138,6 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
           </linearGradient>
         </defs>
 
-        {/* Tactical subtle grid lines */}
         {showGrid && (
           <g className="opacity-20 stroke-slate-700" strokeDasharray="2,3">
             <line
@@ -203,39 +157,42 @@ export const D3Sparkline: React.FC<D3SparklineProps> = ({
           </g>
         )}
 
-        {/* Gradient Area Fill */}
-        {showArea && (
+        {showArea && areaPath && (
           <path
-            ref={areaRef}
+            d={areaPath}
             fill={`url(#${areaGradId})`}
             className="pointer-events-none transition-all duration-300"
           />
         )}
 
-        {/* Sparkline Curve */}
-        <path
-          ref={pathRef}
-          fill="none"
-          stroke={`url(#${gradientId})`}
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="drop-shadow-[0_0_8px_rgba(0,229,255,0.4)] transition-all duration-300"
-        />
+        {linePath && (
+          <path
+            d={linePath}
+            fill="none"
+            stroke={`url(#${gradientId})`}
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="drop-shadow-[0_0_8px_rgba(0,229,255,0.4)] transition-all duration-300"
+          />
+        )}
 
-        {/* Animated Pulsing Dot for Latest Point */}
         {showLatestPoint && values.length > 0 && (
           <g>
             <circle
-              ref={pulseRef}
+              cx={lastX}
+              cy={lastY}
               r="6.5"
               fill="none"
+              stroke={strokeColor}
               strokeWidth="1.5"
               className="animate-ping opacity-75"
             />
             <circle
-              ref={dotRef}
+              cx={lastX}
+              cy={lastY}
               r="3.5"
+              fill={strokeColor}
               className="drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]"
             />
           </g>

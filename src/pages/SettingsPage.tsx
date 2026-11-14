@@ -5,13 +5,9 @@ import {
   User as UserIcon,
   ShieldCheck,
   Bell,
-  Gauge,
   Save,
   CheckCircle2,
-  RefreshCw,
   HelpCircle,
-  BookOpen,
-  ExternalLink,
 } from 'lucide-react';
 
 interface SettingsPageProps {
@@ -49,7 +45,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 overflow-x-hidden">
       
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
@@ -290,108 +286,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </p>
             </details>
           ))}
-        </div>
-      </div>
-
-      {/* SCIENTIFIC SOURCES & NASA OPEN SCIENCE REPOSITORY (Strictly located in SettingsPage) */}
-      <div className="bg-[#101B30]/90 backdrop-blur-md border border-[#00E5FF]/20 rounded-2xl p-6 sm:p-7 shadow-[0_4px_24px_rgba(0,229,255,0.03)] space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center gap-2 text-base font-bold text-white tracking-wide">
-            <BookOpen className="w-5 h-5 text-[#21D4A5]" />
-            <span>Official NASA Scientific Sources & Data Provenance</span>
-          </div>
-          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-800">
-            PEER-REVIEWED STANDARDS
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <div className="p-4 rounded-xl bg-[#0B1224] border border-slate-800 hover:border-cyan-500/40 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white text-sm">NASA Human Research Program (HRP)</span>
-              <a
-                href="https://www.nasa.gov/hrp/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                <span>HRP.gov</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <p className="text-slate-400 text-xs font-sans leading-relaxed">
-              Provides the evidence books and risk mitigation protocols for the 5 hazards of human spaceflight: radiation, isolation, distance, gravity fields, and closed environments.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#0B1224] border border-slate-800 hover:border-cyan-500/40 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white text-sm">NASA Open Science Data Repository (OSDR)</span>
-              <a
-                href="https://osdr.nasa.gov/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                <span>OSDR.gov</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <p className="text-slate-400 text-xs font-sans leading-relaxed">
-              Hosts spaceflight omics, phenotypic datasets, and astronaut physiological baseline profiles calibrated from Apollo, Skylab, Shuttle, and ISS expeditions.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#0B1224] border border-slate-800 hover:border-cyan-500/40 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white text-sm">NASA GeneLab Multi-Omics</span>
-              <a
-                href="https://genelab.nasa.gov/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                <span>GeneLab</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <p className="text-slate-400 text-xs font-sans leading-relaxed">
-              Open-access multi-omics repository characterizing telomere dynamics, DNA damage response, mitochondrial stress, and immune system alterations in long-duration spaceflight.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#0B1224] border border-slate-800 hover:border-cyan-500/40 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white text-sm">Human Research Roadmap (HRR)</span>
-              <a
-                href="https://humanresearchroadmap.nasa.gov/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                <span>HRR.gov</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <p className="text-slate-400 text-xs font-sans leading-relaxed">
-              Defines gap milestones, clinical risk thresholds, and medical countermeasure certification standards for Artemis lunar missions and future human Mars exploration.
-            </p>
-          </div>
-        </div>
-
-        {/* SCIENTIFIC INTEGRITY & BIO-MATHEMATICAL NOTICE */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs font-sans space-y-1.5">
-          <div className="font-bold text-slate-200 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Scientific Integrity & Operational Decision Support Notice</span>
-          </div>
-          <p className="text-slate-400 leading-relaxed text-[11px]">
-            All displayed astronaut biometric measurements and streaming telemetry are realistic models calibrated directly against NASA physiological literature and flight standards (NASA-STD-3001 Vol 1). This application does not access private protected health information and is designed exclusively as an operational clinical decision-support tool.
-          </p>
-          <div className="pt-2 flex flex-col sm:flex-row justify-between text-[10px] font-mono text-slate-500 border-t border-slate-800">
-            <span>NASA Space Apps Challenge 2026 Submission</span>
-            <span>SPACE HEALTH MONITO &bull; Monitoring Human Health Beyond Earth</span>
-          </div>
         </div>
       </div>
 

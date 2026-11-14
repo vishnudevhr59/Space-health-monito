@@ -15,8 +15,12 @@ class VoiceAlertService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('shm_voice_alerts_enabled');
-      this.isEnabled = stored !== null ? stored === 'true' : true;
+      try {
+        const stored = localStorage.getItem('shm_voice_alerts_enabled');
+        this.isEnabled = stored !== null ? stored === 'true' : true;
+      } catch {
+        this.isEnabled = true;
+      }
 
       if ('speechSynthesis' in window) {
         // Initialize voice list
@@ -45,7 +49,11 @@ class VoiceAlertService {
   public toggleVoiceAlerts(): boolean {
     this.isEnabled = !this.isEnabled;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('shm_voice_alerts_enabled', String(this.isEnabled));
+      try {
+        localStorage.setItem('shm_voice_alerts_enabled', String(this.isEnabled));
+      } catch {
+        // Ignore storage errors in restricted contexts
+      }
       if (!this.isEnabled && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -57,7 +65,11 @@ class VoiceAlertService {
   public setVoiceEnabled(enabled: boolean): void {
     this.isEnabled = enabled;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('shm_voice_alerts_enabled', String(this.isEnabled));
+      try {
+        localStorage.setItem('shm_voice_alerts_enabled', String(this.isEnabled));
+      } catch {
+        // Ignore storage errors in restricted contexts
+      }
       if (!this.isEnabled && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }

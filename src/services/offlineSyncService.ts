@@ -87,7 +87,11 @@ class OfflineSyncService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      this.lastSyncTime = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
+      try {
+        this.lastSyncTime = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
+      } catch {
+        this.lastSyncTime = null;
+      }
       this.initLedger();
 
       // Listen for window online/offline events

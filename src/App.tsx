@@ -14,6 +14,7 @@ import { BottomNavBar } from './components/BottomNavBar';
 import { Sidebar } from './components/Sidebar';
 import { AuthModal } from './components/AuthModal';
 import { DataProvenanceModal } from './components/DataProvenanceModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { offlineSyncService } from './services/offlineSyncService';
 
 // Pages
@@ -140,25 +141,25 @@ export default function App() {
         alertsRes,
         researchRes,
       ] = await Promise.all([
-        fetch(`/api/telemetry/${astronaut.id}`).then((r) => r.json()).catch(() => ({ history: offlineSyncService.getCachedTelemetry() })),
-        fetch(`/api/sleep/${astronaut.id}`).then((r) => r.json()).catch(() => []),
-        fetch(`/api/activity/${astronaut.id}`).then((r) => r.json()).catch(() => []),
-        fetch(`/api/radiation/${astronaut.id}`).then((r) => r.json()).catch(() => ({ records: [] })),
-        fetch('/api/alerts').then((r) => r.json()).catch(() => []),
-        fetch('/api/research').then((r) => r.json()).catch(() => []),
+        fetch(`/api/telemetry/${astronaut.id}`).then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => ({ history: offlineSyncService.getCachedTelemetry() })),
+        fetch(`/api/sleep/${astronaut.id}`).then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => []),
+        fetch(`/api/activity/${astronaut.id}`).then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => []),
+        fetch(`/api/radiation/${astronaut.id}`).then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => ({ records: [] })),
+        fetch('/api/alerts').then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => []),
+        fetch('/api/research').then((r) => (r.ok ? r.json() : Promise.reject(r.status))).catch(() => []),
       ]);
 
-      if (telemetryRes.history && telemetryRes.history.length > 0) {
+      if (telemetryRes && Array.isArray(telemetryRes.history) && telemetryRes.history.length > 0) {
         setTelemetry(telemetryRes.history);
         offlineSyncService.cacheTelemetry(telemetryRes.history);
       } else {
         const cached = offlineSyncService.getCachedTelemetry();
-        if (cached.length > 0) setTelemetry(cached);
+        if (Array.isArray(cached) && cached.length > 0) setTelemetry(cached);
       }
 
       if (Array.isArray(sleepRes)) setSleepRecords(sleepRes);
       if (Array.isArray(activityRes)) setActivityRecords(activityRes);
-      if (radRes.records) setRadiation(radRes.records);
+      if (radRes && Array.isArray(radRes.records)) setRadiation(radRes.records);
       if (Array.isArray(alertsRes)) setAlerts(alertsRes);
       if (Array.isArray(researchRes)) setResearchList(researchRes);
     } catch (err) {
@@ -357,6 +358,11 @@ export default function App() {
       {/* ROW 5: MAIN VIEWPORT STAGE */}
       <div className="flex-1 flex relative w-full overflow-x-hidden pb-24 sm:pb-28">
         <main className="w-full flex-1 min-w-0 transition-all duration-300">
+          <ErrorBoundary
+            key={currentTab}
+            fallbackTitle={`Subsystem Recovery (${currentTab.toUpperCase()})`}
+            onReset={() => setCurrentTab('dashboard')}
+          >
           {/* PAGE 1: LANDING PAGE */}
           {currentTab === 'landing' && (
             <LandingPage
@@ -495,6 +501,7 @@ export default function App() {
           {currentTab === 'system-health' && (
             <SystemHealthPage />
           )}
+          </ErrorBoundary>
         </main>
       </div>
 
